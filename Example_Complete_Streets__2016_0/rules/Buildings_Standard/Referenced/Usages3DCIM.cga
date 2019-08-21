@@ -1,0 +1,138 @@
+/**
+ * File:    Usages.cga
+ * Created: 20 Apr 2014 21:53:37 GMT
+ * Author:  chri7180
+ */
+
+version "2015.0"
+
+# Usages from 3DCIM.
+# This file can be customized per locale.
+
+
+#@Range("Assembly","Agricultural","Educational","Industrial","Mercantile","Office","Public","Residential","Service","Storage","Transport","Utility","Other","Unknown")
+/*
+Assembly
+Agricultural
+Educational
+Industrial
+Mercantile
+Office
+Public
+Residential
+Service
+Storage
+Transport
+Utility
+Other
+Unknown
+*/
+
+ 
+# 3DCIM usages:
+# For each use, which color is used? 
+getUsageColor(usage) = 
+	case usage == "Assembly": "#2F4F4F"
+	case usage == "Agricultural": "#228B22"
+	case usage == "Educational": "#008DFF"
+	case usage == "Industrial": "#A020F0"
+	case usage == "Mercantile": "#FF0000"
+	case usage == "Office": "#0000FF"
+	case usage == "Public": "#00CDFF"
+	case usage == "Residential": "#FFFF00"
+	case usage == "Service": "#9565ef"
+	case usage == "Storage": "#D75DEF"
+	case usage == "Transport": "#BEBEBE"
+	case usage == "Utility": "#636363"
+	case usage == "Other": "#FFFFFF"
+	case usage == "Unknown": "#FFFFFF"
+	else: "#FFFFFF"
+
+# 3DCIM usages:
+# For each use, which texture folder is used? 
+getUsageFacadeTextureFolder(usage) = 
+	case usage == "Assembly": "office"
+	case usage == "Agricultural": "industrial"
+	case usage == "Educational": "office"
+	case usage == "Industrial": "industrial"
+	case usage == "Mercantile": "retail"
+	case usage == "Office": "office"
+	case usage == "Public": "office"
+	case usage == "Residential": "residential"
+	case usage == "Service": "industrial"
+	case usage == "Storage": "industrial"
+	case usage == "Transport": "industrial"
+	case usage == "Utility": "industrial"
+	case usage == "Other": "office"
+	case usage == "Unknown": "office"
+	else: "office"
+
+
+#################################################
+#@Range("DEFAULT","BUSINESS INDUSTRY","BUSINESS PARK","CIVIC & COMMUNITY INSTITUTION","COMMERCIAL","COMMERCIAL & RESIDENTIAL","EDUCATIONAL INSTITUTION","HEALTH & MEDICAL CARE","MASS RAPID TRANSIT","PARK","PLACE OF WORSHIP","RESIDENTIAL","RESIDENTIAL WITH COMMERCIAL AT 1ST STOREY","ROAD","SPECIAL USE","WHITE SITE")
+getZoningFacadeTextureFolder(zoning)= 
+	case zoning == "DEFAULT" : "OFFICE_CIVIC"
+	case zoning == "BUSINESS INDUSTRY": "UTILITY"
+	case zoning == "BUSINESS PARK": "WHITESITE"
+	case zoning == "CIVIC & COMMUNITY INSTITUTION": "OFFICE_CIVIC"
+	case zoning == "COMMERCIAL": "COMMERCIAL"
+	case zoning == "COMMERCIAL & RESIDENTIAL": "COMMERCIAL"
+	case zoning == "DEFAULT": "COMMERCIAL"
+	case zoning == "EDUCATIONAL INSTITUTION": "OFFICE_CIVIC"
+	case zoning == "HEALTH & MEDICAL CARE": "OFFICE_CIVIC"
+	case zoning == "MASS RAPID TRANSIT": "UTILITY"
+	case zoning == "PARK": "UTILITY"
+	case zoning == "PLACE OF WORSHIP": "UTILITY"
+	case zoning == "RESIDENTIAL": "RESIDENTIAL"
+	case zoning == "RESIDENTIAL WITH COMMERCIAL AT 1ST STOREY": "RESIDENTIAL_W_1COM"
+	case zoning == "ROAD": "UTILITY"
+	case zoning == "SPECIAL USE": "WHITESITE"
+	case zoning == "WHITE SITE": "WHITESITE"
+	else: "OFFICE_CIVIC"
+
+########
+## FROM ZONING STANDARDS, EXCEL-DRIVEN
+
+getZoneData(zone) = 
+    case zone =="BUSINESS INDUSTRY": "213;173;199;#D5ADC7;Business Industry;Misc;1;;;;;;;;;"
+    case zone =="BUSINESS PARK - WHITE": "0;122;160;#007AA0;Business Park, White Site;Commercial;0.2;Parking;0.2;Office;0.6;;;;;"
+    case zone =="CEMETERY": "158;137;0;#9E8900;Cemetery;Misc;1;;;;;;;;;"
+    case zone =="CIVIC & COMMUNITY INSTITUTION": "204;0;33;#CC0021;Civic & Community Institution;Misc;1;;;;;;;;;"
+    case zone =="COMMERCIAL": "33;81;153;#215199;Commercial;Commercial;1;;;;;;;;;"
+    case zone =="COMMERCIAL & RESIDENTIAL": "53;173;229;#35ADE5;Commercial & Residential;Commercial;0.4;Residential;0.6;;;;;;;"
+    case zone =="EDUCATIONAL INSTITUTION": "242;242;193;#F2F2C1;Educational Institution;Misc;1;;;;;;;;;"
+    case zone =="HEALTH & MEDICAL CARE": "204;0;33;#CC0021;Health & Medical Care;Misc;1;;;;;;;;;"
+    case zone =="LIGHT RAPID TRANSIT": "255;255;255;#FFFFFF;Light Rapid Transit;Misc;1;;;;;;;;;"
+    case zone =="MASS RAPID TRANSIT": "255;255;255;#FFFFFF;Mass Rapid Transit;Misc;1;;;;;;;;;"
+    case zone =="OPEN SPACE": "170;178;0;#AAB200;Open Space;Misc;1;;;;;;;;;"
+    case zone =="PARK": "0;163;58;#00A33A;Park;Misc;1;;;;;;;;;"
+    case zone =="PARKING - MCSP": "255;255;255;#FFFFFF;Parking - MSCP;Misc;1;;;;;;;;;"
+    case zone =="PLACE OF WORSHIP": "204;0;33;#CC0021;Place of worship;Misc;1;;;;;;;;;"
+    case zone =="PORT / AIRPORT": "209;209;209;#D1D1D1;Port or Airport;Misc;1;;;;;;;;;"
+    case zone =="LANDED HOUSING": "244;186;130;#F4BA82;Landed Housing;Misc;1;;;;;;;;;"
+    case zone =="RESIDENTIAL": "244;186;130;#F4BA82;Residential;Residential;1;;;;;;;;;"
+    case zone =="RESIDENTIAL WITH COMMERCIAL AT 1ST STOREY": "232;130;132;#E88284;Residential with Commerical at 1st Story;Commercial;0.01;Residential;0.99;;;;;;;"
+    case zone =="HOTEL": "165;158;198;#A59EC6;Hotel;Hotel;1;;;;;;;;;"
+    case zone =="ROAD": "255;255;255;#FFFFFF;Road;Misc;1;;;;;;;;;"
+    case zone =="SPECIAL USE": "79;102;2;#4F6602;Special Use;Misc;1;;;;;;;;;"
+    case zone =="SPORTS & RECREATION": "163;211;155;#A3D39B;Sports and Recreation;Misc;1;;;;;;;;;"
+    case zone =="TRANSPORT FACILITIES": "147;153;155;#93999B;Transportation Facility;Misc;1;;;;;;;;;"
+    case zone =="UTILITY": "147;153;155;#93999B;Utility;Misc;1;;;;;;;;;"
+    case zone =="WHITE": "245;242;242;#F5F2F2;White Site;Commercial;0.2;Parking;0.2;Office;0.2;Hotel;0.2;Residential;0.2;"
+    else: ""
+
+getZoneData_Color_R(zone) = float(listItem(getZoneData(zone),0))
+getZoneData_Color_G(zone) = float(listItem(getZoneData(zone),1))
+getZoneData_Color_B(zone) = float(listItem(getZoneData(zone),2))
+getZoneData_Color_Hex(zone) = listItem(getZoneData(zone),3)
+getZoneData_Friendly_Name(zone) = listItem(getZoneData(zone),4)
+getZoneData_Use_1(zone) = listItem(getZoneData(zone),5)
+getZoneData_Use_1_Percent(zone) = float(listItem(getZoneData(zone),6))
+getZoneData_Use_2(zone) = listItem(getZoneData(zone),7)
+getZoneData_Use_2_Percent(zone) = float(listItem(getZoneData(zone),8))
+getZoneData_Use_3(zone) = listItem(getZoneData(zone),9)
+getZoneData_Use_3_Percent(zone) = float(listItem(getZoneData(zone),10))
+getZoneData_Use_4(zone) = listItem(getZoneData(zone),11)
+getZoneData_Use_4_Percent(zone) = float(listItem(getZoneData(zone),12))
+getZoneData_Use_5(zone) = listItem(getZoneData(zone),13)
+getZoneData_Use_5_Percent(zone) = float(listItem(getZoneData(zone),14))

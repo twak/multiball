@@ -1,0 +1,142 @@
+/**
+ * Author:  andi, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+@Range("gable1","gable2","hip1","hip2")
+attr roofStyle = "gable1"
+
+## control from master
+@Range(2.5,5.5)
+attr tilespacing = 3
+windowspacing = tilespacing/2
+
+
+attr rooftex = fileRandom("assets/roof/rooftex_*.jpg")
+const dirttex = "assets/dirt/dirt.jpg"
+
+
+Roof-->
+	case roofStyle == "hip1" : roofHip(30,1) Chimney comp(f){top : Rooftex | bottom : Wall}
+	case roofStyle =="gable1" : roofGable(40,0) Chimney comp(f){bottom : Wall | vertical : WallWExt | top : Rooftex}
+	case roofStyle =="gable2" : roofGable(20,1) Chimney comp(f){bottom : Wall | vertical : Wall | top : Rooftex}
+	else : 
+		roofGable(65,0.3,0) 
+		split(y){3 : comp(f){bottom : reverseNormals Wall Dormers | horizontal : Roof2 | vertical : Wall | all : Rooftex} }
+		
+
+WallWExt --> split(x){~1.1 : PedimentExt}*
+	
+PedimentExt -->
+	s('1,scope.sy+0.2,0.5) t(0,0,-0.5)
+	primitiveCube()	comp(f){top : PedimentExtRoof | side : Wall}
+
+PedimentExtRoof -->
+	roofGable(20,.1,0) comp(f){top : Rooftex | side : Wall}
+	
+Roof2-->
+	roofGable(20) 
+	Chimney
+	comp(f){top : Rooftex | side : Rooftex} //RoofExtr 
+
+RoofExtr--> extrude(world.up,0.4) comp(f){all:Rooftex}
+
+Rooftex-->	
+	setupProjection(0, scope.xy,5.74, 6.4, 1)
+	texture(rooftex)  
+	projectUV(0)
+	setupProjection(2, world.xz,16, 16, -1)
+	set(material.dirtmap, dirttex)  
+	projectUV(2)
+			
+
+Dormers -->
+	set(trim.vertical,false)
+	set(trim.horizontal,false)
+	
+	comp(e){all :  r(90,0,0) s('1,2.2,2) primitiveCube() DormSplit}
+
+DormSplit -->
+	
+	40% : split(x){~rand(1,2) : NIL | ~1: split(x){~2*windowspacing : Dormer}* | ~rand(1) : NIL}
+	40% : split(x){~rand(1) : NIL | ~1 : split(x){~2*windowspacing : Dormer}* | ~rand(1,2) : NIL}
+	else : split(x){~2*windowspacing : Dormer}*
+	
+Dormer -->
+	case scope.sx < 2 : NIL
+	else :
+	primitiveCube() 
+	s('0.5,'1,'1) center(x) t(0,0.2,-0.2) 
+	comp(f){back : WindowTile | top : Dormroof | side : Wall}
+
+Dormroof -->
+	roofHip(20,0.2) comp(f){top : Rooftex}
+
+chimneySplitHeight =
+	50%:
+		1.3
+	else:
+		rand(1.6,1.8)
+	
+Chimney -->
+	comp(e){ridge : RidgeChimney}
+	split(y){~1: NIL | chimneySplitHeight: t(0,-.2,0) comp(f){bottom: reverseNormals ChimneyBase}}
+
+
+ChimneyBase -->
+	scatter(surface,geometry.area/200,uniform) { PutChimney }
+
+PutChimney -->
+	set(trim.vertical, false)
+	s(0,rand(2,3),0)
+	i(fileRandom("assets/roof/chimneys/*.obj"))
+	texture(fileRandom("assets/roof/chimneys/*.png"))
+	Chimney.
+
+
+
+
+
+RidgeChimney -->
+	case scope.sx < 7 : NIL
+	else :
+	set(trim.vertical, false)
+	t('rand(0.2,0.8),0,-0.6)
+	r(90,0,0)
+	s(0,rand(2,3),0)
+	i(fileRandom("assets/roof/chimneys/*.obj"))
+	texture(fileRandom("assets/roof/chimneys/*.png"))
+	Chimney.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

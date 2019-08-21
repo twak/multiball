@@ -1,0 +1,228 @@
+/**
+ * Author:  Christian
+ */
+
+version "2013.1"
+
+###########################################
+#
+#			ASSETS
+#
+###########################################
+
+@Range(grey=1,red=2,white=3)
+attr design = 33% : 1  33% : 2 else : 3
+
+###NEUE ASSETS###
+const win1=
+	"tiles/altstadthaus/win1.obj"
+
+//	case design == 1 : "tiles/altstadthaus/win1.obj"
+//	case design == 2 : "tiles/altstadthaus/win2.obj"
+//	else : "tiles/altstadthaus/win3.obj"
+
+const wintex = 
+	case design == 1 : "tiles/altstadthaus/tex_ornate_win1.jpg"
+	case design == 2 : "tiles/altstadthaus/tex_ornate_win2.jpg"
+	else : "tiles/altstadthaus/tex_ornate_win3.jpg"
+	
+const wallTex = fileRandom("assets/wall/wall*.jpg")
+
+	
+const pillar=
+	50% :  "pillar/pillar_round1.obj"
+	else : "pillar/saeule_ornate.obj"
+	
+const pillar2="pillar/saeule_ornate2.obj"
+const door="tiles/altstadthaus/door.obj"
+const win_small="tiles/altstadthaus/win_small.obj"
+
+const schauF1="tiles/altstadthaus/shop_rec1.obj"
+const schauF2="tiles/altstadthaus/shop_round1.obj"
+
+
+###########################################
+#
+#			ATTRIBUTE
+#
+###########################################
+
+#
+@Range(16,24)
+attr buildingHeight = rand(16,24)
+@Range(2.5,4.5)
+attr floorheight = 3.5
+@Range(4,6)
+attr firstFloorheight=4.9
+@Range(3,5)
+attr tilespacing=4
+#Fenster
+const windowspacing=5
+
+####
+@Range(0,2)
+attr Balkenbreite=1.2
+@Range(0,1)
+attr ledgeHeight=0.3
+
+
+##########################################
+ 
+ 
+attr adaptFootprint = scope.sx > 10 && scope.sz > 10
+
+LotInner -->
+	Lot
+
+Lot-->
+	case  adaptFootprint : mirrorScope(p(0.5), false,false) shapeL(10,10){shape : Footprint | remainder : GroundFilled}
+	else : Footprint
+ 
+ 
+Footprint--> 
+	case geometry.area < 20 : Ground
+	else : 
+	Ground
+	offset(-1, inside)
+   	extrude(buildingHeight)
+	setupProjection(0, scope.xy, 5, 5,-1)
+	comp(f){side : Facade | top : Roof}
+
+
+
+
+
+		
+Facade--> split(y){
+				firstFloorheight : Erdgeschoss
+				| ledgeHeight: CreateLedge(0)
+				| ~1 : ObereStockwerke(1)
+				| ledgeHeight: CreateLedge(1)
+				| 3: ObereStockwerke(2)
+				| ledgeHeight: CreateLedge(1)
+				}
+				
+Erdgeschoss-->split(x){
+					//Balkenbreite/2: Balken
+					{~tilespacing: Tile(0,split.index)}*
+					|Balkenbreite: Balken(0)
+				 }
+				
+//1-> mittlere Fenster, 2-> obere Fenster
+ObereStockwerke(top)-->
+	case scope.sx < 4 : Balken(1) 
+	else :	split(x){
+				//Balkenbreite: Balken(1) |
+				{~tilespacing: Tile(top,0)}*
+				|Balkenbreite: Balken(1)
+			 }
+
+//Topfloor=0 -> erdgeschoss, 1->mitte, 2-> ganz oben
+Tile(topfloor,index)-->
+
+case topfloor==1:
+			split(x){
+
+					Balkenbreite: Balken(1) |
+					{~windowspacing : Fensterreihe}*
+					//| {Balkenbreite/2: Balken}
+
+				 }
+				 
+//Setzt kleine Fenster ganz oben
+case topfloor==2:
+				split(x){
+
+					{ Balkenbreite: Balken(1) |
+					 ~windowspacing : FensterSmall}*
+					//| {Balkenbreite/2: Balken}
+
+				 }
+
+
+else:		split(x){
+
+					Balkenbreite: Balken(0)
+					| {~tilespacing : Bodenreihe(index)}*
+					//| {Balkenbreite/2: Balken}
+
+				 }
+
+const ledge = "pillar/ledge.obj"
+				 
+CreateLedge(topLedge)--> case topLedge==1: s('1.5, '1, 0.4) center(x) i(ledge) 
+						 else:  s('1.5, '1, 0.8) center(x) i(ledge) 
+
+
+
+
+
+
+Fensterreihe-->split(y){ 
+
+	{~floorheight : FloorSplit(3)}*
+}
+
+Bodenreihe(index)-->case index==2:  s('1,'1,0.5)  i(door) t(0,0,-0.025)
+					case index%2==0 && index!=3: s('1,'1,0.5)  i(schauF1) t(0,0,-0.025)
+					else:s('1,'1,0.5)  i(schauF2) t(0,0,-0.025)
+					
+					
+//Baut fenster ein
+Fenster-->s('1,'1,0.5)  i(win1) t(0,0,-0.145) texture(wintex)
+FensterSmall-->s('1,'1,0.5)  i(win_small) t(0,0,-0.145)
+
+//Zwischenbalken der Fenster
+Balken(topfloor)-->  
+//case inside(): NIL
+// else:
+  case topfloor==1: s('1, '1, 0.2) i(pillar)
+  case topfloor==0 :  s('1, '1, 0.5) i(pillar2)
+  else:NIL
+
+
+
+
+
+
+
+
+
+
+#splittet die Stockwerke für die Fenster auf
+FloorSplit(floorindex) --> case !touches():
+								case floorindex == 3 : split(x){~tilespacing : Fenster}* 
+							else:NIL
+			
+						else: NIL
+						
+
+
+
+
+
+import cy : "courtyard.cga"
+
+Ground --> cy.FloorTexture
+GroundFilled --> cy.LotInner
+	
+	
+	
+	
+### Roof
+
+@Range("gable1","gable2","hip1","hip2")
+attr roofStyle = 25% : "gable1" 25% : "gable2" 25% : "hip1" else : "hip2"
+
+import roof : "roof.cga"
+
+Roof--> offset(0.4, inside) roof.Roof
+
+roof.WindowTile --> i(win_small) texture(wintex)
+
+roof.Wall --> Wall
+
+Wall -->
+	projectUV(0)
+	texture(wallTex)
+	#color("#ff9999")

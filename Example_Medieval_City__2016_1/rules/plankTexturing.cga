@@ -1,0 +1,40 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2016.1"
+
+PlankTexturing(type, textureName) -->
+	case type == "nailed":
+		alignScopeToGeometry(zUp, any, longest) 
+		setupProjection(0,scope.xy, ~4, ~0.6, 1)
+		projectUV(0)
+		texture(textureName)
+		#translateUV(0, rand(1), 0)
+		TowerBoard.
+	case type == "notNailed":
+		alignScopeToGeometry(zUp, any, longest) 
+		setupProjection(0,scope.xy, ~4, ~0.6, 1)
+		projectUV(0)
+		texture(textureName)
+		#translateUV(0, rand(1), 0)
+		TowerBoard.
+	case type == "construction":
+		alignScopeToGeometry(zUp, any, longest) 
+		setupProjection(0,scope.xy, ~4, ~0.6, 1)
+		projectUV(0)
+		texture(textureName)
+		translateUV(0, rand(1), 0)
+		ConstructionPlank.
+	else:
+		alignScopeToGeometry(zUp, any, longest) 
+		setupProjection(0,scope.xy, ~4, ~0.6, 1)
+		projectUV(0)
+		texture(textureName)
+		translateUV(0, rand(1), 0)
+		TowerBoard.
+
+PlankTopTexturing -->
+	setupProjection(0,scope.xy, ~4, '1, 1)
+	projectUV(0)
+	texture(fileRandom("assets/outerWall/plankTop_*.png"))

@@ -1,0 +1,340 @@
+/**
+ * File:    Simple_Building.cga
+ * Created: 4 Feb 2013 20:12:42 GMT
+ * Author:  ESRI
+ */
+
+version "2015.0"
+
+import TEXTURING: "Referenced/One_Part_Texturing.cga" (Usage = Usage , Story_Height, totalHeight = totalHeight, Transparency, Override_Color, Facade_Texture = Facade_Texture, Roof_Texture = Roof_Texture, Roof_Form = Roof_Form, Roof_Mix, Sloped_Roof_Texture_Scaler)
+import USAGES: "Referenced/Usages3DCIM.cga"
+
+const colorByUsage = USAGES.getUsageColor(Usage) 
+
+################################################
+# 
+
+
+@Group("BUILDING FORM", 1) @Order(1) 
+@Description("Total height to top of roof.")
+attr Total_Height =
+	case totalHeight > 0: totalHeight
+	else: rand(Min_Height, Max_Height)
+
+@Group("BUILDING FORM") @Order(2) 
+@Description("Total height of roof, from eave to ridge.")
+attr Roof_Height =
+	case (totalHeight - eaveHeight) > 0: (totalHeight - eaveHeight)
+	else: rand(Min_Roof_Height, Max_Roof_Height)
+
+@Group("BUILDING FORM") @Order(6)
+@Range("Random", "Flat", "Gable", "Hip")
+attr Roof_Form = 
+	# XX CW temp adjustment to fix JLD obj attribute "Flat Roof" to be "Flat" as per 3DCIM.
+	case roofForm != "": (case roofForm == "Flat Roof": "Flat" else: roofForm)
+	else: "Random"
+
+@Group("BUILDING FORM") @Order(7)
+@Range(3,6)
+attr Floor_Height = 3.5 
+
+#####################################################
+
+# From 3DCIM:
+@Group("USAGE AND ZONING",3) @Order(0)
+@Range("Assembly","Agricultural","Educational","Industrial","Mercantile","Office","Public","Residential","Service","Storage","Transport","Utility","Other","Unknown")
+attr Usage = 
+	case usage != "": usage
+	else: "Residential" 
+
+#######################################################
+
+		
+@Group("BUILDING DISPLAY",10) @Order(1)
+@Range("Color Solid White", "Color by Usage", "Color by Terrain",  "Color Random", "Texture by Usage")
+attr Facade_Display = "Texture by Usage"
+
+@Group("BUILDING DISPLAY") @Order(2)
+@Range("Color Solid White", "Color by Usage", "Color by Terrain", "Color Random", "Texture by Roof Type", "Texture by Aerial Image")
+attr Roof_Display = "Texture by Roof Type"
+
+@Group("BUILDING DISPLAY") @Order(4)
+attr Facade_Texture = TEXTURING.getFacadeTexture(floorCountTotal, getFacadeTextureFolder) 
+
+const getFacadeTextureFolder = 
+	case Facade_Display == "Texture by Usage":
+		USAGES.getUsageFacadeTextureFolder(Usage)
+	else:
+		"error"
+
+@Group("BUILDING DISPLAY") @Order(4)
+attr Roof_Texture = TEXTURING.getRoofTexture(Roof_Form)
+
+
+#getUsageFacadeTextureFolder(usage)
+#getUsageColor(usage)
+
+#############################################
+
+@Group("RANDOMIZATION",40) @Order(0)
+attr Random_Color =
+	5% : "#FFDB97"
+	5% : "#B28F4E"
+	5% : "#FFFDFB"
+	5% : "#A08040"
+	5% : "#606040"
+	5% : "#404040"
+	5% : "#732600"
+	5% : "#39200A"
+	5% : "#FF9C5A"
+	5% : "#8A5948"
+	5% : "#73635F"
+	5% : "#28130F"
+	5% : "#154F37"
+	5% : "#666134"
+	5% : "#627559"
+	5% : "#D4713E"
+	5% : "#884827"
+	5% : "#553C2F"
+	5% : "#886350"
+	else : "#3B1F11"
+
+
+@Group("RANDOMIZATION") @Order(3) 
+@Description("Used when Total_Height is unavailable.")
+attr Min_Height = 5
+
+@Group("RANDOMIZATION") @Order(4) 
+@Description("Used when Total_Height is unavailable.")
+attr Max_Height = 10
+
+@Group("RANDOMIZATION") @Order(5) 
+@Description("Used when Total_Height is unavailable.")
+attr Min_Roof_Height = 2
+
+@Group("RANDOMIZATION") @Order(6) 
+@Description("Used when Total_Height is unavailable.")
+attr Max_Roof_Height = 3.5
+
+
+#####################################################
+
+@Group("AERIAL IMAGE MAPPING",50) @Order(2)
+@File
+attr Terrain_Image_File = ""
+@Group("AERIAL IMAGE MAPPING") @Order(3)
+attr X_Size = 0                                                   
+@Group("AERIAL IMAGE MAPPING") @Order(4)
+attr Z_Size = 0                                                   
+@Group("AERIAL IMAGE MAPPING") @Order(5)
+attr X_Offset = 0                                           
+@Group("AERIAL IMAGE MAPPING") @Order(6)
+attr Z_Offset = 0       
+
+#################################################
+
+@Group("TERRAIN COLOR MAPPING", 60) @Order(2)
+attr ChannelR = 0
+@Group("TERRAIN COLOR MAPPING") @Order(3)
+attr ChannelG = 0
+@Group("TERRAIN COLOR MAPPING") @Order(4)
+attr ChannelB = 0
+
+
+
+############################################
+
+@Group("OPTIONS",90) @Order(1)
+@Range("Meters", "Feet")
+attr Units = "Meters"
+const unitScale = case Units=="Feet": 0.3048 else: 1
+
+
+####################################################
+# 3DCIM Attributes (auto-connect to Object Attrs) 
+
+@Group("3DCIM MAPPING", 100) @Order(1) 
+attr totalHeight = 0
+
+@Group("3DCIM MAPPING") @Order(2) 
+attr eaveHeight = 0
+
+@Group("3DCIM MAPPING") @Order(6)
+attr roofForm = ""
+
+@Group("3DCIM MAPPING") @Order(8) 
+attr usage = ""
+
+
+
+
+####################################################
+# RULES
+
+
+
+
+# CW Added for texturing:
+floorCountTotal = rint((Total_Height - Roof_Height) / Floor_Height)  
+@Hidden
+attr StartingElevation = 0  
+adjTotalHeight = (floorCountTotal * Floor_Height) + Roof_Height
+SetupLowLODTexturing -->
+	# set Texturing attributes for imported texturing rule.
+	TEXTURING.SetupFromImportingRule(Facade_Texture, StartingElevation, adjTotalHeight, floorCountTotal)
+
+
+@StartRule
+Footprint -->
+	# Align with XZ plane. Flatten vertices in Y direction.
+	alignScopeToAxes(y)
+	s('1,0,'1)
+	center(xz)
+
+	set(StartingElevation, scope.elevation) # CW Added for texturing.
+	#set(TEXTURING._Usage, usage )
+	#set(TEXTURING._Facade_Texture, TEXTURING.getFacadeTexture(floorCountTotal)) # CW Added for texturing.
+#print("1> "+TEXTURING._Usage)
+#print("2> "+TEXTURING._Facade_Texture)
+	extrude((floorCountTotal * Floor_Height) * unitScale )
+	comp(f) {side : Facade | top : Roof | all : NIL}
+
+
+############################################
+# FACADE
+
+
+Facade -->
+	case Facade_Display == "Color Solid White":
+		color(1,1,1)
+	case Facade_Display == "Color by Usage":
+		color(colorByUsage)
+	case Facade_Display == "Color by Terrain":
+		color(ChannelR, ChannelG, ChannelB)
+	case Facade_Display == "Texture by Usage":
+		SetupLowLODTexturing
+	case Facade_Display == "Texture by Zoning":
+		SetupLowLODTexturing
+	else:
+		color(Random_Color)
+	
+
+############################################
+# ROOF
+	
+/* 
+# XX Change later to use 3DCIM Roof types: 
+#@Range("Flat","Mono-pitch","Shed","Gable","Cross-gable","Hip","Mansard","Gambrel","Pyramid","Butterfly","Bonnet","Saltbox","Arched Roof","Dome","Conical","Barrel","Imperial","Multi-level","Other","Unknown")
+RoofLATER3DCIM -->
+	case Roof_Form == "Flat"		: FlatRoof
+	case Roof_Form == "Mono-pitch"	: #MonopitchRoof
+	case Roof_Form == "Shed"		: ShedRoof
+	case Roof_Form == "Gable"		: GableRoof
+	case Roof_Form == "Cross-gable"	: #CrossGableRoof
+	case Roof_Form == "Hip"			: HipRoof
+	case Roof_Form == "Mansard"		: MansardRoof
+	case Roof_Form == "Gambrel"		: GambrelRoof
+	case Roof_Form == "Pyramid"		: PyramidRoof
+	case Roof_Form == "Butterfly"	: ButterflyRoof
+	case Roof_Form == "Bonnet"		: #BonnetRoof
+	case Roof_Form == "Saltbox"		: SaltboxRoof
+	case Roof_Form == "Arched Roof"	: #ArchedRoof
+	case Roof_Form == "Dome"		: DomeRoof
+	case Roof_Form == "Conical"		: #ConicalRoof
+	case Roof_Form == "Barrel"		: #BarrelRoof
+	case Roof_Form == "Imperial"	: #ImperialRoof
+	case Roof_Form == "Multi-level" : #MultilevelRoof
+	case Roof_Form == "Other "		: OtherRoof
+	case Roof_Form == "Unknown"		: UnknownRoof
+	else							: FlatRoof
+*/
+
+Roof -->
+	case _roofTypeAdjusted == "Gable"	: GableRoof
+	case _roofTypeAdjusted == "Hip"		: HipRoof
+	else								: FlatRoof
+
+_roofTypeAdjusted = 
+	case Roof_Form == "Random": 
+		50%: "Gable"
+		30%: "Hip"
+		else:"Flat"
+	else: Roof_Form
+
+#########################################
+#  Roof Forms
+
+GableRoof -->
+	roofGable(45,0,0,false,0) RoofMassScale
+
+HipRoof -->
+	roofHip(45) RoofMassScale
+
+FlatRoof -->
+	RoofMassScale2
+
+
+# End Roof Types. Start Roof Scaling.
+
+RoofMassScale -->
+	s('1, Roof_Height, '1) ## Another point of scaling?
+	RoofMassScale2
+
+RoofMassScale2 -->
+	RoofDisplaySwitch
+
+
+
+RoofDisplaySwitch -->
+	case Roof_Display == "Color Solid White":
+		color(1,1,1)
+	case Roof_Display == "Color by Usage":
+		color(colorByUsage)
+	case Roof_Display == "Color by Terrain":
+		color(ChannelR, ChannelG, ChannelB)
+	case Roof_Display == "Color Random":
+		color(Random_Color)
+	case Roof_Display == "Texture by Roof Type":
+		TEXTURING.TextureRoof
+	case Roof_Display == "Texture by Aerial Image":
+		RoofAerial	
+	else:
+		color(0,0,0)
+
+
+#################################
+# Roof Texturing
+
+RoofAerial -->
+	setupProjection(0, world.xz, X_Size, -Z_Size, X_Offset, Z_Offset)
+	projectUV(0)
+	texture(Terrain_Image_File)
+
+
+
+
+
+
+#############################
+# Utilities
+
+# RGB To Hex
+firstCharIndex(zeroTo255) = (zeroTo255 - zeroTo255 % 16) / 16
+secondCharIndex(zeroTo255) = zeroTo255 % 16
+hexCharList = "0;1;2;3;4;5;6;7;8;9;A;B;C;D;E;F;"
+toHex(zeroTo255) = listItem(hexCharList,firstCharIndex(rint(zeroTo255))) +
+					 listItem(hexCharList,secondCharIndex(rint(zeroTo255)))
+convertRGBToHex(r255,g255,b255) = "#" + toHex(r255) + toHex(g255) + toHex(b255)
+
+
+
+
+
+
+
+
+
+
+
+
+	

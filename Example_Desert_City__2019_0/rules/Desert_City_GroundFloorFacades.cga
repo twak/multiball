@@ -1,0 +1,4699 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+
+
+
+
+attr LOD_int = 1
+const n = 0
+const styleIsUsed = 0
+
+#! SIZE 19.751928 5.894656
+
+GFStart_commercial_1 -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_commercial_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_commercial_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~5.60: GF_cont_commercial_1__1_1 | 0.29: GF_cont_commercial_1__1_2 }
+
+GF_cont_commercial_1__1_1 -->
+	split(x, noAdjust) { 0.83: GF_cont_commercial_1__1_1_1 | ~5.97: GF_cont_commercial_1__1_1_2 | 0.46: GF_cont_commercial_1__1_1_3 | ~6.81: GF_cont_commercial_1__1_1_4 | 0.38: GF_cont_commercial_1__1_1_5 | ~4.91: GF_cont_commercial_1__1_1_6 | 0.39: GF_cont_commercial_1__1_1_7 }
+
+GF_cont_commercial_1__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '23.7447, '1.0523)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '23.7447, '1.0523)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_2 -->
+	split(y, noAdjust) { ~2.97: GF_cont_commercial_1__1_1_2_1 | 0.90: GF_cont_commercial_1__1_1_2_2 | ~1.74: GF_cont_commercial_1__1_1_2_3 }
+
+GF_cont_commercial_1__1_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.3082, '1.9851, '-0.1393, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.3082, '1.9851, '-0.1393, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.3082, '6.5711, '-0.1393, '-3.3101)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.3082, '6.5711, '-0.1393, '-3.3101)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.3082, '3.3969, '-0.1393, '-2.2281)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.3082, '3.3969, '-0.1393, '-2.2281)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '43.3268, '1.0523, '-14.9215, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '43.3268, '1.0523, '-14.9215, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_4 -->
+	split(x, noAdjust) { ~6.81: GF_cont_commercial_1__1_1_4_1 }*
+
+GF_cont_commercial_1__1_1_4_1 -->
+	split(x, noAdjust) { 0.41: GF_cont_commercial_1__1_1_4_1_1 | ~6.00: GF_cont_commercial_1__1_1_4_1_2 | 0.40: GF_cont_commercial_1__1_1_4_1_3 }
+
+GF_cont_commercial_1__1_1_4_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '47.9689, '1.0523, '-17.6273, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '47.9689, '1.0523, '-17.6273, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_4_1_2 -->
+	split(y, noAdjust) { ~2.88: GF_cont_commercial_1__1_1_4_1_2_1 | 0.93: GF_cont_commercial_1__1_1_4_1_2_2 | ~1.79: GF_cont_commercial_1__1_1_4_1_2_3 }
+
+GF_cont_commercial_1__1_1_4_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.2920, '2.0459, '-1.2783, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.2920, '2.0459, '-1.2783, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_4_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.2920, '6.3625, '-1.2783, '-3.1098)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.2920, '6.3625, '-1.2783, '-3.1098)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_4_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.2920, '3.2855, '-1.2783, '-2.1223)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.2920, '3.2855, '-1.2783, '-2.1223)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_4_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '49.7456, '1.0523, '-34.4284, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '49.7456, '1.0523, '-34.4284, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '51.6588, '1.0523, '-36.7909, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '51.6588, '1.0523, '-36.7909, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_6 -->
+	split(y, noAdjust) { ~2.95: GF_cont_commercial_1__1_1_6_1 | 0.93: GF_cont_commercial_1__1_1_6_2 | ~1.72: GF_cont_commercial_1__1_1_6_3 }
+
+GF_cont_commercial_1__1_1_6_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0214, '1.9950, '-2.9418, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0214, '1.9950, '-2.9418, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_6_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0214, '6.3625, '-2.9418, '-3.1892)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0214, '6.3625, '-2.9418, '-3.1892)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_6_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0214, '3.4260, '-2.9418, '-2.2557)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0214, '3.4260, '-2.9418, '-2.2557)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_1_7 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '50.5591, '1.0523, '-49.5591, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '50.5591, '1.0523, '-49.5591, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_1__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '20.1240, '0.0000, '-19.1240)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '20.1240, '0.0000, '-19.1240)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+
+
+
+
+
+
+
+
+
+
+#! SIZE 16.190536 8.284789
+
+GFStart_commercial_2 -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_commercial_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_commercial_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~8.09: GF_cont_commercial_2__1_1 | 0.20: GF_cont_commercial_2__1_2 }
+
+GF_cont_commercial_2__1_1 -->
+	split(x, noAdjust) { 1.06: GF_cont_commercial_2__1_1_1 | 4.68: GF_cont_commercial_2__1_1_2 | ~5.10: GF_cont_commercial_2__1_1_3 | 4.39: GF_cont_commercial_2__1_1_4 | 0.96: GF_cont_commercial_2__1_1_5 }
+
+GF_cont_commercial_2__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '15.3132, '1.0247)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '15.3132, '1.0247)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_2 -->
+	split(y, noAdjust) { ~4.34: GF_cont_commercial_2__1_1_2_1 | 1.29: GF_cont_commercial_2__1_1_2_2 | ~2.46: GF_cont_commercial_2__1_1_2_3 }
+
+GF_cont_commercial_2__1_1_2_1 -->
+	split(x, noAdjust) { ~4.29: GF_cont_commercial_2__1_1_2_1_1 | 0.39: GF_cont_commercial_2__1_1_2_1_2 }
+
+GF_cont_commercial_2__1_1_2_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.7748, '1.9096, '-0.2465, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.7748, '1.9096, '-0.2465, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_2_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '41.0458, '1.9096, '-13.5540, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '41.0458, '1.9096, '-13.5540, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.4569, '6.4167, '-0.2257, '-3.3603)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.4569, '6.4167, '-0.2257, '-3.3603)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.4569, '3.3737, '-0.2257, '-2.2925)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.4569, '3.3737, '-0.2257, '-2.2925)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_3 -->
+	split(x, noAdjust) { ~5.10: GF_cont_commercial_2__1_1_3_1 }*
+
+GF_cont_commercial_2__1_1_3_1 -->
+	split(y, noAdjust) { ~4.34: GF_cont_commercial_2__1_1_3_1_1 | 1.28: GF_cont_commercial_2__1_1_3_1_2 | ~2.47: GF_cont_commercial_2__1_1_3_1_3 }
+
+GF_cont_commercial_2__1_1_3_1_1 -->
+	split(x, noAdjust) { 0.45: GF_cont_commercial_2__1_1_3_1_1_1 | ~4.25: GF_cont_commercial_2__1_1_3_1_1_2 | 0.40: GF_cont_commercial_2__1_1_3_1_1_3 }
+
+GF_cont_commercial_2__1_1_3_1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '36.1153, '1.9096, '-12.8058, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '36.1153, '1.9096, '-12.8058, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_3_1_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.8052, '1.9096, '-1.4546, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.8052, '1.9096, '-1.4546, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_3_1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '40.6643, '1.9096, '-26.2311, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '40.6643, '1.9096, '-26.2311, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_3_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.1738, '6.4802, '-1.1254, '-3.3936)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.1738, '6.4802, '-1.1254, '-3.3936)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_3_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.1738, '3.3564, '-1.1254, '-2.2756)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.1738, '3.3564, '-1.1254, '-2.2756)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_4 -->
+	split(y, noAdjust) { ~4.29: GF_cont_commercial_2__1_1_4_1 | 1.15: GF_cont_commercial_2__1_1_4_2 | ~2.65: GF_cont_commercial_2__1_1_4_3 }
+
+GF_cont_commercial_2__1_1_4_1 -->
+	split(x, noAdjust) { 0.39: GF_cont_commercial_2__1_1_4_1_1 | ~4.00: GF_cont_commercial_2__1_1_4_1_2 }
+
+GF_cont_commercial_2__1_1_4_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '41.2598, '1.9321, '-27.6299, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '41.2598, '1.9321, '-27.6299, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_4_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0476, '1.9321, '-2.8086, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0476, '1.9321, '-2.8086, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.20000002) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_4_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.6860, '7.1923, '-2.4684, '-3.7225)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.6860, '7.1923, '-2.4684, '-3.7225)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_4_3 -->
+	split(x, noAdjust) { 0.39: GF_cont_commercial_2__1_1_4_3_1 | ~4.00: GF_cont_commercial_2__1_1_4_3_2 }
+
+GF_cont_commercial_2__1_1_4_3_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '41.2598, '3.1316, '-27.6299, '-2.0562)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '41.2598, '3.1316, '-27.6299, '-2.0562)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_4_3_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0476, '3.1316, '-2.8086, '-2.0562)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0476, '3.1316, '-2.8086, '-2.0562)
+		t(0, 0, -0.55) 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '16.9352, '1.0247, '-15.9352, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '16.9352, '1.0247, '-15.9352, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_commercial_2__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '41.5578, '0.0000, '-40.5578)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '41.5578, '0.0000, '-40.5578)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+
+
+
+
+
+
+
+
+
+#! SIZE 13.069926 2.543163
+
+GFStart_industrial_1 -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_industrial_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_industrial_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~2.28: GF_cont_industrial_1__1_1 | 0.26: GF_cont_industrial_1__1_2 }
+
+GF_cont_industrial_1__1_1 -->
+	split(x, noAdjust) { 0.26: GF_cont_industrial_1__1_1_1 | 0.60: GF_cont_industrial_1__1_1_2 | 1.22: GF_cont_industrial_1__1_1_3 | 0.52: GF_cont_industrial_1__1_1_4 | ~10.23: GF_cont_industrial_1__1_1_5 | 0.23: GF_cont_industrial_1__1_1_6 }
+
+GF_cont_industrial_1__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '50.6490, '1.1139)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '50.6490, '1.1139)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '21.7832, '1.1139, '-0.4301, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '21.7832, '1.1139, '-0.4301, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_3 -->
+	split(y, noAdjust) { ~1.24: GF_cont_industrial_1__1_1_3_1 | 0.38: GF_cont_industrial_1__1_1_3_2 | ~0.65: GF_cont_industrial_1__1_1_3_3 }
+
+GF_cont_industrial_1__1_1_3_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.6861, '2.0433, '-0.7015, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.6861, '2.0433, '-0.7015, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_3_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.6861, '6.6122, '-0.7015, '-3.2361)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.6861, '6.6122, '-0.7015, '-3.2361)
+		t(0, 0, -0.3) 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_3_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.6861, '3.8895, '-0.7015, '-2.4918)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.6861, '3.8895, '-0.7015, '-2.4918)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_4 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '24.9867, '1.1139, '-3.9786, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '24.9867, '1.1139, '-3.9786, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_5 -->
+	split(x, noAdjust) { ~5.12: GF_cont_industrial_1__1_1_5_1 }*
+
+GF_cont_industrial_1__1_1_5_1 -->
+	split(x, noAdjust) { 0.50: GF_cont_industrial_1__1_1_5_1_1 | ~1.18: GF_cont_industrial_1__1_1_5_1_2 | ~1.24: GF_cont_industrial_1__1_1_5_1_3 | ~1.20: GF_cont_industrial_1__1_1_5_1_4 | 1.00: GF_cont_industrial_1__1_1_5_1_5 }
+
+GF_cont_industrial_1__1_1_5_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '26.1399, '1.1139, '-15.4392, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '26.1399, '1.1139, '-15.4392, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_5_1_2 -->
+	split(y, noAdjust) { ~1.61: GF_cont_industrial_1__1_1_5_1_2_1 | ~0.68: GF_cont_industrial_1__1_1_5_1_2_2 }
+
+GF_cont_industrial_1__1_1_5_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '11.1052, '1.5833, '-6.9840, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '11.1052, '1.5833, '-6.9840, '0.0000)
+		t(0, 0, -0.3) 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_5_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '11.1052, '3.7570, '-6.9840, '-2.3728)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '11.1052, '3.7570, '-6.9840, '-2.3728)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_5_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.5534, '1.1139, '-7.5873, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.5534, '1.1139, '-7.5873, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_5_1_4 -->
+	split(y, noAdjust) { ~1.28: GF_cont_industrial_1__1_1_5_1_4_1 | 0.36: GF_cont_industrial_1__1_1_5_1_4_2 | ~0.65: GF_cont_industrial_1__1_1_5_1_4_3 }
+
+GF_cont_industrial_1__1_1_5_1_4_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.8916, '1.9940, '-8.8625, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.8916, '1.9940, '-8.8625, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_5_1_4_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.8916, '7.0343, '-8.8625, '-3.5278)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.8916, '7.0343, '-8.8625, '-3.5278)
+		t(0, 0, -0.3) 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_5_1_4_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.8916, '3.9359, '-8.8625, '-2.5334)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.8916, '3.9359, '-8.8625, '-2.5334)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_5_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '13.0700, '1.1139, '-11.8350, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '13.0700, '1.1139, '-11.8350, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_1_6 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '55.6233, '1.1139, '-54.6233, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '55.6233, '1.1139, '-54.6233, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_1__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '9.7797, '0.0000, '-8.7797)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '9.7797, '0.0000, '-8.7797)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.45000002) 
+		primitiveCube() 
+		projectUV(0) 
+
+
+
+
+
+
+
+
+#! SIZE 15.547439 2.4003837
+
+GFStart_industrial_2 -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_industrial_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_industrial_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~2.31: GF_cont_industrial_2__1_1 | 0.09: GF_cont_industrial_2__1_2 }
+
+GF_cont_industrial_2__1_1 -->
+	split(x, noAdjust) { 0.46: GF_cont_industrial_2__1_1_1 | ~4.58: GF_cont_industrial_2__1_1_2 | ~1.88: GF_cont_industrial_2__1_1_3 | 2.46: GF_cont_industrial_2__1_1_4 | 0.13: GF_cont_industrial_2__1_1_5 | ~2.05: GF_cont_industrial_2__1_1_6 | 0.17: GF_cont_industrial_2__1_1_7 | ~2.02: GF_cont_industrial_2__1_1_8 | 1.80: GF_cont_industrial_2__1_1_9 }
+
+GF_cont_industrial_2__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '33.6889, '1.0370)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '33.6889, '1.0370)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_2__1_1_2 -->
+	split(x, noAdjust) { ~4.58: GF_cont_industrial_2__1_1_2_1 }*
+
+GF_cont_industrial_2__1_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.3943, '1.0370, '-0.1008, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.3943, '1.0370, '-0.1008, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_2__1_1_3 -->
+	split(x, noAdjust) { ~1.88: GF_cont_industrial_2__1_1_3_1 }*
+
+GF_cont_industrial_2__1_1_3_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.2525, '1.0370, '-2.6762, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.2525, '1.0370, '-2.6762, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_2__1_1_4 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '6.3319, '1.0370, '-2.8207, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '6.3319, '1.0370, '-2.8207, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_2__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '124.3770, '1.0370, '-75.0488, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '124.3770, '1.0370, '-75.0488, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_2__1_1_6 -->
+	split(y, noAdjust) { ~2.01: GF_cont_industrial_2__1_1_6_1 | 0.30: GF_cont_industrial_2__1_1_6_2 }
+
+GF_cont_industrial_2__1_1_6_1 -->
+	split(x, noAdjust) { ~2.05: GF_cont_industrial_2__1_1_6_1_1 }*
+
+GF_cont_industrial_2__1_1_6_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.5708, '1.1935, '-4.6291, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.5708, '1.1935, '-4.6291, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_industrial_2__1_1_6_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.5708, '7.9070, '-4.6291, '-6.6252)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.5708, '7.9070, '-4.6291, '-6.6252)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_2__1_1_7 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '91.6467, '1.0370, '-68.1416, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '91.6467, '1.0370, '-68.1416, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_2__1_1_8 -->
+	split(x, noAdjust) { ~2.02: GF_cont_industrial_2__1_1_8_1 }*
+
+GF_cont_industrial_2__1_1_8_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.7048, '1.0370, '-5.8128, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.7048, '1.0370, '-5.8128, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_2__1_1_9 -->
+	split(y, noAdjust) { ~1.71: GF_cont_industrial_2__1_1_9_1 | 0.61: GF_cont_industrial_2__1_1_9_2 }
+
+GF_cont_industrial_2__1_1_9_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.6375, '1.4056, '-7.6375, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.6375, '1.4056, '-7.6375, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_2__1_1_9_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.6375, '3.9535, '-7.6375, '-2.8126)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.6375, '3.9535, '-7.6375, '-2.8126)
+		t(0, 0, -0.5) 
+		s('1, '1, 2.0) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_industrial_2__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '28.0595, '0.0000, '-27.0595)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '28.0595, '0.0000, '-27.0595)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+
+
+
+
+
+
+
+
+#! SIZE 21.322407 8.738691
+
+GFStart_religious_1 -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_religious_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_religious_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~8.11: GF_cont_religious_1__1_1 | 0.62: GF_cont_religious_1__1_2 }
+
+GF_cont_religious_1__1_1 -->
+	split(x, noAdjust) { ~7.86: GF_cont_religious_1__1_1_1 | 1.37: GF_cont_religious_1__1_1_2 | 3.00: GF_cont_religious_1__1_1_3 | 1.59: GF_cont_religious_1__1_1_4 | ~7.50: GF_cont_religious_1__1_1_5 }
+
+GF_cont_religious_1__1_1_1 -->
+	split(x, noAdjust) { ~7.86: GF_cont_religious_1__1_1_1_1 }*
+
+GF_cont_religious_1__1_1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.7116, '1.0770)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.7116, '1.0770)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.05) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_religious_1__1_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '15.5655, '1.0770, '-5.7404, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '15.5655, '1.0770, '-5.7404, '0.0000)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.05) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_religious_1__1_1_3 -->
+	split(y, noAdjust) { 3.56: GF_cont_religious_1__1_1_3_1 | ~4.56: GF_cont_religious_1__1_1_3_2 }
+
+GF_cont_religious_1__1_1_3_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.1075, '2.4556, '-3.0778, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.1075, '2.4556, '-3.0778, '0.0000)
+		t(0, 0, -1.05) 
+		projectUV(0) 
+
+GF_cont_religious_1__1_1_3_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.1075, '1.9183, '-3.0778, '-0.7812)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.1075, '1.9183, '-3.0778, '-0.7812)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.05) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_religious_1__1_1_4 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '13.4069, '1.0770, '-7.6920, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '13.4069, '1.0770, '-7.6920, '0.0000)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.05) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_religious_1__1_1_5 -->
+	split(x, noAdjust) { ~7.50: GF_cont_religious_1__1_1_5_1 }*
+
+GF_cont_religious_1__1_1_5_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.8435, '1.0770, '-1.8435, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.8435, '1.0770, '-1.8435, '0.0000)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.05) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_religious_1__1_2 -->
+	split(x, noAdjust) { ~10.66: GF_cont_religious_1__1_2_1 }*
+
+GF_cont_religious_1__1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.0000, '13.9900, '0.0000, '-12.9900)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.0000, '13.9900, '0.0000, '-12.9900)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.4499999) 
+		primitiveCube() 
+		projectUV(0) 
+
+
+
+
+
+
+
+
+#! SIZE 8.59637 2.6279058
+
+GFStart_residential_1 -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_residential_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_residential_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~2.54: GF_cont_residential_1__1(0) | 0.09: GF_cont_residential_1__1(1) }
+
+
+residential_1(i) -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_residential_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_residential_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		GF_cont_residential_1__1(i)
+
+
+GF_cont_residential_1__1(i) -->
+	case i == 0: GF_cont_residential_1__1_1
+	case i == 1: GF_cont_residential_1__1_2
+	else: GF_cont_residential_1__1_1
+
+GF_cont_residential_1__1_1 -->
+	split(x, noAdjust) { { ~3.84: GF_cont_residential_1__1_1_1 }* | ~0.39: GF_cont_residential_1__1_1_2 | { ~4.38: GF_cont_residential_1__1_1_3 }* }
+
+GF_cont_residential_1__1_1_1 -->
+	split(x, noAdjust) { ~3.84: GF_cont_residential_1__1_1_1_1 }
+
+GF_cont_residential_1__1_1_1_1 -->
+	split(x, noAdjust) { 0.53: GF_cont_residential_1__1_1_1_1_1 | ~1.80: GF_cont_residential_1__1_1_1_1_2 | ~1.51: GF_cont_residential_1__1_1_1_1_3 }
+
+GF_cont_residential_1__1_1_1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '16.2168, '1.0362)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '16.2168, '1.0362)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_1__1_1_1_1_2 -->
+	split(y, noAdjust) { 0.75: GF_cont_residential_1__1_1_1_1_2_1 | ~1.38: GF_cont_residential_1__1_1_1_1_2_2 | 0.41: GF_cont_residential_1__1_1_1_1_2_3 }
+
+GF_cont_residential_1__1_1_1_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.7758, '3.5032, '-0.2945, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.7758, '3.5032, '-0.2945, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_1__1_1_1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.7758, '1.9046, '-0.2945, '-0.5437)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.7758, '1.9046, '-0.2945, '-0.5437)
+		t(0, 0, -0.3) 
+		projectUV(0) 
+
+GF_cont_residential_1__1_1_1_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.7758, '6.4691, '-0.2945, '-5.2432)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.7758, '6.4691, '-0.2945, '-5.2432)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_1__1_1_1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '5.7087, '1.0362, '-1.5474, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '5.7087, '1.0362, '-1.5474, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_1__1_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '22.3158, '1.0362, '-9.9579, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '22.3158, '1.0362, '-9.9579, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.45000002) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_1__1_1_3 -->
+	split(x, noAdjust) { ~4.38: GF_cont_residential_1__1_1_3_1 }
+
+GF_cont_residential_1__1_1_3_1 -->
+	split(x, noAdjust) { 1.11: GF_cont_residential_1__1_1_3_1_1 | ~1.69: GF_cont_residential_1__1_1_3_1_2 | ~1.57: GF_cont_residential_1__1_1_3_1_3 }
+
+GF_cont_residential_1__1_1_3_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.7193, '1.0362, '-3.7905, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.7193, '1.0362, '-3.7905, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_1__1_1_3_1_2 -->
+	split(y, noAdjust) { 0.73: GF_cont_residential_1__1_1_3_1_2_1 | ~1.31: GF_cont_residential_1__1_1_3_1_2_2 | 0.50: GF_cont_residential_1__1_1_3_1_2_3 }
+
+GF_cont_residential_1__1_1_3_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '5.0718, '3.6042, '-3.1475, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '5.0718, '3.6042, '-3.1475, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_1__1_1_3_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '5.0718, '2.0065, '-3.1475, '-0.5567)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '5.0718, '2.0065, '-3.1475, '-0.5567)
+		t(0, 0, -0.3) 
+		projectUV(0) 
+
+GF_cont_residential_1__1_1_3_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '5.0718, '5.2846, '-3.1475, '-4.1000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '5.0718, '5.2846, '-3.1475, '-4.1000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_1__1_1_3_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '5.4870, '1.0362, '-4.4870, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '5.4870, '1.0362, '-4.4870, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_1__1_2 -->
+	split(x, noAdjust) { ~3.84: GF_cont_residential_1__1_2_1 | ~0.39: GF_cont_residential_1__1_2_2 | ~4.37: GF_cont_residential_1__1_2_3 }
+
+GF_cont_residential_1__1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.2410, '28.6345, '0.0000, '-27.6345)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.2410, '28.6345, '0.0000, '-27.6345)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_1__1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '21.9174, '28.6345, '-9.7801, '-27.6345)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '21.9174, '28.6345, '-9.7801, '-27.6345)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.45000002) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_1__1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.9679, '28.6345, '-0.9679, '-27.6345)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.9679, '28.6345, '-0.9679, '-27.6345)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+
+
+
+
+
+
+
+GFStart_residential_2 -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_residential_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_residential_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~2.67: GF_cont_residential_2__1(0) | 0.38: GF_cont_residential_2__1(1) }
+
+
+residential_2(i) -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_residential_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_residential_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		GF_cont_residential_2__1(i)
+
+
+GF_cont_residential_2__1(i) -->
+	case i == 0: GF_cont_residential_2__1_1
+	case i == 1: GF_cont_residential_2__1_2
+	else: GF_cont_residential_2__1_1
+
+GF_cont_residential_2__1_1 -->
+	split(x, noAdjust) { ~0.40: GF_cont_residential_2__1_1_1 | { ~1.98: GF_cont_residential_2__1_1_2 }* | ~2.01: GF_cont_residential_2__1_1_3 | { ~1.80: GF_cont_residential_2__1_1_4 }* | { ~1.75: GF_cont_residential_2__1_1_5 }* }
+
+GF_cont_residential_2__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '19.8145, '1.1441)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '19.8145, '1.1441)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_2__1_1_2 -->
+	split(x, noAdjust) { ~1.98: GF_cont_residential_2__1_1_2_1 }
+
+GF_cont_residential_2__1_1_2_1 -->
+	split(y, noAdjust) { 0.88: GF_cont_residential_2__1_1_2_1_1 | ~1.28: GF_cont_residential_2__1_1_2_1_2 | 0.51: GF_cont_residential_2__1_1_2_1_3 }
+
+GF_cont_residential_2__1_1_2_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0057, '3.4877, '-0.2022, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0057, '3.4877, '-0.2022, '0.0000)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_2__1_1_2_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0057, '2.3818, '-0.2022, '-0.6829)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0057, '2.3818, '-0.2022, '-0.6829)
+		t(0, 0, -0.2) 
+		projectUV(0) 
+
+GF_cont_residential_2__1_1_2_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0057, '5.9703, '-0.2022, '-4.2185)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0057, '5.9703, '-0.2022, '-4.2185)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_2__1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.9514, '1.1441, '-1.1859, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.9514, '1.1441, '-1.1859, '0.0000)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_2__1_1_4 -->
+	split(x, noAdjust) { ~1.80: GF_cont_residential_2__1_1_4_1 }
+
+GF_cont_residential_2__1_1_4_1 -->
+	split(y, noAdjust) { ~0.92: GF_cont_residential_2__1_1_4_1_1 | ~1.22: GF_cont_residential_2__1_1_4_1_2 | 0.53: GF_cont_residential_2__1_1_4_1_3 }
+
+GF_cont_residential_2__1_1_4_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.4154, '3.3320, '-2.4425, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.4154, '3.3320, '-2.4425, '0.0000)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_2__1_1_4_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.4154, '2.5015, '-2.4425, '-0.7508)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.4154, '2.5015, '-2.4425, '-0.7508)
+		t(0, 0, -0.2) 
+		projectUV(0) 
+
+GF_cont_residential_2__1_1_4_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.4154, '5.7406, '-2.4425, '-4.0178)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.4154, '5.7406, '-2.4425, '-4.0178)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_2__1_1_5 -->
+	split(x, noAdjust) { ~1.75: GF_cont_residential_2__1_1_5_1 }
+
+GF_cont_residential_2__1_1_5_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.5387, '1.1441, '-3.5387, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.5387, '1.1441, '-3.5387, '0.0000)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_residential_2__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '7.9413, '0.0000, '-6.9413)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '7.9413, '0.0000, '-6.9413)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+
+
+
+
+
+
+GFStart_retail_1 -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_retail_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_retail_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~4.23: GF_cont_retail_1__1_1 | 0.16: GF_cont_retail_1__1_2 }
+
+GF_cont_retail_1__1_1 -->
+	split(x, noAdjust) { 0.34: GF_cont_retail_1__1_1_1 | 5.76: GF_cont_retail_1__1_1_2 | 5.46: GF_cont_retail_1__1_1_3 | ~5.15: GF_cont_retail_1__1_1_4 | 0.44: GF_cont_retail_1__1_1_5 }
+
+GF_cont_retail_1__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '49.9740, '1.0380)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '49.9740, '1.0380)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.75) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_2 -->
+	split(y, noAdjust) { ~4.07: GF_cont_retail_1__1_1_2_1 | 0.17: GF_cont_retail_1__1_1_2_2 }
+
+GF_cont_retail_1__1_1_2_1 -->
+	split(x, noAdjust) { 0.11: GF_cont_retail_1__1_1_2_1_1 | ~5.47: GF_cont_retail_1__1_1_2_1_2 | 0.18: GF_cont_retail_1__1_1_2_1_3 }
+
+GF_cont_retail_1__1_1_2_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '162.9196, '1.0810, '-3.2601, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '162.9196, '1.0810, '-3.2601, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_2_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.1331, '1.0810, '-0.0819, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.1331, '1.0810, '-0.0819, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_2_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '95.8353, '1.0810, '-33.0941, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '95.8353, '1.0810, '-33.0941, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.9784, '26.0967, '-0.0596, '-24.1421)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.9784, '26.0967, '-0.0596, '-24.1421)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_3 -->
+	split(y, noAdjust) { ~4.07: GF_cont_retail_1__1_1_3_1 | 0.17: GF_cont_retail_1__1_1_3_2 }
+
+GF_cont_retail_1__1_1_3_1 -->
+	split(x, noAdjust) { 0.23: GF_cont_retail_1__1_1_3_1_1 | ~5.00: GF_cont_retail_1__1_1_3_1_2 | 0.23: GF_cont_retail_1__1_1_3_1_3 }
+
+GF_cont_retail_1__1_1_3_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '74.0546, '1.0810, '-26.3455, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '74.0546, '1.0810, '-26.3455, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_3_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.4299, '1.0810, '-1.2665, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.4299, '1.0810, '-1.2665, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_3_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '74.0546, '1.0810, '-48.9364, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '74.0546, '1.0810, '-48.9364, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_3_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.1391, '26.0967, '-1.1168, '-24.1421)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.1391, '26.0967, '-1.1168, '-24.1421)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_4 -->
+	split(x, noAdjust) { ~5.15: GF_cont_retail_1__1_1_4_1 }*
+
+GF_cont_retail_1__1_1_4_1 -->
+	split(y, noAdjust) { ~3.98: GF_cont_retail_1__1_1_4_1_1 | 0.25: GF_cont_retail_1__1_1_4_1_2 }
+
+GF_cont_retail_1__1_1_4_1_1 -->
+	split(x, noAdjust) { 0.25: GF_cont_retail_1__1_1_4_1_1_1 | ~4.75: GF_cont_retail_1__1_1_4_1_1_2 | 0.15: GF_cont_retail_1__1_1_4_1_1_3 }
+
+GF_cont_retail_1__1_1_4_1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '67.8836, '1.1038, '-45.7751, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '67.8836, '1.1038, '-45.7751, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_4_1_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.6124, '1.1038, '-2.4891, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.6124, '1.1038, '-2.4891, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_4_1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '116.3711, '1.1038, '-112.3996, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '116.3711, '1.1038, '-112.3996, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_4_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.3317, '17.3978, '-2.2466, '-15.7614)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.3317, '17.3978, '-2.2466, '-15.7614)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_1__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '39.1626, '1.0380, '-38.1626, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '39.1626, '1.0380, '-38.1626, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.75) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_1__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '27.3379, '0.0000, '-26.3379)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '27.3379, '0.0000, '-26.3379)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.75) 
+		primitiveCube() 
+		projectUV(0) 
+
+
+
+
+
+
+
+
+
+#! SIZE 12.820552 6.999727
+
+GFStart_retail_2 -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_retail_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_retail_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~6.60: GF_cont_retail_2__1_1 | 0.40: GF_cont_retail_2__1_2 }
+
+GF_cont_retail_2__1_1 -->
+	split(x, noAdjust) { 0.69: GF_cont_retail_2__1_1_1 | 4.00: GF_cont_retail_2__1_1_2 | ~3.57: GF_cont_retail_2__1_1_3 | 0.71: GF_cont_retail_2__1_1_4 | ~3.50: GF_cont_retail_2__1_1_5 | 0.36: GF_cont_retail_2__1_1_6 }
+
+GF_cont_retail_2__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.6280, '1.0609)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.6280, '1.0609)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_2__1_1_2 -->
+	split(y, noAdjust) { ~4.10: GF_cont_retail_2__1_1_2_1 | 2.49: GF_cont_retail_2__1_1_2_2 }
+
+GF_cont_retail_2__1_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.2051, '1.7059, '-0.1721, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.2051, '1.7059, '-0.1721, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_retail_2__1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.2051, '2.8056, '-0.1721, '-1.6446)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.2051, '2.8056, '-0.1721, '-1.6446)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_2__1_1_3 -->
+	split(x, noAdjust) { ~3.57: GF_cont_retail_2__1_1_3_1 }*
+
+GF_cont_retail_2__1_1_3_1 -->
+	split(y, noAdjust) { ~4.12: GF_cont_retail_2__1_1_3_1_1 | 2.48: GF_cont_retail_2__1_1_3_1_2 }
+
+GF_cont_retail_2__1_1_3_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.5951, '1.7003, '-1.3147, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.5951, '1.7003, '-1.3147, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_retail_2__1_1_3_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.5951, '2.8209, '-1.3147, '-1.6591)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.5951, '2.8209, '-1.3147, '-1.6591)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_2__1_1_4 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.1830, '1.0609, '-11.7069, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.1830, '1.0609, '-11.7069, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_2__1_1_5 -->
+	split(x, noAdjust) { ~3.50: GF_cont_retail_2__1_1_5_1 }*
+
+GF_cont_retail_2__1_1_5_1 -->
+	split(y, noAdjust) { ~4.09: GF_cont_retail_2__1_1_5_1_1 | 2.51: GF_cont_retail_2__1_1_5_1_2 }
+
+GF_cont_retail_2__1_1_5_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.6648, '1.7116, '-2.5611, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.6648, '1.7116, '-2.5611, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+GF_cont_retail_2__1_1_5_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.6648, '2.7904, '-2.5611, '-1.6304)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.6648, '2.7904, '-2.5611, '-1.6304)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_2__1_1_6 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '35.3359, '1.0609, '-34.3359, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '35.3359, '1.0609, '-34.3359, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_retail_2__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '17.4314, '0.0000, '-16.4314)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '17.4314, '0.0000, '-16.4314)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+
+
+
+
+
+
+
+
+#! SIZE 26.936968 3.4979985
+
+GFStart_school_1 -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_school_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_school_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~3.37: GF_cont_school_1__1_1 | 0.13: GF_cont_school_1__1_2 }
+
+GF_cont_school_1__1_1 -->
+	split(x, noAdjust) { 0.28: GF_cont_school_1__1_1_1 | ~5.56: GF_cont_school_1__1_1_2 | 3.13: GF_cont_school_1__1_1_3 | ~17.71: GF_cont_school_1__1_1_4 | 0.26: GF_cont_school_1__1_1_5 }
+
+GF_cont_school_1__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '97.3829, '1.0382)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '97.3829, '1.0382)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_2 -->
+	split(x, noAdjust) { ~1.39: GF_cont_school_1__1_1_2_1 }*
+
+GF_cont_school_1__1_1_2_1 -->
+	split(x, noAdjust) { ~0.13: GF_cont_school_1__1_1_2_1_1 | ~1.09: GF_cont_school_1__1_1_2_1_2 | ~0.17: GF_cont_school_1__1_1_2_1_3 }
+
+GF_cont_school_1__1_1_2_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '202.0633, '1.0382, '-2.0749, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '202.0633, '1.0382, '-2.0749, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_2_1_2 -->
+	split(y, noAdjust) { ~1.26: GF_cont_school_1__1_1_2_1_2_1 | 1.16: GF_cont_school_1__1_1_2_1_2_2 | 0.95: GF_cont_school_1__1_1_2_1_2_3 }
+
+GF_cont_school_1__1_1_2_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '24.7168, '2.7813, '-0.3761, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '24.7168, '2.7813, '-0.3761, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_2_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '24.7168, '3.0202, '-0.3761, '-1.0859)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '24.7168, '3.0202, '-0.3761, '-1.0859)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.25) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_2_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '24.7168, '3.6687, '-0.3761, '-2.5337)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '24.7168, '3.6687, '-0.3761, '-2.5337)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_2_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '161.4207, '1.0382, '-8.9873, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '161.4207, '1.0382, '-8.9873, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_3 -->
+	split(y, noAdjust) { ~2.52: GF_cont_school_1__1_1_3_1 | 0.85: GF_cont_school_1__1_1_3_2 }
+
+GF_cont_school_1__1_1_3_1 -->
+	split(x, noAdjust) { 0.33: GF_cont_school_1__1_1_3_1_1 | ~2.50: GF_cont_school_1__1_1_3_1_2 | 0.30: GF_cont_school_1__1_1_3_1_3 }
+
+GF_cont_school_1__1_1_3_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '81.0866, '1.3876, '-17.5697, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '81.0866, '1.3876, '-17.5697, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_3_1_2 -->
+	split(y, noAdjust) { 0.62: GF_cont_school_1__1_1_3_1_2_1 | ~1.90: GF_cont_school_1__1_1_3_1_2_2 }
+
+GF_cont_school_1__1_1_3_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.7748, '5.6744, '-2.4675, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.7748, '5.6744, '-2.4675, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.65000004) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_3_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.7748, '1.8367, '-2.4675, '-0.3237)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.7748, '1.8367, '-2.4675, '-0.3237)
+		t(0, 0, -0.55) 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_3_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '90.1560, '1.3876, '-29.0140, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '90.1560, '1.3876, '-29.0140, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_3_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.6034, '4.1231, '-1.8642, '-2.9714)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.6034, '4.1231, '-1.8642, '-2.9714)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_4 -->
+	split(x, noAdjust) { ~8.85: GF_cont_school_1__1_1_4_1 }*
+
+GF_cont_school_1__1_1_4_1 -->
+	split(x, noAdjust) { ~1.48: GF_cont_school_1__1_1_4_1_1 }*
+
+GF_cont_school_1__1_1_4_1_1 -->
+	split(y, noAdjust) { 1.24: GF_cont_school_1__1_1_4_1_1_1 | ~1.14: GF_cont_school_1__1_1_4_1_1_2 | 0.99: GF_cont_school_1__1_1_4_1_1_3 }
+
+GF_cont_school_1__1_1_4_1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.2543, '2.8149, '-12.0771, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.2543, '2.8149, '-12.0771, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_4_1_1_2 -->
+	split(x, noAdjust) { ~0.14: GF_cont_school_1__1_1_4_1_1_2_1 | 1.20: GF_cont_school_1__1_1_4_1_1_2_2 | ~0.13: GF_cont_school_1__1_1_4_1_1_2_3 }
+
+GF_cont_school_1__1_1_4_1_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '191.9887, '3.0760, '-127.0198, '-1.0927)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '191.9887, '3.0760, '-127.0198, '-1.0927)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_4_1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '22.4000, '3.0760, '-14.9365, '-1.0927)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '22.4000, '3.0760, '-14.9365, '-1.0927)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.25) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_4_1_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '202.8426, '3.0760, '-144.3128, '-1.0927)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '202.8426, '3.0760, '-144.3128, '-1.0927)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_4_1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.2543, '3.5351, '-12.0771, '-2.4051)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.2543, '3.5351, '-12.0771, '-2.4051)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '102.9820, '1.0382, '-101.9820, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '102.9820, '1.0382, '-101.9820, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_1__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '27.1918, '0.0000, '-26.1918)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '27.1918, '0.0000, '-26.1918)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+
+
+
+
+
+#! SIZE 20.199707 3.7024984
+
+GFStart_school_2 -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_school_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_school_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~3.59: GF_cont_school_2__1_1 | 0.11: GF_cont_school_2__1_2 }
+
+GF_cont_school_2__1_1 -->
+	split(x, noAdjust) { 0.22: GF_cont_school_2__1_1_1 | ~6.69: GF_cont_school_2__1_1_2 | 1.16: GF_cont_school_2__1_1_3 | 0.89: GF_cont_school_2__1_1_4 | 0.39: GF_cont_school_2__1_1_5 | 1.41: GF_cont_school_2__1_1_6 | 0.34: GF_cont_school_2__1_1_7 | 1.10: GF_cont_school_2__1_1_8 | 0.87: GF_cont_school_2__1_1_9 | ~6.85: GF_cont_school_2__1_1_10 | 0.29: GF_cont_school_2__1_1_11 }
+
+GF_cont_school_2__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '92.8696, '1.0315)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '92.8696, '1.0315)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_2 -->
+	split(x, noAdjust) { ~6.69: GF_cont_school_2__1_1_2_1 }*
+
+GF_cont_school_2__1_1_2_1 -->
+	split(x, noAdjust) { ~0.51: GF_cont_school_2__1_1_2_1_1 | 2.37: GF_cont_school_2__1_1_2_1_2 | ~0.28: GF_cont_school_2__1_1_2_1_3 | 2.39: GF_cont_school_2__1_1_2_1_4 | ~1.13: GF_cont_school_2__1_1_2_1_5 }
+
+GF_cont_school_2__1_1_2_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '39.6540, '1.0315, '-0.4270, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '39.6540, '1.0315, '-0.4270, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_2_1_2 -->
+	split(y, noAdjust) { ~0.74: GF_cont_school_2__1_1_2_1_2_1 | 2.08: GF_cont_school_2__1_1_2_1_2_2 | ~0.78: GF_cont_school_2__1_1_2_1_2_3 }
+
+GF_cont_school_2__1_1_2_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.5277, '5.0242, '-0.3069, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.5277, '5.0242, '-0.3069, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_2_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.5277, '1.7836, '-0.3069, '-0.3550)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.5277, '1.7836, '-0.3069, '-0.3550)
+		t(0, 0, -0.45) 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_2_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.5277, '4.7661, '-0.3069, '-3.6208)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.5277, '4.7661, '-0.3069, '-3.6208)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_2_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '72.0984, '1.0315, '-11.0491, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '72.0984, '1.0315, '-11.0491, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_2_1_4 -->
+	split(y, noAdjust) { ~0.75: GF_cont_school_2__1_1_2_1_4_1 | 2.05: GF_cont_school_2__1_1_2_1_4_2 | ~0.79: GF_cont_school_2__1_1_2_1_4_3 }
+
+GF_cont_school_2__1_1_2_1_4_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.4370, '4.9388, '-1.4100, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.4370, '4.9388, '-1.4100, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_2_1_4_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.4370, '1.8058, '-1.4100, '-0.3656)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.4370, '1.8058, '-1.4100, '-0.3656)
+		t(0, 0, -0.45) 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_2_1_4_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.4370, '4.6893, '-1.4100, '-3.5462)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.4370, '4.6893, '-1.4100, '-3.5462)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_2_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '17.8220, '1.0315, '-5.0908, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '17.8220, '1.0315, '-5.0908, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '17.3875, '1.0315, '-5.9423, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '17.3875, '1.0315, '-5.9423, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_4 -->
+	split(y, noAdjust) { 1.03: GF_cont_school_2__1_1_4_1 | ~1.56: GF_cont_school_2__1_1_4_2 | 1.01: GF_cont_school_2__1_1_4_3 }
+
+GF_cont_school_2__1_1_4_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '22.7559, '3.5987, '-9.0857, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '22.7559, '3.5987, '-9.0857, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_4_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '22.7559, '2.3800, '-9.0857, '-0.6614)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '22.7559, '2.3800, '-9.0857, '-0.6614)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.19999999) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_4_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '22.7559, '3.6839, '-9.0857, '-2.5716)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '22.7559, '3.6839, '-9.0857, '-2.5716)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '51.9303, '1.0315, '-23.0162, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '51.9303, '1.0315, '-23.0162, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_6 -->
+	split(y, noAdjust) { ~2.72: GF_cont_school_2__1_1_6_1 | 0.87: GF_cont_school_2__1_1_6_2 }
+
+GF_cont_school_2__1_1_6_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '14.3636, '1.3615, '-6.6427, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '14.3636, '1.3615, '-6.6427, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.14999998) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_6_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '14.3636, '4.2552, '-6.6427, '-3.1254)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '14.3636, '4.2552, '-6.6427, '-3.1254)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_7 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '59.2102, '1.0315, '-31.5052, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '59.2102, '1.0315, '-31.5052, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_8 -->
+	split(y, noAdjust) { 1.04: GF_cont_school_2__1_1_8_1 | ~1.48: GF_cont_school_2__1_1_8_2 | 1.06: GF_cont_school_2__1_1_8_3 }
+
+GF_cont_school_2__1_1_8_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.3634, '3.5564, '-10.0811, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.3634, '3.5564, '-10.0811, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_8_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.3634, '2.4954, '-10.0811, '-0.7017)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.3634, '2.4954, '-10.0811, '-0.7017)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.19999999) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_8_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.3634, '3.4773, '-10.0811, '-2.3713)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.3634, '3.4773, '-10.0811, '-2.3713)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_9 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '23.3484, '1.0315, '-14.0893, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '23.3484, '1.0315, '-14.0893, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_10 -->
+	split(x, noAdjust) { ~6.85: GF_cont_school_2__1_1_10_1 }*
+
+GF_cont_school_2__1_1_10_1 -->
+	split(x, noAdjust) { ~1.07: GF_cont_school_2__1_1_10_1_1 | 2.48: GF_cont_school_2__1_1_10_1_2 | ~0.25: GF_cont_school_2__1_1_10_1_3 | 2.57: GF_cont_school_2__1_1_10_1_4 | ~0.47: GF_cont_school_2__1_1_10_1_5 }
+
+GF_cont_school_2__1_1_10_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.8828, '1.0315, '-12.2033, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.8828, '1.0315, '-12.2033, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_10_1_2 -->
+	split(y, noAdjust) { ~0.67: GF_cont_school_2__1_1_10_1_2_1 | 2.06: GF_cont_school_2__1_1_10_1_2_2 | ~0.85: GF_cont_school_2__1_1_10_1_2_3 }
+
+GF_cont_school_2__1_1_10_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.1341, '5.4993, '-5.6876, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.1341, '5.4993, '-5.6876, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_10_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.1341, '1.7947, '-5.6876, '-0.3263)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.1341, '1.7947, '-5.6876, '-0.3263)
+		t(0, 0, -0.45) 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_10_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.1341, '4.3393, '-5.6876, '-3.2070)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.1341, '4.3393, '-5.6876, '-3.2070)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_10_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '79.3077, '1.0315, '-65.2037, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '79.3077, '1.0315, '-65.2037, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_10_1_4 -->
+	split(y, noAdjust) { ~0.66: GF_cont_school_2__1_1_10_1_4_1 | 2.08: GF_cont_school_2__1_1_10_1_4_2 | ~0.85: GF_cont_school_2__1_1_10_1_4_3 }
+
+GF_cont_school_2__1_1_10_1_4_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.8523, '5.6054, '-6.5549, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.8523, '5.6054, '-6.5549, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_10_1_4_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.8523, '1.7836, '-6.5549, '-0.3182)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.8523, '1.7836, '-6.5549, '-0.3182)
+		t(0, 0, -0.45) 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_10_1_4_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.8523, '4.3393, '-6.5549, '-3.2070)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.8523, '4.3393, '-6.5549, '-3.2070)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_10_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '42.8691, '1.0315, '-41.2454, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '42.8691, '1.0315, '-41.2454, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_1_11 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '68.7261, '1.0315, '-67.7261, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '68.7261, '1.0315, '-67.7261, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+GF_cont_school_2__1_2 -->
+	split(x, noAdjust) { ~10.10: GF_cont_school_2__1_2_1 }*
+
+GF_cont_school_2__1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.0000, '32.7875, '0.0000, '-31.7875)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.0000, '32.7875, '0.0000, '-31.7875)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+
+
+
+style commercial_1
+const styleIsUsed = 1
+
+
+
+
+
+
+attr LOD_int = 2
+
+
+
+
+
+#! SIZE 19.751928 5.894656
+
+StyleStart -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_commercial_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_commercial_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~5.60: Style_commercial_1__1_1 | 0.29: Style_commercial_1__1_2 }
+
+Style_commercial_1__1_1 -->
+	split(x, noAdjust) { 0.83: Style_commercial_1__1_1_1 | ~5.97: Style_commercial_1__1_1_2 | 0.46: Style_commercial_1__1_1_3 | ~6.81: Style_commercial_1__1_1_4 | 0.38: Style_commercial_1__1_1_5 | ~4.91: Style_commercial_1__1_1_6 | 0.39: Style_commercial_1__1_1_7 }
+
+Style_commercial_1__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '23.7447, '1.0523)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '23.7447, '1.0523)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_1__1_1_2 -->
+	split(y, noAdjust) { ~2.97: Style_commercial_1__1_1_2_1 | 0.90: Style_commercial_1__1_1_2_2 | ~1.74: Style_commercial_1__1_1_2_3 }
+
+Style_commercial_1__1_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.3082, '1.9851, '-0.1393, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.3082, '1.9851, '-0.1393, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_commercial_1__1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.3082, '6.5711, '-0.1393, '-3.3101)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.3082, '6.5711, '-0.1393, '-3.3101)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_1__1_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.3082, '3.3969, '-0.1393, '-2.2281)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.3082, '3.3969, '-0.1393, '-2.2281)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_commercial_1__1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '43.3268, '1.0523, '-14.9215, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '43.3268, '1.0523, '-14.9215, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_1__1_1_4 -->
+	split(x, noAdjust) { ~6.81: Style_commercial_1__1_1_4_1 }*
+
+Style_commercial_1__1_1_4_1 -->
+	split(x, noAdjust) { 0.41: Style_commercial_1__1_1_4_1_1 | ~6.00: Style_commercial_1__1_1_4_1_2 | 0.40: Style_commercial_1__1_1_4_1_3 }
+
+Style_commercial_1__1_1_4_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '47.9689, '1.0523, '-17.6273, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '47.9689, '1.0523, '-17.6273, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_1__1_1_4_1_2 -->
+	split(y, noAdjust) { ~2.88: Style_commercial_1__1_1_4_1_2_1 | 0.93: Style_commercial_1__1_1_4_1_2_2 | ~1.79: Style_commercial_1__1_1_4_1_2_3 }
+
+Style_commercial_1__1_1_4_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.2920, '2.0459, '-1.2783, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.2920, '2.0459, '-1.2783, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_commercial_1__1_1_4_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.2920, '6.3625, '-1.2783, '-3.1098)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.2920, '6.3625, '-1.2783, '-3.1098)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_1__1_1_4_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.2920, '3.2855, '-1.2783, '-2.1223)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.2920, '3.2855, '-1.2783, '-2.1223)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_commercial_1__1_1_4_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '49.7456, '1.0523, '-34.4284, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '49.7456, '1.0523, '-34.4284, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_1__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '51.6588, '1.0523, '-36.7909, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '51.6588, '1.0523, '-36.7909, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_1__1_1_6 -->
+	split(y, noAdjust) { ~2.95: Style_commercial_1__1_1_6_1 | 0.93: Style_commercial_1__1_1_6_2 | ~1.72: Style_commercial_1__1_1_6_3 }
+
+Style_commercial_1__1_1_6_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0214, '1.9950, '-2.9418, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0214, '1.9950, '-2.9418, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_commercial_1__1_1_6_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0214, '6.3625, '-2.9418, '-3.1892)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0214, '6.3625, '-2.9418, '-3.1892)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_1__1_1_6_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0214, '3.4260, '-2.9418, '-2.2557)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0214, '3.4260, '-2.9418, '-2.2557)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_commercial_1__1_1_7 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '50.5591, '1.0523, '-49.5591, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '50.5591, '1.0523, '-49.5591, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_1__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '20.1240, '0.0000, '-19.1240)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '20.1240, '0.0000, '-19.1240)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+style commercial_2
+const styleIsUsed = 1
+
+
+
+
+
+
+attr LOD_int = 2
+
+
+
+
+
+#! SIZE 16.190536 8.284789
+
+StyleStart -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_commercial_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_commercial_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~8.09: Style_commercial_2__1_1 | 0.20: Style_commercial_2__1_2 }
+
+Style_commercial_2__1_1 -->
+	split(x, noAdjust) { 1.06: Style_commercial_2__1_1_1 | 4.68: Style_commercial_2__1_1_2 | ~5.10: Style_commercial_2__1_1_3 | 4.39: Style_commercial_2__1_1_4 | 0.96: Style_commercial_2__1_1_5 }
+
+Style_commercial_2__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '15.3132, '1.0247)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '15.3132, '1.0247)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_2 -->
+	split(y, noAdjust) { ~4.34: Style_commercial_2__1_1_2_1 | 1.29: Style_commercial_2__1_1_2_2 | ~2.46: Style_commercial_2__1_1_2_3 }
+
+Style_commercial_2__1_1_2_1 -->
+	split(x, noAdjust) { ~4.29: Style_commercial_2__1_1_2_1_1 | 0.39: Style_commercial_2__1_1_2_1_2 }
+
+Style_commercial_2__1_1_2_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.7748, '1.9096, '-0.2465, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.7748, '1.9096, '-0.2465, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_2_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '41.0458, '1.9096, '-13.5540, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '41.0458, '1.9096, '-13.5540, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.4569, '6.4167, '-0.2257, '-3.3603)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.4569, '6.4167, '-0.2257, '-3.3603)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.4569, '3.3737, '-0.2257, '-2.2925)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.4569, '3.3737, '-0.2257, '-2.2925)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_3 -->
+	split(x, noAdjust) { ~5.10: Style_commercial_2__1_1_3_1 }*
+
+Style_commercial_2__1_1_3_1 -->
+	split(y, noAdjust) { ~4.34: Style_commercial_2__1_1_3_1_1 | 1.28: Style_commercial_2__1_1_3_1_2 | ~2.47: Style_commercial_2__1_1_3_1_3 }
+
+Style_commercial_2__1_1_3_1_1 -->
+	split(x, noAdjust) { 0.45: Style_commercial_2__1_1_3_1_1_1 | ~4.25: Style_commercial_2__1_1_3_1_1_2 | 0.40: Style_commercial_2__1_1_3_1_1_3 }
+
+Style_commercial_2__1_1_3_1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '36.1153, '1.9096, '-12.8058, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '36.1153, '1.9096, '-12.8058, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_3_1_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.8052, '1.9096, '-1.4546, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.8052, '1.9096, '-1.4546, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_3_1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '40.6643, '1.9096, '-26.2311, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '40.6643, '1.9096, '-26.2311, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_3_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.1738, '6.4802, '-1.1254, '-3.3936)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.1738, '6.4802, '-1.1254, '-3.3936)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_3_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.1738, '3.3564, '-1.1254, '-2.2756)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.1738, '3.3564, '-1.1254, '-2.2756)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_4 -->
+	split(y, noAdjust) { ~4.29: Style_commercial_2__1_1_4_1 | 1.15: Style_commercial_2__1_1_4_2 | ~2.65: Style_commercial_2__1_1_4_3 }
+
+Style_commercial_2__1_1_4_1 -->
+	split(x, noAdjust) { 0.39: Style_commercial_2__1_1_4_1_1 | ~4.00: Style_commercial_2__1_1_4_1_2 }
+
+Style_commercial_2__1_1_4_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '41.2598, '1.9321, '-27.6299, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '41.2598, '1.9321, '-27.6299, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_4_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0476, '1.9321, '-2.8086, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0476, '1.9321, '-2.8086, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.20000002) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_4_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.6860, '7.1923, '-2.4684, '-3.7225)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.6860, '7.1923, '-2.4684, '-3.7225)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_4_3 -->
+	split(x, noAdjust) { 0.39: Style_commercial_2__1_1_4_3_1 | ~4.00: Style_commercial_2__1_1_4_3_2 }
+
+Style_commercial_2__1_1_4_3_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '41.2598, '3.1316, '-27.6299, '-2.0562)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '41.2598, '3.1316, '-27.6299, '-2.0562)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_1_4_3_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0476, '3.1316, '-2.8086, '-2.0562)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0476, '3.1316, '-2.8086, '-2.0562)
+		t(0, 0, -0.55) 
+		projectUV(0) 
+
+Style_commercial_2__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '16.9352, '1.0247, '-15.9352, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '16.9352, '1.0247, '-15.9352, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_commercial_2__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '41.5578, '0.0000, '-40.5578)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '41.5578, '0.0000, '-40.5578)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+style industrial_1
+const styleIsUsed = 1
+
+
+
+
+
+
+attr LOD_int = 2
+
+
+
+
+
+#! SIZE 13.069926 2.543163
+
+StyleStart -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_industrial_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_industrial_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~2.28: Style_industrial_1__1_1 | 0.26: Style_industrial_1__1_2 }
+
+Style_industrial_1__1_1 -->
+	split(x, noAdjust) { 0.26: Style_industrial_1__1_1_1 | 0.60: Style_industrial_1__1_1_2 | 1.22: Style_industrial_1__1_1_3 | 0.52: Style_industrial_1__1_1_4 | ~10.23: Style_industrial_1__1_1_5 | 0.23: Style_industrial_1__1_1_6 }
+
+Style_industrial_1__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '50.6490, '1.1139)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '50.6490, '1.1139)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '21.7832, '1.1139, '-0.4301, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '21.7832, '1.1139, '-0.4301, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_1_3 -->
+	split(y, noAdjust) { ~1.24: Style_industrial_1__1_1_3_1 | 0.38: Style_industrial_1__1_1_3_2 | ~0.65: Style_industrial_1__1_1_3_3 }
+
+Style_industrial_1__1_1_3_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.6861, '2.0433, '-0.7015, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.6861, '2.0433, '-0.7015, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_1_3_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.6861, '6.6122, '-0.7015, '-3.2361)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.6861, '6.6122, '-0.7015, '-3.2361)
+		t(0, 0, -0.3) 
+		projectUV(0) 
+
+Style_industrial_1__1_1_3_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.6861, '3.8895, '-0.7015, '-2.4918)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.6861, '3.8895, '-0.7015, '-2.4918)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_1_4 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '24.9867, '1.1139, '-3.9786, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '24.9867, '1.1139, '-3.9786, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_1_5 -->
+	split(x, noAdjust) { ~5.12: Style_industrial_1__1_1_5_1 }*
+
+Style_industrial_1__1_1_5_1 -->
+	split(x, noAdjust) { 0.50: Style_industrial_1__1_1_5_1_1 | ~1.18: Style_industrial_1__1_1_5_1_2 | ~1.24: Style_industrial_1__1_1_5_1_3 | ~1.20: Style_industrial_1__1_1_5_1_4 | 1.00: Style_industrial_1__1_1_5_1_5 }
+
+Style_industrial_1__1_1_5_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '26.1399, '1.1139, '-15.4392, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '26.1399, '1.1139, '-15.4392, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_1_5_1_2 -->
+	split(y, noAdjust) { ~1.61: Style_industrial_1__1_1_5_1_2_1 | ~0.68: Style_industrial_1__1_1_5_1_2_2 }
+
+Style_industrial_1__1_1_5_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '11.1052, '1.5833, '-6.9840, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '11.1052, '1.5833, '-6.9840, '0.0000)
+		t(0, 0, -0.3) 
+		projectUV(0) 
+
+Style_industrial_1__1_1_5_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '11.1052, '3.7570, '-6.9840, '-2.3728)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '11.1052, '3.7570, '-6.9840, '-2.3728)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_1_5_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.5534, '1.1139, '-7.5873, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.5534, '1.1139, '-7.5873, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_1_5_1_4 -->
+	split(y, noAdjust) { ~1.28: Style_industrial_1__1_1_5_1_4_1 | 0.36: Style_industrial_1__1_1_5_1_4_2 | ~0.65: Style_industrial_1__1_1_5_1_4_3 }
+
+Style_industrial_1__1_1_5_1_4_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.8916, '1.9940, '-8.8625, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.8916, '1.9940, '-8.8625, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_1_5_1_4_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.8916, '7.0343, '-8.8625, '-3.5278)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.8916, '7.0343, '-8.8625, '-3.5278)
+		t(0, 0, -0.3) 
+		projectUV(0) 
+
+Style_industrial_1__1_1_5_1_4_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.8916, '3.9359, '-8.8625, '-2.5334)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.8916, '3.9359, '-8.8625, '-2.5334)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_1_5_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '13.0700, '1.1139, '-11.8350, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '13.0700, '1.1139, '-11.8350, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_1_6 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '55.6233, '1.1139, '-54.6233, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '55.6233, '1.1139, '-54.6233, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_1__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '9.7797, '0.0000, '-8.7797)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '9.7797, '0.0000, '-8.7797)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.45000002) 
+		primitiveCube() 
+		projectUV(0) 
+
+style industrial_2
+const styleIsUsed = 1
+
+
+
+
+
+
+attr LOD_int = 2
+
+
+
+
+
+#! SIZE 15.547439 2.4003837
+
+StyleStart -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_industrial_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_industrial_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~2.31: Style_industrial_2__1_1 | 0.09: Style_industrial_2__1_2 }
+
+Style_industrial_2__1_1 -->
+	split(x, noAdjust) { 0.46: Style_industrial_2__1_1_1 | ~4.58: Style_industrial_2__1_1_2 | ~1.88: Style_industrial_2__1_1_3 | 2.46: Style_industrial_2__1_1_4 | 0.13: Style_industrial_2__1_1_5 | ~2.05: Style_industrial_2__1_1_6 | 0.17: Style_industrial_2__1_1_7 | ~2.02: Style_industrial_2__1_1_8 | 1.80: Style_industrial_2__1_1_9 }
+
+Style_industrial_2__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '33.6889, '1.0370)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '33.6889, '1.0370)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_2__1_1_2 -->
+	split(x, noAdjust) { ~4.58: Style_industrial_2__1_1_2_1 }*
+
+Style_industrial_2__1_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.3943, '1.0370, '-0.1008, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.3943, '1.0370, '-0.1008, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_2__1_1_3 -->
+	split(x, noAdjust) { ~1.88: Style_industrial_2__1_1_3_1 }*
+
+Style_industrial_2__1_1_3_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.2525, '1.0370, '-2.6762, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.2525, '1.0370, '-2.6762, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_2__1_1_4 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '6.3319, '1.0370, '-2.8207, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '6.3319, '1.0370, '-2.8207, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_2__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '124.3770, '1.0370, '-75.0488, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '124.3770, '1.0370, '-75.0488, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_2__1_1_6 -->
+	split(y, noAdjust) { ~2.01: Style_industrial_2__1_1_6_1 | 0.30: Style_industrial_2__1_1_6_2 }
+
+Style_industrial_2__1_1_6_1 -->
+	split(x, noAdjust) { ~2.05: Style_industrial_2__1_1_6_1_1 }*
+
+Style_industrial_2__1_1_6_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.5708, '1.1935, '-4.6291, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.5708, '1.1935, '-4.6291, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_industrial_2__1_1_6_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.5708, '7.9070, '-4.6291, '-6.6252)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.5708, '7.9070, '-4.6291, '-6.6252)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_2__1_1_7 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '91.6467, '1.0370, '-68.1416, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '91.6467, '1.0370, '-68.1416, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_2__1_1_8 -->
+	split(x, noAdjust) { ~2.02: Style_industrial_2__1_1_8_1 }*
+
+Style_industrial_2__1_1_8_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.7048, '1.0370, '-5.8128, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.7048, '1.0370, '-5.8128, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_2__1_1_9 -->
+	split(y, noAdjust) { ~1.71: Style_industrial_2__1_1_9_1 | 0.61: Style_industrial_2__1_1_9_2 }
+
+Style_industrial_2__1_1_9_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.6375, '1.4056, '-7.6375, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.6375, '1.4056, '-7.6375, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_2__1_1_9_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.6375, '3.9535, '-7.6375, '-2.8126)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.6375, '3.9535, '-7.6375, '-2.8126)
+		t(0, 0, -0.5) 
+		s('1, '1, 2.0) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_industrial_2__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '28.0595, '0.0000, '-27.0595)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '28.0595, '0.0000, '-27.0595)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+style religious_1
+const styleIsUsed = 1
+
+
+
+
+
+
+attr LOD_int = 2
+
+
+
+
+
+#! SIZE 21.322407 8.738691
+
+StyleStart -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_religious_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_religious_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~8.11: Style_religious_1__1_1 | 0.62: Style_religious_1__1_2 }
+
+Style_religious_1__1_1 -->
+	split(x, noAdjust) { ~7.86: Style_religious_1__1_1_1 | 1.37: Style_religious_1__1_1_2 | 3.00: Style_religious_1__1_1_3 | 1.59: Style_religious_1__1_1_4 | ~7.50: Style_religious_1__1_1_5 }
+
+Style_religious_1__1_1_1 -->
+	split(x, noAdjust) { ~7.86: Style_religious_1__1_1_1_1 }*
+
+Style_religious_1__1_1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.7116, '1.0770)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.7116, '1.0770)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.05) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_religious_1__1_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '15.5655, '1.0770, '-5.7404, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '15.5655, '1.0770, '-5.7404, '0.0000)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.05) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_religious_1__1_1_3 -->
+	split(y, noAdjust) { 3.56: Style_religious_1__1_1_3_1 | ~4.56: Style_religious_1__1_1_3_2 }
+
+Style_religious_1__1_1_3_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.1075, '2.4556, '-3.0778, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.1075, '2.4556, '-3.0778, '0.0000)
+		t(0, 0, -1.05) 
+		projectUV(0) 
+
+Style_religious_1__1_1_3_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.1075, '1.9183, '-3.0778, '-0.7812)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.1075, '1.9183, '-3.0778, '-0.7812)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.05) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_religious_1__1_1_4 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '13.4069, '1.0770, '-7.6920, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '13.4069, '1.0770, '-7.6920, '0.0000)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.05) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_religious_1__1_1_5 -->
+	split(x, noAdjust) { ~7.50: Style_religious_1__1_1_5_1 }*
+
+Style_religious_1__1_1_5_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.8435, '1.0770, '-1.8435, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.8435, '1.0770, '-1.8435, '0.0000)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.05) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_religious_1__1_2 -->
+	split(x, noAdjust) { ~10.66: Style_religious_1__1_2_1 }*
+
+Style_religious_1__1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.0000, '13.9900, '0.0000, '-12.9900)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.0000, '13.9900, '0.0000, '-12.9900)
+		t(0, 0, -1.05) 
+		s('1, '1, 1.4499999) 
+		primitiveCube() 
+		projectUV(0) 
+
+style residential_1
+const styleIsUsed = 1
+
+
+
+
+
+
+attr LOD_int = 2
+
+
+
+
+
+#! SIZE 8.59637 2.6279058
+
+
+StyleStart -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_residential_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_residential_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~2.54: Style_residential_1__1(0) | 0.09: Style_residential_1__1(1) }
+
+
+StyleTrigger(i) -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_residential_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_residential_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		Style_residential_1__1(i)
+
+
+Style_residential_1__1(i) -->
+	case i == 0: Style_residential_1__1_1
+	case i == 1: Style_residential_1__1_2
+	else: Style_residential_1__1_1
+
+Style_residential_1__1_1 -->
+	split(x, noAdjust) { { ~3.84: Style_residential_1__1_1_1 }* | ~0.39: Style_residential_1__1_1_2 | { ~4.38: Style_residential_1__1_1_3 }* }
+
+Style_residential_1__1_1_1 -->
+	split(x, noAdjust) { ~3.84: Style_residential_1__1_1_1_1 }
+
+Style_residential_1__1_1_1_1 -->
+	split(x, noAdjust) { 0.53: Style_residential_1__1_1_1_1_1 | ~1.80: Style_residential_1__1_1_1_1_2 | ~1.51: Style_residential_1__1_1_1_1_3 }
+
+Style_residential_1__1_1_1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '16.2168, '1.0362)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '16.2168, '1.0362)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_1__1_1_1_1_2 -->
+	split(y, noAdjust) { 0.75: Style_residential_1__1_1_1_1_2_1 | ~1.38: Style_residential_1__1_1_1_1_2_2 | 0.41: Style_residential_1__1_1_1_1_2_3 }
+
+Style_residential_1__1_1_1_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.7758, '3.5032, '-0.2945, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.7758, '3.5032, '-0.2945, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_1__1_1_1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.7758, '1.9046, '-0.2945, '-0.5437)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.7758, '1.9046, '-0.2945, '-0.5437)
+		t(0, 0, -0.3) 
+		projectUV(0) 
+
+Style_residential_1__1_1_1_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.7758, '6.4691, '-0.2945, '-5.2432)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.7758, '6.4691, '-0.2945, '-5.2432)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_1__1_1_1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '5.7087, '1.0362, '-1.5474, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '5.7087, '1.0362, '-1.5474, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_1__1_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '22.3158, '1.0362, '-9.9579, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '22.3158, '1.0362, '-9.9579, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.45000002) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_1__1_1_3 -->
+	split(x, noAdjust) { ~4.38: Style_residential_1__1_1_3_1 }
+
+Style_residential_1__1_1_3_1 -->
+	split(x, noAdjust) { 1.11: Style_residential_1__1_1_3_1_1 | ~1.69: Style_residential_1__1_1_3_1_2 | ~1.57: Style_residential_1__1_1_3_1_3 }
+
+Style_residential_1__1_1_3_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.7193, '1.0362, '-3.7905, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.7193, '1.0362, '-3.7905, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_1__1_1_3_1_2 -->
+	split(y, noAdjust) { 0.73: Style_residential_1__1_1_3_1_2_1 | ~1.31: Style_residential_1__1_1_3_1_2_2 | 0.50: Style_residential_1__1_1_3_1_2_3 }
+
+Style_residential_1__1_1_3_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '5.0718, '3.6042, '-3.1475, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '5.0718, '3.6042, '-3.1475, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_1__1_1_3_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '5.0718, '2.0065, '-3.1475, '-0.5567)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '5.0718, '2.0065, '-3.1475, '-0.5567)
+		t(0, 0, -0.3) 
+		projectUV(0) 
+
+Style_residential_1__1_1_3_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '5.0718, '5.2846, '-3.1475, '-4.1000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '5.0718, '5.2846, '-3.1475, '-4.1000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_1__1_1_3_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '5.4870, '1.0362, '-4.4870, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '5.4870, '1.0362, '-4.4870, '0.0000)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_1__1_2 -->
+	split(x, noAdjust) { ~3.84: Style_residential_1__1_2_1 | ~0.39: Style_residential_1__1_2_2 | ~4.37: Style_residential_1__1_2_3 }
+
+Style_residential_1__1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.2410, '28.6345, '0.0000, '-27.6345)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.2410, '28.6345, '0.0000, '-27.6345)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_1__1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '21.9174, '28.6345, '-9.7801, '-27.6345)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '21.9174, '28.6345, '-9.7801, '-27.6345)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.45000002) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_1__1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.9679, '28.6345, '-0.9679, '-27.6345)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.9679, '28.6345, '-0.9679, '-27.6345)
+		t(0, 0, -0.3) 
+		s('1, '1, 0.3) 
+		primitiveCube() 
+		projectUV(0) 
+
+style residential_2
+const styleIsUsed = 1
+
+
+
+
+
+
+attr LOD_int = 2
+
+
+
+
+
+#! SIZE 7.9476604 3.0529785
+
+
+StyleStart -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_residential_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_residential_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~2.67: Style_residential_2__1(0) | 0.38: Style_residential_2__1(1) }
+
+
+StyleTrigger(i) -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_residential_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_residential_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		Style_residential_2__1(i)
+
+
+Style_residential_2__1(i) -->
+	case i == 0: Style_residential_2__1_1
+	case i == 1: Style_residential_2__1_2
+	else: Style_residential_2__1_1
+
+Style_residential_2__1_1 -->
+	split(x, noAdjust) { ~0.40: Style_residential_2__1_1_1 | { ~1.98: Style_residential_2__1_1_2 }* | ~2.01: Style_residential_2__1_1_3 | { ~1.80: Style_residential_2__1_1_4 }* | { ~1.75: Style_residential_2__1_1_5 }* }
+
+Style_residential_2__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '19.8145, '1.1441)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '19.8145, '1.1441)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_2__1_1_2 -->
+	split(x, noAdjust) { ~1.98: Style_residential_2__1_1_2_1 }
+
+Style_residential_2__1_1_2_1 -->
+	split(y, noAdjust) { 0.88: Style_residential_2__1_1_2_1_1 | ~1.28: Style_residential_2__1_1_2_1_2 | 0.51: Style_residential_2__1_1_2_1_3 }
+
+Style_residential_2__1_1_2_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0057, '3.4877, '-0.2022, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0057, '3.4877, '-0.2022, '0.0000)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_2__1_1_2_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0057, '2.3818, '-0.2022, '-0.6829)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0057, '2.3818, '-0.2022, '-0.6829)
+		t(0, 0, -0.2) 
+		projectUV(0) 
+
+Style_residential_2__1_1_2_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.0057, '5.9703, '-0.2022, '-4.2185)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.0057, '5.9703, '-0.2022, '-4.2185)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_2__1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.9514, '1.1441, '-1.1859, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.9514, '1.1441, '-1.1859, '0.0000)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_2__1_1_4 -->
+	split(x, noAdjust) { ~1.80: Style_residential_2__1_1_4_1 }
+
+Style_residential_2__1_1_4_1 -->
+	split(y, noAdjust) { ~0.92: Style_residential_2__1_1_4_1_1 | ~1.22: Style_residential_2__1_1_4_1_2 | 0.53: Style_residential_2__1_1_4_1_3 }
+
+Style_residential_2__1_1_4_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.4154, '3.3320, '-2.4425, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.4154, '3.3320, '-2.4425, '0.0000)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_2__1_1_4_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.4154, '2.5015, '-2.4425, '-0.7508)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.4154, '2.5015, '-2.4425, '-0.7508)
+		t(0, 0, -0.2) 
+		projectUV(0) 
+
+Style_residential_2__1_1_4_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.4154, '5.7406, '-2.4425, '-4.0178)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.4154, '5.7406, '-2.4425, '-4.0178)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_2__1_1_5 -->
+	split(x, noAdjust) { ~1.75: Style_residential_2__1_1_5_1 }
+
+Style_residential_2__1_1_5_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '4.5387, '1.1441, '-3.5387, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '4.5387, '1.1441, '-3.5387, '0.0000)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_residential_2__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '7.9413, '0.0000, '-6.9413)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '7.9413, '0.0000, '-6.9413)
+		t(0, 0, -0.2) 
+		s('1, '1, 0.2) 
+		primitiveCube() 
+		projectUV(0) 
+
+style retail_1
+const styleIsUsed = 1
+
+
+
+
+
+
+attr LOD_int = 2
+
+
+
+
+
+#! SIZE 17.149494 4.3952317
+
+StyleStart -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_retail_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_retail_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~4.23: Style_retail_1__1_1 | 0.16: Style_retail_1__1_2 }
+
+Style_retail_1__1_1 -->
+	split(x, noAdjust) { 0.34: Style_retail_1__1_1_1 | 5.76: Style_retail_1__1_1_2 | 5.46: Style_retail_1__1_1_3 | ~5.15: Style_retail_1__1_1_4 | 0.44: Style_retail_1__1_1_5 }
+
+Style_retail_1__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '49.9740, '1.0380)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '49.9740, '1.0380)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.75) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_1__1_1_2 -->
+	split(y, noAdjust) { ~4.07: Style_retail_1__1_1_2_1 | 0.17: Style_retail_1__1_1_2_2 }
+
+Style_retail_1__1_1_2_1 -->
+	split(x, noAdjust) { 0.11: Style_retail_1__1_1_2_1_1 | ~5.47: Style_retail_1__1_1_2_1_2 | 0.18: Style_retail_1__1_1_2_1_3 }
+
+Style_retail_1__1_1_2_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '162.9196, '1.0810, '-3.2601, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '162.9196, '1.0810, '-3.2601, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_1__1_1_2_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.1331, '1.0810, '-0.0819, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.1331, '1.0810, '-0.0819, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_retail_1__1_1_2_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '95.8353, '1.0810, '-33.0941, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '95.8353, '1.0810, '-33.0941, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_1__1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.9784, '26.0967, '-0.0596, '-24.1421)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.9784, '26.0967, '-0.0596, '-24.1421)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_1__1_1_3 -->
+	split(y, noAdjust) { ~4.07: Style_retail_1__1_1_3_1 | 0.17: Style_retail_1__1_1_3_2 }
+
+Style_retail_1__1_1_3_1 -->
+	split(x, noAdjust) { 0.23: Style_retail_1__1_1_3_1_1 | ~5.00: Style_retail_1__1_1_3_1_2 | 0.23: Style_retail_1__1_1_3_1_3 }
+
+Style_retail_1__1_1_3_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '74.0546, '1.0810, '-26.3455, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '74.0546, '1.0810, '-26.3455, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_1__1_1_3_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.4299, '1.0810, '-1.2665, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.4299, '1.0810, '-1.2665, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_retail_1__1_1_3_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '74.0546, '1.0810, '-48.9364, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '74.0546, '1.0810, '-48.9364, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_1__1_1_3_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.1391, '26.0967, '-1.1168, '-24.1421)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.1391, '26.0967, '-1.1168, '-24.1421)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_1__1_1_4 -->
+	split(x, noAdjust) { ~5.15: Style_retail_1__1_1_4_1 }*
+
+Style_retail_1__1_1_4_1 -->
+	split(y, noAdjust) { ~3.98: Style_retail_1__1_1_4_1_1 | 0.25: Style_retail_1__1_1_4_1_2 }
+
+Style_retail_1__1_1_4_1_1 -->
+	split(x, noAdjust) { 0.25: Style_retail_1__1_1_4_1_1_1 | ~4.75: Style_retail_1__1_1_4_1_1_2 | 0.15: Style_retail_1__1_1_4_1_1_3 }
+
+Style_retail_1__1_1_4_1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '67.8836, '1.1038, '-45.7751, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '67.8836, '1.1038, '-45.7751, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_1__1_1_4_1_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.6124, '1.1038, '-2.4891, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.6124, '1.1038, '-2.4891, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_retail_1__1_1_4_1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '116.3711, '1.1038, '-112.3996, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '116.3711, '1.1038, '-112.3996, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_1__1_1_4_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.3317, '17.3978, '-2.2466, '-15.7614)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.3317, '17.3978, '-2.2466, '-15.7614)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_1__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '39.1626, '1.0380, '-38.1626, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '39.1626, '1.0380, '-38.1626, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.75) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_1__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '27.3379, '0.0000, '-26.3379)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '27.3379, '0.0000, '-26.3379)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.75) 
+		primitiveCube() 
+		projectUV(0) 
+
+style retail_2
+const styleIsUsed = 1
+
+
+
+
+
+
+attr LOD_int = 2
+
+
+
+
+
+#! SIZE 12.820552 6.999727
+
+StyleStart -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_retail_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_retail_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~6.60: Style_retail_2__1_1 | 0.40: Style_retail_2__1_2 }
+
+Style_retail_2__1_1 -->
+	split(x, noAdjust) { 0.69: Style_retail_2__1_1_1 | 4.00: Style_retail_2__1_1_2 | ~3.57: Style_retail_2__1_1_3 | 0.71: Style_retail_2__1_1_4 | ~3.50: Style_retail_2__1_1_5 | 0.36: Style_retail_2__1_1_6 }
+
+Style_retail_2__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.6280, '1.0609)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.6280, '1.0609)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_2__1_1_2 -->
+	split(y, noAdjust) { ~4.10: Style_retail_2__1_1_2_1 | 2.49: Style_retail_2__1_1_2_2 }
+
+Style_retail_2__1_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.2051, '1.7059, '-0.1721, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.2051, '1.7059, '-0.1721, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_retail_2__1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.2051, '2.8056, '-0.1721, '-1.6446)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.2051, '2.8056, '-0.1721, '-1.6446)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_2__1_1_3 -->
+	split(x, noAdjust) { ~3.57: Style_retail_2__1_1_3_1 }*
+
+Style_retail_2__1_1_3_1 -->
+	split(y, noAdjust) { ~4.12: Style_retail_2__1_1_3_1_1 | 2.48: Style_retail_2__1_1_3_1_2 }
+
+Style_retail_2__1_1_3_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.5951, '1.7003, '-1.3147, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.5951, '1.7003, '-1.3147, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_retail_2__1_1_3_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.5951, '2.8209, '-1.3147, '-1.6591)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.5951, '2.8209, '-1.3147, '-1.6591)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_2__1_1_4 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.1830, '1.0609, '-11.7069, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.1830, '1.0609, '-11.7069, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_2__1_1_5 -->
+	split(x, noAdjust) { ~3.50: Style_retail_2__1_1_5_1 }*
+
+Style_retail_2__1_1_5_1 -->
+	split(y, noAdjust) { ~4.09: Style_retail_2__1_1_5_1_1 | 2.51: Style_retail_2__1_1_5_1_2 }
+
+Style_retail_2__1_1_5_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.6648, '1.7116, '-2.5611, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.6648, '1.7116, '-2.5611, '0.0000)
+		t(0, 0, -0.5) 
+		projectUV(0) 
+
+Style_retail_2__1_1_5_1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '3.6648, '2.7904, '-2.5611, '-1.6304)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '3.6648, '2.7904, '-2.5611, '-1.6304)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.5) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_2__1_1_6 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '35.3359, '1.0609, '-34.3359, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '35.3359, '1.0609, '-34.3359, '0.0000)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_retail_2__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '17.4314, '0.0000, '-16.4314)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '17.4314, '0.0000, '-16.4314)
+		t(0, 0, -0.5) 
+		s('1, '1, 0.9) 
+		primitiveCube() 
+		projectUV(0) 
+
+style school_1
+const styleIsUsed = 1
+
+
+
+
+
+
+attr LOD_int = 2
+
+
+
+
+
+#! SIZE 26.936968 3.4979985
+
+StyleStart -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_school_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_school_1_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~3.37: Style_school_1__1_1 | 0.13: Style_school_1__1_2 }
+
+Style_school_1__1_1 -->
+	split(x, noAdjust) { 0.28: Style_school_1__1_1_1 | ~5.56: Style_school_1__1_1_2 | 3.13: Style_school_1__1_1_3 | ~17.71: Style_school_1__1_1_4 | 0.26: Style_school_1__1_1_5 }
+
+Style_school_1__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '97.3829, '1.0382)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '97.3829, '1.0382)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_2 -->
+	split(x, noAdjust) { ~1.39: Style_school_1__1_1_2_1 }*
+
+Style_school_1__1_1_2_1 -->
+	split(x, noAdjust) { ~0.13: Style_school_1__1_1_2_1_1 | ~1.09: Style_school_1__1_1_2_1_2 | ~0.17: Style_school_1__1_1_2_1_3 }
+
+Style_school_1__1_1_2_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '202.0633, '1.0382, '-2.0749, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '202.0633, '1.0382, '-2.0749, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_2_1_2 -->
+	split(y, noAdjust) { ~1.26: Style_school_1__1_1_2_1_2_1 | 1.16: Style_school_1__1_1_2_1_2_2 | 0.95: Style_school_1__1_1_2_1_2_3 }
+
+Style_school_1__1_1_2_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '24.7168, '2.7813, '-0.3761, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '24.7168, '2.7813, '-0.3761, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_2_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '24.7168, '3.0202, '-0.3761, '-1.0859)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '24.7168, '3.0202, '-0.3761, '-1.0859)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.25) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_2_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '24.7168, '3.6687, '-0.3761, '-2.5337)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '24.7168, '3.6687, '-0.3761, '-2.5337)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_2_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '161.4207, '1.0382, '-8.9873, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '161.4207, '1.0382, '-8.9873, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_3 -->
+	split(y, noAdjust) { ~2.52: Style_school_1__1_1_3_1 | 0.85: Style_school_1__1_1_3_2 }
+
+Style_school_1__1_1_3_1 -->
+	split(x, noAdjust) { 0.33: Style_school_1__1_1_3_1_1 | ~2.50: Style_school_1__1_1_3_1_2 | 0.30: Style_school_1__1_1_3_1_3 }
+
+Style_school_1__1_1_3_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '81.0866, '1.3876, '-17.5697, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '81.0866, '1.3876, '-17.5697, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_3_1_2 -->
+	split(y, noAdjust) { 0.62: Style_school_1__1_1_3_1_2_1 | ~1.90: Style_school_1__1_1_3_1_2_2 }
+
+Style_school_1__1_1_3_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.7748, '5.6744, '-2.4675, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.7748, '5.6744, '-2.4675, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.65000004) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_3_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '10.7748, '1.8367, '-2.4675, '-0.3237)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '10.7748, '1.8367, '-2.4675, '-0.3237)
+		t(0, 0, -0.55) 
+		projectUV(0) 
+
+Style_school_1__1_1_3_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '90.1560, '1.3876, '-29.0140, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '90.1560, '1.3876, '-29.0140, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_3_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.6034, '4.1231, '-1.8642, '-2.9714)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.6034, '4.1231, '-1.8642, '-2.9714)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_4 -->
+	split(x, noAdjust) { ~8.85: Style_school_1__1_1_4_1 }*
+
+Style_school_1__1_1_4_1 -->
+	split(x, noAdjust) { ~1.48: Style_school_1__1_1_4_1_1 }*
+
+Style_school_1__1_1_4_1_1 -->
+	split(y, noAdjust) { 1.24: Style_school_1__1_1_4_1_1_1 | ~1.14: Style_school_1__1_1_4_1_1_2 | 0.99: Style_school_1__1_1_4_1_1_3 }
+
+Style_school_1__1_1_4_1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.2543, '2.8149, '-12.0771, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.2543, '2.8149, '-12.0771, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_4_1_1_2 -->
+	split(x, noAdjust) { ~0.14: Style_school_1__1_1_4_1_1_2_1 | 1.20: Style_school_1__1_1_4_1_1_2_2 | ~0.13: Style_school_1__1_1_4_1_1_2_3 }
+
+Style_school_1__1_1_4_1_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '191.9887, '3.0760, '-127.0198, '-1.0927)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '191.9887, '3.0760, '-127.0198, '-1.0927)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_4_1_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '22.4000, '3.0760, '-14.9365, '-1.0927)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '22.4000, '3.0760, '-14.9365, '-1.0927)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.25) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_4_1_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '202.8426, '3.0760, '-144.3128, '-1.0927)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '202.8426, '3.0760, '-144.3128, '-1.0927)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_4_1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.2543, '3.5351, '-12.0771, '-2.4051)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.2543, '3.5351, '-12.0771, '-2.4051)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '102.9820, '1.0382, '-101.9820, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '102.9820, '1.0382, '-101.9820, '0.0000)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_1__1_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '1.0000, '27.1918, '0.0000, '-26.1918)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '1.0000, '27.1918, '0.0000, '-26.1918)
+		t(0, 0, -0.55) 
+		s('1, '1, 0.55) 
+		primitiveCube() 
+		projectUV(0) 
+
+style school_2
+const styleIsUsed = 1
+
+
+
+
+
+
+attr LOD_int = 2
+
+
+
+
+
+#! SIZE 20.199707 3.7024984
+
+StyleStart -->
+	case LOD_int <= 0:
+		texture("assets/GroundFloor/GF_school_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+	setupProjection(0, scope.xy, '1.0000, '1.0000)
+		projectUV(0)
+	else:
+		texture("assets/GroundFloor/GF_school_2_rectified.png")
+		alignScopeToGeometry(zUp, 0, world.lowest)
+		split(y, noAdjust) { ~3.59: Style_school_2__1_1 | 0.11: Style_school_2__1_2 }
+
+Style_school_2__1_1 -->
+	split(x, noAdjust) { 0.22: Style_school_2__1_1_1 | ~6.69: Style_school_2__1_1_2 | 1.16: Style_school_2__1_1_3 | 0.89: Style_school_2__1_1_4 | 0.39: Style_school_2__1_1_5 | 1.41: Style_school_2__1_1_6 | 0.34: Style_school_2__1_1_7 | 1.10: Style_school_2__1_1_8 | 0.87: Style_school_2__1_1_9 | ~6.85: Style_school_2__1_1_10 | 0.29: Style_school_2__1_1_11 }
+
+Style_school_2__1_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '92.8696, '1.0315)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '92.8696, '1.0315)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_2 -->
+	split(x, noAdjust) { ~6.69: Style_school_2__1_1_2_1 }*
+
+Style_school_2__1_1_2_1 -->
+	split(x, noAdjust) { ~0.51: Style_school_2__1_1_2_1_1 | 2.37: Style_school_2__1_1_2_1_2 | ~0.28: Style_school_2__1_1_2_1_3 | 2.39: Style_school_2__1_1_2_1_4 | ~1.13: Style_school_2__1_1_2_1_5 }
+
+Style_school_2__1_1_2_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '39.6540, '1.0315, '-0.4270, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '39.6540, '1.0315, '-0.4270, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_2_1_2 -->
+	split(y, noAdjust) { ~0.74: Style_school_2__1_1_2_1_2_1 | 2.08: Style_school_2__1_1_2_1_2_2 | ~0.78: Style_school_2__1_1_2_1_2_3 }
+
+Style_school_2__1_1_2_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.5277, '5.0242, '-0.3069, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.5277, '5.0242, '-0.3069, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_2_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.5277, '1.7836, '-0.3069, '-0.3550)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.5277, '1.7836, '-0.3069, '-0.3550)
+		t(0, 0, -0.45) 
+		projectUV(0) 
+
+Style_school_2__1_1_2_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.5277, '4.7661, '-0.3069, '-3.6208)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.5277, '4.7661, '-0.3069, '-3.6208)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_2_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '72.0984, '1.0315, '-11.0491, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '72.0984, '1.0315, '-11.0491, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_2_1_4 -->
+	split(y, noAdjust) { ~0.75: Style_school_2__1_1_2_1_4_1 | 2.05: Style_school_2__1_1_2_1_4_2 | ~0.79: Style_school_2__1_1_2_1_4_3 }
+
+Style_school_2__1_1_2_1_4_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.4370, '4.9388, '-1.4100, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.4370, '4.9388, '-1.4100, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_2_1_4_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.4370, '1.8058, '-1.4100, '-0.3656)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.4370, '1.8058, '-1.4100, '-0.3656)
+		t(0, 0, -0.45) 
+		projectUV(0) 
+
+Style_school_2__1_1_2_1_4_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.4370, '4.6893, '-1.4100, '-3.5462)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.4370, '4.6893, '-1.4100, '-3.5462)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_2_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '17.8220, '1.0315, '-5.0908, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '17.8220, '1.0315, '-5.0908, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '17.3875, '1.0315, '-5.9423, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '17.3875, '1.0315, '-5.9423, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_4 -->
+	split(y, noAdjust) { 1.03: Style_school_2__1_1_4_1 | ~1.56: Style_school_2__1_1_4_2 | 1.01: Style_school_2__1_1_4_3 }
+
+Style_school_2__1_1_4_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '22.7559, '3.5987, '-9.0857, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '22.7559, '3.5987, '-9.0857, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_4_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '22.7559, '2.3800, '-9.0857, '-0.6614)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '22.7559, '2.3800, '-9.0857, '-0.6614)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.19999999) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_4_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '22.7559, '3.6839, '-9.0857, '-2.5716)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '22.7559, '3.6839, '-9.0857, '-2.5716)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '51.9303, '1.0315, '-23.0162, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '51.9303, '1.0315, '-23.0162, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_6 -->
+	split(y, noAdjust) { ~2.72: Style_school_2__1_1_6_1 | 0.87: Style_school_2__1_1_6_2 }
+
+Style_school_2__1_1_6_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '14.3636, '1.3615, '-6.6427, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '14.3636, '1.3615, '-6.6427, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.14999998) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_6_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '14.3636, '4.2552, '-6.6427, '-3.1254)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '14.3636, '4.2552, '-6.6427, '-3.1254)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_7 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '59.2102, '1.0315, '-31.5052, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '59.2102, '1.0315, '-31.5052, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_8 -->
+	split(y, noAdjust) { 1.04: Style_school_2__1_1_8_1 | ~1.48: Style_school_2__1_1_8_2 | 1.06: Style_school_2__1_1_8_3 }
+
+Style_school_2__1_1_8_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.3634, '3.5564, '-10.0811, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.3634, '3.5564, '-10.0811, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_8_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.3634, '2.4954, '-10.0811, '-0.7017)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.3634, '2.4954, '-10.0811, '-0.7017)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.19999999) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_8_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.3634, '3.4773, '-10.0811, '-2.3713)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.3634, '3.4773, '-10.0811, '-2.3713)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_9 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '23.3484, '1.0315, '-14.0893, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '23.3484, '1.0315, '-14.0893, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_10 -->
+	split(x, noAdjust) { ~6.85: Style_school_2__1_1_10_1 }*
+
+Style_school_2__1_1_10_1 -->
+	split(x, noAdjust) { ~1.07: Style_school_2__1_1_10_1_1 | 2.48: Style_school_2__1_1_10_1_2 | ~0.25: Style_school_2__1_1_10_1_3 | 2.57: Style_school_2__1_1_10_1_4 | ~0.47: Style_school_2__1_1_10_1_5 }
+
+Style_school_2__1_1_10_1_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '18.8828, '1.0315, '-12.2033, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '18.8828, '1.0315, '-12.2033, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_10_1_2 -->
+	split(y, noAdjust) { ~0.67: Style_school_2__1_1_10_1_2_1 | 2.06: Style_school_2__1_1_10_1_2_2 | ~0.85: Style_school_2__1_1_10_1_2_3 }
+
+Style_school_2__1_1_10_1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.1341, '5.4993, '-5.6876, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.1341, '5.4993, '-5.6876, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_10_1_2_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.1341, '1.7947, '-5.6876, '-0.3263)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.1341, '1.7947, '-5.6876, '-0.3263)
+		t(0, 0, -0.45) 
+		projectUV(0) 
+
+Style_school_2__1_1_10_1_2_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '8.1341, '4.3393, '-5.6876, '-3.2070)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '8.1341, '4.3393, '-5.6876, '-3.2070)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_10_1_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '79.3077, '1.0315, '-65.2037, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '79.3077, '1.0315, '-65.2037, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_10_1_4 -->
+	split(y, noAdjust) { ~0.66: Style_school_2__1_1_10_1_4_1 | 2.08: Style_school_2__1_1_10_1_4_2 | ~0.85: Style_school_2__1_1_10_1_4_3 }
+
+Style_school_2__1_1_10_1_4_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.8523, '5.6054, '-6.5549, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.8523, '5.6054, '-6.5549, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_10_1_4_2 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.8523, '1.7836, '-6.5549, '-0.3182)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.8523, '1.7836, '-6.5549, '-0.3182)
+		t(0, 0, -0.45) 
+		projectUV(0) 
+
+Style_school_2__1_1_10_1_4_3 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '7.8523, '4.3393, '-6.5549, '-3.2070)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '7.8523, '4.3393, '-6.5549, '-3.2070)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_10_1_5 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '42.8691, '1.0315, '-41.2454, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '42.8691, '1.0315, '-41.2454, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_1_11 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '68.7261, '1.0315, '-67.7261, '0.0000)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '68.7261, '1.0315, '-67.7261, '0.0000)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 
+
+Style_school_2__1_2 -->
+	split(x, noAdjust) { ~10.10: Style_school_2__1_2_1 }*
+
+Style_school_2__1_2_1 -->
+	case LOD_int <= 1:
+		setupProjection(0, scope.xy, '2.0000, '32.7875, '0.0000, '-31.7875)
+		projectUV(0) 
+	else:
+		setupProjection(0, scope.xy, '2.0000, '32.7875, '0.0000, '-31.7875)
+		t(0, 0, -0.45) 
+		s('1, '1, 0.45) 
+		primitiveCube() 
+		projectUV(0) 

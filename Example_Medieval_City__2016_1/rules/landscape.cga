@@ -1,0 +1,301 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2016.1"
+
+import plankTexturing : "plankTexturing.cga"
+import Plant : "/ESRI.lib/rules/Plants/Plant_Loader.cga"
+
+@Group("LEVEL OF DETAIL")
+attr highLOD = false
+
+randFieldTexture = fileRandom("assets/landscape/fields/*.jpg")
+
+randTreeDist =
+	60%: rand(15,24)
+	20%: rand(30,60)
+	else: rand(15,30)
+
+const randFieldProjectionWidth = rand(60,90)
+
+
+#######################################################
+# start !
+#######################################################
+
+Crossing                      --> Street
+Junction                      --> Street
+JunctionEntry                 --> Street  
+Freeway                       --> Street
+FreewayEntry                  --> Street
+Joint                         --> Street
+Roundabout                    --> Street
+RoundaboutIsland              --> Street
+RoundaboutEntry               --> Street
+Sidewalk					  --> Street
+
+LotCorner --> Green
+LotInner --> Lot
+		
+Street -->
+	[
+		split(v, unitSpace, 0){
+			.15:
+			split(u, unitSpace, 0){~.05: NIL | 0.15: PutStone(rand(.2,.35)) | ~.05:  NIL }*
+		| ~1: NIL |
+			0.15:
+			split(u, unitSpace, 0){~.05: NIL | 0.15: PutStone(rand(.2,.35)) | ~.05:  NIL }*
+		}
+	]
+	comp(f){all:
+		alignScopeToGeometry(zUp, any, longest)
+		setupProjection(0, scope.xy, 6,6)
+		projectUV(0)
+		translateUV(0, rand(1), rand(1))
+		texture("assets/courtyards/courtyard_floor_3.jpg")
+		Street.
+	}
+
+
+#######################################################
+# Lots
+#######################################################
+
+makegardenProbability = p(0.3)
+
+Lot -->
+	alignScopeToAxes(y)	
+	LotAligned
+	
+LotAligned -->
+	case scope.sx < 50 && scope.sz < 50 && geometry.area > 45:
+		case scope.sy < 8 && makegardenProbability:
+		# gardens
+			Garden
+		else:
+		# standard field layout
+			Green
+			GreenTrees
+			FieldWalls
+			setback(1.5) { front : PutTrees | remainder : NIL }		
+	else: 
+	# standard field layout
+		Green
+		GreenTrees
+		FieldWalls
+		setback(1.5) { front : PutTrees | remainder : NIL }	
+	
+Green -->
+	alignScopeToAxes(y)
+	setupProjection(0, scope.xz, randFieldProjectionWidth, randFieldProjectionWidth,0)
+	projectUV(0)
+	texture(randFieldTexture)
+	translateUV(0, rand(1), rand(1))
+	rotateUV(0, rand(360))
+	Field.
+
+GreenTrees -->
+	case scope.sx > 200 && scope.sz > 200:
+		split(x){80: split(x){80: ScatterTrees}*}*
+	case scope.sx > 60 && scope.sz > 60:
+		split(x){30: split(x){30: ScatterTrees}*}*
+	case scope.sx > 20 && scope.sz > 20:
+		split(x){15: split(x){15: ScatterTrees}*}*
+	else:
+		ScatterTrees
+
+ScatterTrees -->
+	30%:
+		80%:
+			scatter(surface, (geometry.area / 90) , uniform) { PutTree }
+			NIL
+		else:
+			scatter(surface, (geometry.area / 110) , gaussian) { PutTree }
+			NIL
+	else:
+		NIL
+
+getMedievalTree = listRandom("Black Locust;Boxwood;European Larch;Generic Dead Tree;Generic Stump;Lacy Tree Philodendron;Leyland Cypress;Lodgepole Pine;Norway Maple;Norway Spruce;Paper Birch;Red Alder;Red Hickory;Sassafras;Scots Pine;Sunflower;Sweetgum;White Ash;White Oak;White Poplar;White Willow;Witch Hazel;")
+
+PutTrees-->
+	split(x){randTreeDist: PutTree}*
+
+PutTree -->
+	Plant.Generate(getMedievalTree)	
+
+#######################################################
+# fences and walls
+#######################################################
+
+const wallTexture = fileRandom("assets/facade/stone/low/*.jpg")
+	
+FieldWalls -->
+	20%:
+		setback(.5) { left : Walls | remainder: NIL}	
+	20%:
+		setback(0.5) { right : Walls| remainder: NIL}
+	20%:
+		setback(.5) { back : Walls| remainder: NIL}	
+	20%:
+		setback(0.5) { front : Walls| remainder: NIL}
+		else:
+			NIL
+
+Walls -->
+	alignScopeToGeometry(zUp, any, longest)
+	WallSplitter
+	
+WallSplitter -->
+	50%:
+		split(x){8: alignScopeToGeometry(zUp, any, longest)innerRect WallSegment}*
+	else:
+		split(x){4:  alignScopeToGeometry(zUp, any, longest)innerRect WallSegment}*
+	
+WallSegment -->
+	10%:
+		NIL
+	else:
+		extrude(world.up, rand(.5,1)) comp(f){bottom: NIL | all: WallSegmentTexturing}
+	
+WallSegmentTexturing -->
+	setupProjection(0, scope.xy, 6, 9)
+	projectUV(0)
+	texture(wallTexture)
+	Wall.	
+		
+#######################################################
+# gardens
+#######################################################	
+	
+Garden -->
+ alignScopeToAxes(y)
+ setback(rand(2, 4)) { left : Green GreenTrees | all : Green GreenTrees | remainder : VeggieFieldTexturing VeggieFieldGate}
+ 	
+VeggieFieldGate -->
+	60%:
+		extrude(world.up, 1)
+		alignScopeToAxes(y)
+		comp(f){vertical: Gate}
+	10%:
+	# back left right
+		extrude(world.up, 1)
+		alignScopeToAxes(y)
+		comp(f){back: Gate | left: Gate | right: Gate | all: NIL}
+	10%:
+	# left right
+		extrude(world.up, 1)
+		alignScopeToAxes(y)
+		comp(f){left: Gate | right: Gate| all: NIL}
+	10%:
+	# front left right
+		extrude(world.up, 1)
+		alignScopeToAxes(y)
+		comp(f){back: Gate | left: Gate | right: Gate| all: NIL}
+	else:
+	#front
+		extrude(world.up, 1)
+		alignScopeToAxes(y)
+		comp(f){front: Gate | all: NIL}
+
+#######################################################
+# Stones
+#######################################################	
+
+PutStone(size) -->
+	case highLOD == true:
+		5%:
+			s(size * rand(.9, 1.1),size * rand(.9, 1.1),size * rand(.9, 1.1)) t(0,rand(-.1,-.05),0) r(scopeCenter, rand(360), rand(360), rand(360)) i(fileRandom("assets/landscape/VUE_rocks/*.obj")) Rock.
+		else:
+			NIL
+	else:
+		NIL
+
+#######################################################
+# Gates
+#######################################################	
+	
+const gatePlankWidth = rand(1.5, 2.5)	
+const gateType = rint(rand(1))
+
+randVeggieFieldTexture = fileRandom("assets/landscape/veggieFields/*.jpg")
+const randVeggieFieldProjectionWidth = rand(30,50)
+
+Gate -->
+	alignScopeToGeometry(zUp, world.lowest, longest)
+	alignScopeToAxes(y)
+	GateHorizontalplank
+	split(x){{~gatePlankWidth/2: NIL | .08: GateplankLOD}* | ~gatePlankWidth/2: NIL}
+
+GateHorizontalplank -->
+	case gateType == 1:
+		alignScopeToGeometry(zUp, world.lowest, longest)
+		split(y){~1: NIL | 0.08: t(0,0,-.02) GateplankLOD}
+	else:
+		alignScopeToGeometry(zUp, world.lowest, longest)
+		split(y){~1: NIL | 0.08: t(0,0,-.02) GateplankLOD | ~0.2: NIL}	
+	
+GateplankLOD -->
+	case highLOD == true:
+		extrude(0.06)
+		comp(f){all: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}
+	else:
+		plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))
+				
+VeggieFieldTexturing -->
+	alignScopeToAxes(y)
+	setupProjection(0, scope.xz, randVeggieFieldProjectionWidth, randVeggieFieldProjectionWidth,0)
+	projectUV(0)
+	texture(randVeggieFieldTexture)
+	translateUV(0, rand(1), rand(1))
+	rotateUV(0, rand(360))
+	Field.		
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+	
+	
+	

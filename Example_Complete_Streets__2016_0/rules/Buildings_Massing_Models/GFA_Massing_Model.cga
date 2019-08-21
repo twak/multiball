@@ -1,0 +1,47 @@
+/**
+ * File:    GFA_Massing_Model.cga.cga
+ * Created: 17 Feb 2014 08:54:32 GMT
+ * Author:  Esri
+ */
+
+version "2015.0"
+
+attr Floor_Height = 3.2
+attr Gross_Floor_Area = 25000
+
+@Hidden
+attr gfaLeft = 0
+@Hidden
+attr volumeLeft = 0
+
+gfaFromVolume(vol) = vol/ Floor_Height
+
+MassModel --> 
+	alignScopeToAxes(y)
+	set(volumeLeft,geometry.volume())
+	set(gfaLeft, Gross_Floor_Area )
+	print("Current Volume: " + volumeLeft)
+	print("Theoretical GFA: " + gfaFromVolume(volumeLeft))
+	print("Target GFA: " + Gross_Floor_Area )
+	Mass
+	
+	
+Mass --> 
+	case gfaLeft > geometry.area(bottom) && scope.sy < Floor_Height *1.1:
+		s('1, Floor_Height ,'1) Floor
+		set(gfaLeft,gfaLeft-geometry.area(bottom))
+		color(0,1,0)
+		t(0, Floor_Height ,0) Mass
+	case gfaLeft > 0:
+		set(gfaLeft,gfaLeft-geometry.area(bottom))
+#		color(0,0,1)
+		split(y){ Floor_Height : Floor 
+				| ~1: Mass }
+	
+	else:
+		color(1,0,0)
+		asdf.
+	
+		
+
+	

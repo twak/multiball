@@ -1,0 +1,142 @@
+/**
+ * Author:  christianholzer
+ * update: andi 201104
+ */
+
+version "2013.1"
+
+
+import cy : "courtyard.cga"
+import roof : "roof.cga"
+
+
+##################
+#	ASSETS
+##################
+
+
+const balken="mansion/pillar.obj"
+const fenster1="mansion/win1.obj"
+const fenster2="mansion/win3.obj"
+const fenster3="mansion/win2.obj"
+const qbalken="mansion/ledge.obj"
+const b1="mansion/b1.obj"
+
+const tuer="mansion/door.obj"
+
+const wallTex = fileRandom("assets/wall/wall*.jpg")
+
+##################
+#	TEXTUR
+##################
+
+
+##################
+#	ATTRIBUTE
+##################
+
+@Range(4,6)
+attr floor1=4.8
+@Range(3,4)
+attr floor2=3.9
+@Range(2.5,4)
+attr floor3=3.1
+
+
+
+@Range(0,2)
+attr bWidth=1.5
+@Range(0,2)
+attr qHeight=0.9
+@Range(2,4.5)
+attr tileWidth=3.5
+@Range(16,27)
+attr buildingHeight= rand(16,27)
+
+
+
+##################
+#	CODE
+##################
+
+LotInner -->
+	Lot
+
+attr adaptFootprint = scope.sx > 10 && scope.sz > 10
+@StartRule
+Lot-->
+	case  adaptFootprint : mirrorScope(p(0.5), false,false) shapeL(10,10){shape : Footprint | remainder : GroundFilled}
+	else : Footprint
+
+Footprint -->
+Ground
+offset(-0.3, inside)
+extrude(buildingHeight) 
+setupProjection(0, scope.xy, 5, 5, -1)
+comp(f){side: Facade2(scope.sx,scope.sy) | top: Roof}
+
+Facade2(sx,sy)-->
+case scope.sx < 5 : Balkensplit(split.index,split.total)
+else :
+
+split(x){
+					{bWidth:Balkensplit(split.index,split.total) |~tileWidth:Fenstersplit(split.index,sx,sy)}*
+					
+					| bWidth:Balkensplit(split.index,split.total)}
+					
+					
+Balkensplit(i,to)-->split(y){floor1:Balken1(i,to) | '1:Balken2(i,to)}
+
+Fenstersplit(ind,sx,sy)-->split(y){
+					floor1:Floor1(ind)
+					|~qHeight:QuerBalken2
+					|{~floor2:Floor2(sx,sy)}*
+					|~qHeight:QuerBalken2
+					|~floor3+0.5:Floor3}
+					
+
+Floor2(sx,sy)--> i(fenster2)t(0,0,-0.23) s('1,'1,0.5)# setupProjection(2, scope.xy, scope.sx, scope.sy)
+	#set(material.dirtmap, dirt)  
+	#projectUV(2)
+Floor1(ind)-->case ind==5:Door else: i(fenster1) t(0,0,-0.38) s('1,'1.03,scope.sy* 0.14)
+Floor3-->i(fenster3)t(0,0,-0.2)
+Door-->i(tuer) t(0,0,-0.6) s('1,'1.03,scope.sy * 0.1485)
+
+Balken1(i,to)-->
+		i(b1)		s('1,'1,0.48)
+
+Balken2(i,to)-->
+		i(balken) 	s('1,'1,0.48)
+
+					
+
+					
+Balken2-->i(balken)
+QuerBalken2-->s('1.3,'1,0.3) center(x)  iQB2
+
+iQB2-->i(qbalken)
+					
+
+
+
+
+
+
+Ground --> cy.FloorTexture
+GroundFilled --> cy.LotInner
+	
+
+#DACH
+
+@Range("gable1","gable2","hip1","hip2")
+attr roofStyle = 25% : "gable1" 25% : "gable2" 25% : "hip1" else : "hip2"
+
+Roof -->  offset(0.4, inside) roof.Roof
+
+roof.WindowTile --> i(fenster3)
+
+roof.Wall --> Wall
+
+Wall -->
+	projectUV(0)
+	texture(wallTex)

@@ -1,0 +1,29 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+import pa : "Park.cga"
+
+const churchAsset = "assets/church/church.obj"
+
+attr rel = 0.7
+
+attr tx = 10
+attr tz = 10
+attr r = 10
+
+Lot -->
+	Park
+	s(0,0,0)
+	s('rel,rel,'rel)
+	center(xz)
+	t(tx,0,tz)
+	r(scopeCenter, 0,r,0)
+	
+	i(churchAsset)
+	Church.
+	
+Park -->
+	pa.Park

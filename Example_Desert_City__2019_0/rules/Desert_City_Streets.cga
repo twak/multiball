@@ -1,0 +1,179 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+
+@Group ("Level of Detail",0)
+@Order(0)
+@Range("high", "medium", "low")
+attr LOD = "medium"
+
+@Group ("Level of Detail")
+@Order(1)
+attr scatterStoneDensity = 40
+@Group ("Level of Detail")
+@Order(2)
+attr scatterRubblePatchDensity = 600
+
+#attr width = 0
+sidewalkHeight = 0.2
+
+const opacity_tex = "assets/sideWalkOpacity/sidewalk_opacity_1.png"
+const dirt_tex = "streets/streetDirtmap.jpg"
+const street_tex = "streets/pavement.jpg"
+const pavement_tex = "streets/streetTexmap.jpg"
+
+## Assets
+const lamp1="streets/lamp.obj"
+const lamp2="streets/lamp2.obj"
+const lamp3="streets/lamp3.obj"
+const hydrant="streets/hydrant.obj"
+const tonne1="streets/tonne1.obj"
+const tonne2="streets/tonne2.obj"
+const schild1="streets/schild1.obj"
+const schild2="streets/schild2.obj"
+const schild3="streets/schild3.obj"
+const liftfass="streets/litfass.obj"
+const cellPhoneTower = "assets/cellPhoneTower/cellPhoneTower.obj"
+
+
+texOffsetX(size) = getGeoCoord(X) % size
+texOffsetZ(size) = -getGeoCoord(Y) % size
+
+##############################################################################
+# Sidewalk
+##############################################################################
+
+
+Sidewalk -->
+	SidewalkConstruction
+		
+
+SidewalkConstruction -->
+	extrude(world.up, sidewalkHeight)
+	comp(f) {vertical : Curbs | top : split(y){ sidewalkHeight : Curbs | ~1 : SidewalkSurface ScatterAssets SidewalkAssets } |  bottom: NIL | all : NIL}
+
+const curb_tex ="streets/curb.jpg"
+
+
+Curbs --> 
+  	setupProjection(0,scope.xy, scope.sx/ceil(scope.sx/1.1),scope.sy) 
+  	projectUV(0) 
+  	texture(curb_tex)
+	setupProjection(2,scope.xy,30,30)
+	projectUV(2)
+	set(material.dirtmap, dirt_tex)
+
+
+
+SidewalkSurface -->
+	alignScopeToAxes()
+	color(1,1,1)
+	setupProjection(0,scope.xz,texDim,texDim, -texOffsetX(texDim), -texOffsetZ(texDim)) 
+	projectUV(0)
+	texture("assets/streets/sidewalkDirt.jpg")
+	setupProjection(2,scope.xz,4272.423,4272.423, -texOffsetX(4272.423), -texOffsetZ(4272.423))
+	projectUV(2)
+	set(material.dirtmap, "assets/streets/sidewalkDirt.jpg")	
+	Sidewalk.
+
+
+##############################################################################
+# Street
+##############################################################################
+
+Crossing                      --> Street
+Junction                      --> Street
+JunctionEntry                 --> Street  
+Freeway                       --> Street
+FreewayEntry                  --> Street
+Joint                         --> Street
+Roundabout                    --> Street
+RoundaboutIsland              --> Sidewalk
+RoundaboutEntry               --> Street
+
+Street -->
+	ScatterAssets
+	StreetTexturing
+
+
+
+
+
+
+##############################################################################
+# Texturing
+##############################################################################
+
+
+
+@Group("Sidewalk") @Range(1,40) 
+attr propDistance = 40
+
+
+
+
+
+texDim = 25
+streetDirtDim = 300
+
+
+StreetTexturing -->
+	alignScopeToAxes()
+	setupProjection(0,scope.xz,texDim,texDim, -texOffsetX(texDim), -texOffsetZ(texDim)) 
+	projectUV(0)
+	texture(pavement_tex)
+	setupProjection(2,scope.xz,streetDirtDim,streetDirtDim, -texOffsetX(streetDirtDim), -texOffsetZ(streetDirtDim))
+	projectUV(2)
+	set(material.dirtmap, "assets/streets/sidewalkDirt.jpg")	
+	Street.
+
+
+
+
+SidewalkAssets --> 
+	case scope.sx < 5 : NIL
+	else :
+	split(v,unitSpace,0){0.5 :
+		split(u,unitSpace,0){~propDistance/2 : NIL | ~propDistance/2 : alignScopeToAxes(y) Lamp }*
+	
+		split(u,unitSpace,0){~propDistance/5 : NIL | ~propDistance/5 : alignScopeToAxes(y) s(0,0,0) Props }*
+	}	
+	
+
+Lamp -->
+	10% : s(0,6,0)r(0,180,0) i(lamp1) 
+	10% : s(0,6,0)r(0,180,0)i(lamp2)
+	1% : s(0,3,0) r(0,rand(360),0) i(lamp3) 
+ 	else: NIL
+
+Props -->	
+ 	3%: s(0,1,0) i(hydrant)
+ 	12%: s(0,1,0) i(tonne1) r(0,rand(360),0)
+ 	8%: s(0,0.5,0)i(tonne2) r(scopeCenter,0,rand(360),0)
+ 	1% : s(0,rand(15,35),0) i(cellPhoneTower,yUp,keepSizeAndPosition) 
+ 	else: NIL
+
+
+ScatterAssets -->
+	case LOD == "low" :
+		NIL
+	else :
+		scatter(surface,geometry.area / scatterStoneDensity ,uniform) { PutRubbleStone }
+		scatter(surface,geometry.area / scatterRubblePatchDensity ,uniform) { PutRubblePatch }
+		NIL
+
+PutRubbleStone -->
+		s(0,rand(.05,.15),0) r(0,rand(360),0)
+		i(fileRandom("assets/scatter/rubblePiece_*.obj"))
+		texture(fileRandom("assets/scatter/rubblePiece*.jpg"))
+		
+PutRubblePatch -->
+		s(0,rand(.05,.2),0) alignScopeToGeometry(yUp, any, world.lowest) r(180,rand(360),0) t (0,'-1.2,0)
+		i(fileRandom("assets/scatter/rubblePatch_*.obj"))
+		texture(fileRandom("assets/scatter/rubblePatch*.jpg"))
+	
+
+	

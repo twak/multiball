@@ -1,0 +1,49 @@
+/**
+ * Author:  Esri R&D Center Zurich
+ */
+
+version "2014.0"
+
+
+import Plant: "/ESRI.lib/rules/Plants/Plant_Loader.cga"
+
+vegetationMix =
+	6%:
+		"California Palm"
+	8%:
+		"Snake Plant"
+	6%:
+		"Saguaro Cactus"
+	2%:
+		"Prickly Pear Cactus"
+	2%:
+		"Parlour Palm"
+	2%:
+		"Palo Verde"
+	10%:
+		"Palm Lily"
+	10%:
+		"Mexican Palmetto"
+	6%:
+		"Lacy Tree Philodendron"
+	8%:
+		"Hedgehog Agave"
+	6%:
+		"Generic Dead Tree"
+	10%:
+		"Sea Islands Yucca"
+	6%:
+		"Desert Willow"
+	9%:
+		"Date Palm"
+	7%:
+		"Coconut Palm"
+	else:
+		"Blue Gum Eucalyptus"
+
+TreeMarker -->
+	alignScopeToAxes(y)
+	TreeMarkerAligned
+
+TreeMarkerAligned -->
+	Plant.Generate(vegetationMix)

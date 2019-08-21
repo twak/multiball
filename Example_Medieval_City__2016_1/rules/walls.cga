@@ -1,0 +1,390 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2016.1"
+
+import roof : "roofs.cga"
+import plankTexturing : "plankTexturing.cga"
+import landscape : "landscape.cga"
+
+##############################################
+# main attributes
+##############################################
+@Group("ROOF DETAILS")
+attr roofTiles = false
+
+@Group("LEVEL OF DETAIL")
+attr highLOD = false
+
+@Group("WALL DETAILS")
+attr wallHeight = 7.5
+
+@Hidden
+attr wallEarthDepth = 2
+wallStreetHeight = wallHeight - 1.5
+
+##############################################
+# outer wall
+##############################################
+	
+WallPart -->
+# move the shape below the terrain and extrude it
+	# create the ribs
+	WallOuterCrenels
+	alignScopeToAxes(y)
+	t(0,-wallEarthDepth,0)
+	extrude(world.up, wallHeight + wallEarthDepth)
+	comp(f) {bottom: NIL | top: OuterWallHorizontalTexturing | all: alignScopeToAxes(y) OuterWallVerticalTexturing }
+
+WallOuterRibs -->
+# create stability ribs
+	split(u,unitSpace,0){{ ~5: NIL | 1:  extrude(world.up, 1) comp(f){back = t(0,0,.85) alignScopeToAxes(y) s(rand(1.6,2.2),wallHeight * rand(.87,.92),rand(1.2,1.4)) i("assets/outerWall/wallRib.obj") comp(f){top: OuterWallHorizontalTexturing | all: OuterWallVerticalTexturing } }}*| ~5: NIL }
+
+WallOuterCrenels -->
+# crenels
+	split(u,unitSpace,0){ ~1: NIL | 1.5: alignScopeToAxes(y) t(0,wallHeight,0) extrude(world.up,1.2) split(y){(geometry.lowerheight): comp(f) {bottom: NIL | all : OuterWallHorizontalTexturing } | ~1: NIL } | ~1: NIL }*
+
+##############################################
+# OuterWallTexturing
+##############################################	
+
+outerWallMapSizeVertical = 38.5
+outerWallMapSizeHorizontal = 21
+
+OuterWallVerticalTexturing -->
+	OuterWallVerticalTexturingChosenTexture(fileRandom("assets/outerWall/OuterWallTexture_v*.jpg"))
+
+OuterWallVerticalTexturingChosenTexture(chosenTexture) -->	
+	setupProjection(0, scope.xy, outerWallMapSizeHorizontal, outerWallMapSizeVertical, 1)
+	projectUV(0)
+	translateUV(0,rand(1),0)
+	texture(chosenTexture)
+		set(material.bumpmap, chosenTexture)
+	set(material.bumpValue, rand(-.15,-.35))
+
+OuterWallHorizontalTexturing -->
+	OuterWallHorizontalTexturingChosenTexture(fileRandom("assets/outerWall/OuterWallTexture_v*.jpg"))
+
+OuterWallHorizontalTexturingChosenTexture(chosenTexture) -->	
+	alignScopeToGeometry(zUp, any, world.lowest)
+	setupProjection(0, scope.xy, outerWallMapSizeHorizontal, outerWallMapSizeVertical, 1)
+	projectUV(0)
+	translateUV(0,rand(1),rand(1))
+	texture(fileRandom("assets/outerWall/OuterWallTexture_v*.jpg"))	
+
+##############################################
+# gate tower
+##############################################	
+
+sidewalkHeight = .15
+
+Crossing -->
+	t(0,-sidewalkHeight,0)
+	InsertTower
+	tileUV(0,8,8)
+	translateUV(0, rand(1), rand(1))
+	texture("assets/streets/StoneFloor_1.jpg")
+	Street.
+
+@Group("WALL DETAILS")
+attr towerAngle = 0
+towerHeight = wallHeight + 6
+
+InsertTower -->
+	s('1,towerHeight,'1)
+	r(0,towerAngle,0)
+	center(xz)
+	i("assets/outerWall/gateVolume.obj")
+	GateSplit(scope.sz)
+
+GateSplit(depth) -->
+	comp(f){top: roof.GuardTowerRoof | 0: TowerGate(depth, "front") | 4: TowerGate(depth, "back") | 2: TowerGuardDoorSplitter(depth, "front") | 6: TowerGuardDoorSplitter(depth, "back") | all: OuterWallVerticalTexturing}
+
+gateHeight = 6
+
+TowerGate(depth, gateSide) -->
+	case gateSide == "front":
+		split(y){gateHeight : t(0,0,-depth) extrude(depth) GateTunnel(depth) | ~1: OuterWallVerticalTexturing}
+	else:
+		split(y){gateHeight : NIL | ~1: OuterWallVerticalTexturing}
+		
+GateTunnel(depth) -->
+	alignScopeToAxes(y)
+	set(trim.vertical, false)
+	comp(f){front: t(0,0,-depth/2) Gate | back: NIL | bottom: NIL | side: OuterWallVerticalTexturing | top: OuterWallHorizontalTexturing}
+
+@Group("WALL DETAILS")
+attr gateOpening = 4.5
+
+Gate -->
+	alignScopeToAxes(y)
+	split(y){gateHeight - (scope.sy - gateOpening) + sidewalkHeight: NIL | ~1: GateConstruction}	
+	
+GateConstruction -->
+	case highLOD == true:
+		split(y){{0.12: t(0,0,.08) GatePlank | ~0.3: NIL}* | 0.12: t(0,0,.08) GatePlank}
+		split(x){{0.12: GatePlank | ~0.3: NIL}* | 0.12: GatePlank}
+	else:
+		split(y){{0.12: t(0,0,.02) GatePlank | ~0.3: NIL}* | 0.12: t(0,0,.02) GatePlank}
+		split(x){{0.12: GatePlank | ~0.3: NIL}* | 0.12: GatePlank}
+
+GatePlank -->
+	case highLOD == true:
+		extrude(0.08)
+		comp(f){all: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png"))}
+	else:
+		plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png"))
+
+guardDoorHeight = 2.2
+guardDoorWidth = 1.1
+guardDoorStep = 0
+
+guardDoorFrameWidth = 0.12
+guardDoorFrameHeight = 0.12
+
+TowerGuardDoorSplitter(depth, gateSide) -->
+	case gateSide == "front":
+		split(y){wallStreetHeight + 2 *sidewalkHeight + guardDoorStep: OuterWallVerticalTexturing | guardDoorHeight : split(x){~1: OuterWallVerticalTexturing| guardDoorWidth : GuardTowerDoorFrame| ~1: OuterWallVerticalTexturing} | ~1: OuterWallVerticalTexturing}
+	else:
+		split(y){wallStreetHeight + 2 * sidewalkHeight + guardDoorStep: OuterWallVerticalTexturing | guardDoorHeight : split(x){~1: OuterWallVerticalTexturing| guardDoorWidth : GuardTowerDoorFrame| ~1: OuterWallVerticalTexturing} | ~1: OuterWallVerticalTexturing}
+	
+GuardTowerDoorFrame -->
+	case highLOD == true :
+		split(x){guardDoorFrameWidth :
+			t (0,0,-.2)
+			extrude(.26)
+			s('1.1,'1,'1)
+			center(x)
+			alignScopeToAxes(y)
+			comp(f){top: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | back: NIL | side: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}
+		| ~1: split(y){~1: GuardDoor |
+		guardDoorFrameHeight:
+			t (0,0,-.2)
+			extrude(.26)
+			alignScopeToAxes(y)
+			comp(f){top: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | bottom: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | front: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | all : NIL}}
+			|
+		guardDoorFrameWidth :
+			t(0,0,-.2)
+			extrude(.26)
+			s('1.1,'1,'1)
+			center(x)
+			alignScopeToAxes(y)
+			comp(f){top: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | back: NIL | side: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}}
+	else:
+		GuardDoor
+		
+guardDoorTex =
+	fileRandom("assets/facade/door_low/*.png")
+
+GuardDoor -->
+	case highLOD == true:
+		t(0,0,-.2)
+		setupProjection(0, scope.xy, '1,'1)
+		projectUV(0)
+		texture(guardDoorTex)
+	else:
+		setupProjection(0, scope.xy, '1,'1)
+		projectUV(0)
+		texture(guardDoorTex)
+	
+##############################################
+# wall
+##############################################	
+	
+Junction                      --> Street
+JunctionEntry                 --> Street  
+Freeway                       --> Street
+FreewayEntry                  --> Street
+Joint                         --> Street
+Roundabout                    --> Street
+RoundaboutIsland              --> Street
+RoundaboutEntry               --> Street
+
+
+Sidewalk -->
+	setupProjection(0,scope.xz, 40, 40)
+	projectUV(0)
+	translateUV(0,rand(1), rand(1))
+	texture("assets/landscape/rock/rock_1.jpg")
+	Rock.
+
+
+Street -->
+	CutStreetHorns
+
+attr streetWidth = 3.5
+attr laneWidth = 3.5
+
+CutStreetHorns -->
+	split(v, uvSpace, 0)
+	{
+	(-geometry.vMin): Sidewalk
+	| ~1 : StreetNoHorns
+	| geometry.vMax - rint(streetWidth/laneWidth): Sidewalk
+	}
+	
+
+StreetNoHorns -->
+# create the roadway on the wall
+# create either the standard pavement or pavement with a guard tower
+	split(v,unitSpace,0){
+	1: WallPart
+	| ~1:
+		WallOuterRibs
+		alignScopeToAxes(y)
+		t(0,wallStreetHeight,0)
+		OuterWallPavement
+		WallOuterTowers|
+	1: WallPart }
+
+##############################################
+# tower
+##############################################	
+
+const randomTowerBaseHeight = rand(4,5)
+
+WallOuterTowers -->
+	case highLOD == true && geometry.area > 2 && geometry.nVertices >= 4:
+		30%:	
+			split(u, unitSpace, 0){~1 : NIL | 10:
+				[
+				split(v, uvSpace, 0){0.2: t(0,0,.8) TowerBaseWall | ~1: NIL | 0.2:  t(0,0,-.8) TowerBaseWall}
+				]
+				alignScopeToAxes(y)
+				s('1,'1,scope.sz + 1.6)
+				center(z)
+				extrude(world.up, randomTowerBaseHeight)
+				split(y){(geometry.lowerheight): comp(f){top: alignScopeToGeometry(zUp, any, longest) alignScopeToAxes(y) t(0,0.015,0) OuterWallTower} | ~1: NIL}
+			| ~1 : NIL}
+		else:
+			NIL
+	 case geometry.area > 2 && geometry.nVertices >= 4:
+	 	30%:
+			split(u, unitSpace, 0){~1 : NIL | 10:
+				[
+				split(v, uvSpace, 0){0.2:  t(0,0,.8) TowerBaseWall | ~1: NIL | 0.2:   t(0,0,-.8) TowerBaseWall}
+				]
+				alignScopeToAxes(y)
+				s('1,'1,scope.sz + 1.6)
+				center(z)
+				extrude(world.up, randomTowerBaseHeight)
+				split(y){(geometry.lowerheight): comp(f){top: alignScopeToGeometry(zUp, any, longest) alignScopeToAxes(y) t(0,0.015,0) OuterWallTower} | ~1: NIL}
+			| ~1 : NIL}
+		else:
+			NIL
+	else:
+		NIL
+
+TowerBaseWall -->
+# create the two wall parts where the outer wall's towers are sitting on
+	alignScopeToAxes(y)
+	extrude(world.up, randomTowerBaseHeight)
+	split(y){(geometry.lowerheight): comp(f){side: alignScopeToAxes(y) OuterWallVerticalTexturing | top : alignScopeToAxes(y) OuterWallVerticalTexturing} | ~1: NIL}
+			
+##############################################
+# OuterWallTower
+##############################################	
+
+OuterWallTower -->
+	case highLOD == true:
+		# make facade and roof
+		[
+		s('1.2,0,'1.2)
+		center(xz)
+		extrude(world.up,2.8)
+		comp(f){side:  split(x){{~0.8: split(x){~1: TowerPlanksScaled | ~1: TowerPlanksScaled | ~1: TowerPlanksScaled } | 0.2: split(y){0.85: TowerPlanksScaled | 1.4  : NIL | ~1: TowerPlanksScaled} }* | ~0.8: split(x){~1: TowerPlanksScaled | ~1: TowerPlanksScaled | ~1: TowerPlanksScaled} } | top : t(0,0,.3) roof.GuardTowerRoof}
+		]
+		# make construction of tower floor and floor under roof.
+		s('1.2,0,'1.2)
+		center(xz)
+		offset(-0.7)
+		comp(f){border: alignScopeToGeometry(zUp, any, longest) split(x){{~0.8: NIL | 0.2: s('1,scope.sy + 0.16,0.24) t(0,-0.16,'-1) primitiveCube() TowerWoodConstruction  t( 0,0,3.0) comp(f){all: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png")) }}* | ~0.8: NIL } | inside: TowerUpperFloor t(0,0,3.04) TowerUpperFloor}
+	else:
+		# low LOD roof
+		s('1.2,0,'1.2)
+		t(0,-.3,0)
+		center(xz)
+		extrude(world.up,3.4)
+		comp(f){top: roof.GuardTowerRoof | bottom: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | all : split(y){ 0.3 : plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png")) | ~1 : split(x){~0.8:plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png"))  | 0.2: split(y){0.85: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png")) | 1.4  : NIL | ~1: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png"))} }* | ~0.3: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png"))  }}
+		
+
+TowerWoodConstruction -->
+	comp(f){top : plankTexturing.PlankTopTexturing | bottom : plankTexturing.PlankTopTexturing | all: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) }
+	[
+	t('-.45,0.1,0)
+	s('.45,0.16,3.34)
+	comp(f){all: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png")) }
+	]
+	[
+	t('1,0.1,0)
+	s('.45,0.18,3.34)
+	comp(f){all: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png")) }
+	]
+	
+TowerUpperFloor -->
+	offset(-0.24)
+	comp(f){border: alignScopeToAxes(y) t(0,-0.24,0) extrude(0.24) comp(f){all: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png"))} | inside: alignScopeToGeometry(zUp, any, longest) split(x){{~0.8: split(x){'0.5: t(0,0,-0.01) comp(f){all: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png"))}}* | 0.2: alignScopeToAxes(y) t(0,-0.24,0) extrude(0.24) comp(f){all: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png"))}}* | ~0.8: split(x){'0.5: t(0,0,-0.01) comp(f){all: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png"))}}* } }
+
+##############################################
+# Scaled Planks for higher LOD
+##############################################	
+
+TowerPlanksScaled-->
+	s('0.96,'0.96,0)
+	center(xy)
+	t(.01,0,-.03)
+	extrude(0.06)
+	comp(f){all: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_nailed_v*.png"))}
+	
+###################################################
+# OuterWallPavement
+###################################################
+
+const RandomStepHeight = rand(.12,.22)
+diagFactor = 2.5
+
+slopeValueDegrees = atan (scope.sy / geometry.du(0,unitSpace))
+
+OuterWallPavement -->
+	case highLOD == true:
+		alignScopeToGeometry(zUp, any, world.lowest)
+		alignScopeToAxes(y)
+		StreetAligned
+	else:
+		StoneStepTexturing
+		
+StreetAligned -->
+	case slopeValueDegrees >= 3:
+		PlateauSteps
+	else:
+		StoneStepTexturing
+
+PlateauSteps -->
+	case (geometry.du(0,unitSpace) >= RandomStepHeight * diagFactor * 22):
+		split(u, unitSpace, 0){RandomStepHeight *diagFactor*floor(rand(6,16)): SteigungExtruded | ~1: PlateauSteps }
+	case (geometry.du(0,unitSpace) >= RandomStepHeight *diagFactor* 15):
+		split(u, unitSpace, 0){RandomStepHeight *diagFactor* floor(rand(6,9)): SteigungExtruded | ~1: PlateauSteps }
+	else:
+		SteigungExtruded
+		
+SteigungExtruded-->
+	alignScopeToAxes(y)
+	split(y){'0.75: s('1,'1.33333,'1) split(y){~RandomStepHeight: StoneStep(scope.sy) }*| ~1: alignScopeToAxes(y) t(0,'1,0) s('1,0,'1) StoneStepTexturing}	
+		
+StoneStep(height) -->		
+	alignScopeToAxes(y)
+	s('1,0,'1)
+	extrude(world.up, height)
+	comp(f){top: StoneStepTexturing | front: StoneStepTexturing}
+
+StoneStepTexturing -->
+	alignScopeToGeometry(zUp, 0)
+	setupProjection(0, scope.xy, 8,8, rand(1), rand(1))
+	projectUV(0)
+	texture("assets/streets/StoneFloor_1.jpg")
+	Street.
+
+
+

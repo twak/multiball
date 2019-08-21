@@ -1,0 +1,22 @@
+/**
+ * File:    MathUtilities.cga
+ * Created: 14 Oct 2014 15:07:32 GMT
+ * Author:  chri7180
+ */
+
+version "2015.0"
+
+###################################################
+# For mapping into new ranges. 
+
+integerOneToNineNormalized(value) = mapToNewRange(value, 1,9,0,1) 
+mapToNewRange(value, origStart , origEnd , newStart , newEnd) =
+	case value > 0: 
+		((value - origStart) / (origEnd - origStart) * (newEnd - newStart)) + newStart
+	else: 0	
+	
+###################################################
+# Odd or Even 
+	
+isOdd(number) = (floor(abs(number)) % 2) > 0   #Make number positive, round to nearest integer just in case of 6 being 5.99999999999999, or 6.000000000000001.
+isEven(number) = !isOdd(number)

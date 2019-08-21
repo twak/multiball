@@ -1,0 +1,67 @@
+/**
+ * Author:  andi, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+import ash_d : "Altstadthaus_damage.cga"
+import ash_hd : "Altstadthaus_heavydamage.cga"
+import ash_y : "Altstadthaus_yellow.cga"
+import ash : "Altstadthaus.cga"
+import bah : "BraunesAltesHaus.cga"
+import h1 : "House1.cga"
+import h2 : "House2.cga"
+import hw : "HouseWhite.cga"
+import man : "mansion.cga"
+import rui : "ruine.cga"
+import yard : "courtyard.cga"
+
+Lot -->
+	10% : ash_d.Lot 
+	10% : ash_hd.Lot
+	10% : ash_y.Lot 
+	10% : ash.Lot
+	10% : bah.Lot
+	10% : h1.Lot
+	10% : h2.Lot
+	10% : hw.Lot
+	10% : man.Lot
+	else : rui.Lot
+
+
+style ash_d
+Lot --> ash_d.Lot 
+
+
+style ash_hd
+Lot --> ash_hd.Lot
+
+style ash_y
+Lot --> ash_y.Lot 
+
+style ash
+Lot --> ash.Lot
+
+style bah
+Lot --> bah.Lot
+
+style h1
+Lot --> h1.Lot
+
+style h2
+Lot --> h2.Lot
+
+style hw
+Lot --> hw.Lot
+
+style man
+Lot --> man.Lot
+
+style rui
+Lot --> rui.Lot
+
+style yard
+Lot --> yard.Lot
+
+	
+	

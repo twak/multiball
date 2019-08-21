@@ -1,0 +1,86 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+import scatterRule: "scatter.cga"
+
+attr courtTex = fileRandom("assets/courtyard/court*.jpg")
+
+attr greenTex = fileRandom("assets/park/grass*.jpg")
+const dirt_tex = "streets/streetDirt.jpg"	
+
+
+Lot -->
+	LotInner
+
+LotInner -->
+	scatterRule.Scatter
+	Courtyard
+
+Courtyard -->
+	case geometry.area > 50:
+		rotateScope(0,rand(360),0)
+		shapeL(8,8) { shape : FloorTexture | remainder : LawnTexture Trees}
+	else:	
+		Trees
+		FloorTexture
+
+FloorTexture -->
+	setupProjection(0, world.xz, 12, 12)
+	projectUV(0)
+	texture(courtTex)
+	
+LawnTexture -->
+	offset(-.4)
+	comp(f){inside :
+		setupProjection(0, world.xz, 12, 12)
+		projectUV(0)
+		texture(greenTex)
+		setupProjection(2,scope.xy,100,100)
+		projectUV(2)
+		set(material.dirtmap, dirt_tex)
+		Green.
+	|
+	border:
+		FloorTexture
+	}
+	
+randomTree =
+	50%:	
+		"assets/park/baum1.obj"
+	else:
+		"assets/park/tree_dead.obj"
+
+Trees -->
+	offset(-.5)
+	comp(f){inside : scatter(surface,geometry.area / 100,uniform) { PutTrees } | border : NIL}
+	
+PutTrees -->
+	set(trim.vertical,false)
+	s(0,rand(6,12),0)
+	r(0,0,rand(360))
+	i(randomTree)
+	Tree.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

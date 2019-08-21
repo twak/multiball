@@ -1,0 +1,230 @@
+/**
+ * Author:  andi, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+import scatterRule: "scatter.cga"
+
+
+## Textures
+const road_tex = "streets/AsphaltDamaged.jpg"
+const concrete_tex = "streets/brokenAsphalt.jpg"
+const pavement_tex = "streets/pavement.jpg"
+const curb_tex ="streets/curb.jpg"
+const dirt_tex = "streets/streetDirt.jpg"
+
+## Assets
+const lamp1="streets/lamp.obj"
+const lamp2="streets/lamp2.obj"
+const lamp3="streets/lamp3.obj"
+
+#straszenloch="straszenloch.obj"
+const hydrant="streets/hydrant.obj"
+const liftfass="streets/litfass.obj"
+const schild1="streets/schild1.obj"
+const schild2="streets/schild2.obj"
+const schild3="streets/schild3.obj"
+const tonne1="streets/tonne1.obj"
+const tonne2="streets/tonne2.obj"
+## User attributes
+
+@Group("Sidewalk") @Range(0,1) 
+attr sidewalkHeight = 0.35
+
+@Group("Sidewalk") @Range(1,40) 
+attr propDistance = 25
+
+@Group("Street") @Range(0,6) 
+attr medianWidth = 
+	case geometry.dv(0, unitSpace) > 11 : 2.7
+	else : 0
+
+## Functions
+
+
+
+/******************** 
+   Rules 
+*********************/
+
+Lot --> Street
+
+Park --> NIL
+
+Junction --> Concrete
+JunctionEntry --> Concrete
+
+Crossing --> 
+	scatterRule.Scatter
+	Concrete
+Freeway                       --> Street
+FreewayEntry                  --> Street
+Joint                         --> Street
+Roundabout                    --> Street
+RoundaboutIsland              --> Sidewalk
+RoundaboutEntry               --> Street
+
+
+Street -->
+	scatterRule.Scatter
+	StreetStart
+
+StreetStart -->
+	Concrete
+	split(v, unitSpace, 0){~1 : Lane(2) | medianWidth : Median | ~1 : alignScopeToGeometry(yUp, 2) Lane(0)}
+	
+Median -->
+	Trees
+	extrude(world.up,sidewalkHeight)
+	comp(f){ top   : offset(-sidewalkHeight) comp(f){border : Curbs | inside : Pavement }
+        	| side : Curbs }
+
+
+Lane(l) --> 
+	split(u,unitSpace,0){4 : Car(l)}*
+
+car = fileRandom("assets/streets/cars/golf_geo*.obj")
+carTex = fileRandom("assets/streets/cars/golf_*.jpg")
+carFlip =
+	70%: 0 else: 180 + rand(-30,30)	
+	
+@Group("Street") @Range(0,1) 
+attr carProb = 0.08	
+
+Car(l) --> 
+	case p(carProb):
+	alignScopeToGeometry(yUp, l)
+	//s(1,1,1) primitiveCube()
+	setPivot(xyz, 1)
+	i(car,yUp,keepSizeAndPosition) center(x) r(scopeCenter, 0,rand(-55,55),carFlip)
+	texture(carTex)
+	else : NIL
+
+@Group("Street") @Range(2,25) 	
+attr treeDist = 6
+@Group("Street") @Range(0,1) 	
+attr treeProb = 1
+
+Trees --> 
+	t(0,sidewalkHeight,0)
+	split(u,unitSpace,0) {~treeDist/2 : NIL | {~treeDist : TreeSpot }* }
+	
+TreeSpot -->
+	case p(treeProb):
+		alignScopeToGeometry(yUp, 0)
+		s(2,0,0)
+		center(z)
+		i(fileRandom("assets/treeHole/treeHole*.obj"))
+		TreeSpot.
+		PutTree
+	else:
+		NIL
+
+tree = 50% : "park/baum1.obj"
+	else : 	"park/tree_dead.obj"
+	
+PutTree -->
+	90%:
+		60%:
+			s(0,rand(6,10),0)
+			center(xz)
+			r(0,rand(360),0)
+			i(tree)
+			Tree.
+		else:
+			s(0,rand(6,10),0)
+			center(xz)
+			r(rand(70,70),rand(360),0)//rand(70,90))
+			i(tree)
+			Tree.
+	else:
+		NIL
+
+
+
+
+
+		  
+
+
+Sidewalk -->
+	
+	set(trim.vertical,false) set(trim.horizontal,false)  
+	comp(f){ all: SidewalkPart }
+  
+SidewalkPart -->   
+  		SidewalkWithCurbs
+  		alignScopeToAxes(y) t(0,sidewalkHeight,0)
+  		SidewalkLamps 
+ 	
+
+SidewalkWithCurbs --> 
+	case  sidewalkHeight > 0:
+		extrude(world.up,sidewalkHeight)
+		comp(f)		
+			{ top   : split(y){ sidewalkHeight : Curbs | ~1 : Pavement /*alignScopeToGeometry(yUp, 0) scatterRule.Scatter*/ }
+        	| front : Curbs }
+	else : Pavement
+	
+	
+Pavement -->
+	setupProjection(0,world.xz,3,3)
+	projectUV(0)
+	texture(pavement_tex)
+	setupProjection(2,world.xz,50,50)
+	projectUV(2)
+	set(material.dirtmap, dirt_tex)
+
+SidewalkLamps --> 
+	case scope.sx < 5 : NIL
+	else :
+	split(v,unitSpace,0){0.5 :
+		split(u,unitSpace,0){~propDistance/2 : NIL | ~propDistance/2 : Lamp }*
+	
+		split(u,unitSpace,0){~propDistance/5 : NIL | ~propDistance/5 : s(0,0,0) Props }*
+	}	
+	
+/*  	case scope.sx>2*propDistance: split(x){ ~propDistance  :  NIL 
+    		| { 0.1: Lamp | ~propDistance : NIL }* }
+    
+    case scope.sx>5:split(x){ 5  : Lamp}
+    
+    else: NIL
+*/
+
+Lamp -->
+	40% : s(0,6,0)r(0,180,0) i(lamp1) 
+	20%: s(0,6,0)r(0,180,0)i(lamp2) 
+ 	else:  s(0,3,0) r(0,rand(360),0) i(lamp3) 
+ 	
+Props -->	
+ 	
+ 	10%:s(0,1,0) i(hydrant)
+ 	11%: s(0,1,0) i(tonne1) r(0,rand(360),0)
+ 	11%: s(0,0.5,0)i(tonne2) r(scopeCenter,0,rand(360),0)
+ 	9%:s(0,1,0) i(schild1) r(0,rand(360),0)
+ 	9%:s(0,1,0) i(schild2) r(0,rand(360),0)
+ 	9%:s(0,1,0) i(schild3) r(0,rand(360),0)
+ 	5% : s(0,2.5,0) i(liftfass) r(0,rand(360),0) center(x)
+ 	
+ 	else: NIL
+
+
+
+
+Curbs --> 
+  	setupProjection(0,scope.xy, scope.sx/ceil(scope.sx/1.1),scope.sy) 
+  	projectUV(0) 
+  	texture(curb_tex)
+	setupProjection(2,scope.xy,50,50)
+	projectUV(2)
+	set(material.dirtmap, dirt_tex)
+
+Concrete -->
+	setupProjection(0,scope.xz,22,22)
+	projectUV(0)
+	texture(concrete_tex)
+	setupProjection(2,scope.xz,50,50)
+	projectUV(2)
+	set(material.dirtmap, dirt_tex)

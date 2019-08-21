@@ -1,0 +1,71 @@
+/**
+ * File:    Park.cga
+ * Author:  christianholzer
+ */
+
+version "2013.1"
+
+import scatterRule: "scatter.cga"
+
+@Range(1,8)
+attr wegbreite=5
+@Range(0.5,2)
+attr mauerbreite=1.25
+@Range(8,20)
+attr treescale=15
+@Range
+attr treeDensity = 0.4
+
+
+const baum="park/baum1.obj"
+attr grastex = fileRandom("assets/park/grass*.jpg")
+const wegtex="park/boden.jpg"
+const mauertex="park/mauer.jpg"
+
+
+LotInner --> Park
+Lot --> Park
+
+Park-->
+	scatterRule.Scatter
+	offset(-mauerbreite) 
+	comp(f) { inside: I | border: O }
+
+
+O   --> 70%:split(x){~scope.sx/3:Mauer|20:WegTex|~scope.sx/3:Mauer}else:Mauer
+I--> offset(-wegbreite) comp(f) { inside: Wiese | border: Weg }
+
+Mauer-->innerRect extrude(3.5) comp(f){side:Mauerside|top:Mauertop}
+
+Mauertop-->setupProjection(0, scope.xy,5,5,1)
+
+			set(material.colormap, mauertex)  
+			projectUV(0)
+
+Mauerside-->setupProjection(0, scope.xy,5,5,1)
+
+			set(material.colormap, mauertex)  
+			projectUV(0)
+
+Weg-->WegTex
+
+
+Wiese --> 
+	WieseTex
+	scatter(surface,geometry.area * treeDensity/50, uniform) { Tree }
+Tree -->
+	alignScopeToAxes(y)
+	s(0,treescale*rand(0.7,1.3),0) t(0,-.3,0) r(scopeCenter, 0,rand(360),0) i(baum)
+
+
+
+WegTex--> setupProjection(0, scope.xy,10,10, 1)
+
+			set(material.colormap, wegtex)  
+			projectUV(0)
+WieseTex--> setupProjection(0, scope.xy,25, 25, 1)
+
+			set(material.colormap, grastex)  
+			projectUV(0)
+
+

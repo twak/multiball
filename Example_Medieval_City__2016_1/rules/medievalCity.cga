@@ -1,0 +1,1692 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2016.1"
+
+import roofs : "roofs.cga"
+import wall : "walls.cga"
+import plankTexturing : "plankTexturing.cga"
+import landscape : "landscape.cga"
+
+##############################################
+# main attributes
+##############################################	
+
+alleyProbability = p(0.8)
+randAlleyWith = rand(1.5,3.5)
+
+@Group("ROOF DETAILS")
+@Range(0.1, 0.45)
+attr randOverHangWidth = roofs.randOverHangWidth # duplicate from roofs.cga
+
+groundFloorHeight = rand (2.5, 3.1)
+upperFloorHeight = rand (2.2, 2.4)
+
+
+@Group("CONSTRUCTION DETAILS")
+@Order(5)
+attr numFloors =
+	case socialLevelType == "high": ceil(rand(1,3))
+	else: ceil(rand(1,2))
+
+@Order(2)
+@Group("LEVEL OF DETAIL")
+attr highLOD = false
+@Order(1)
+@Group("LEVEL OF DETAIL")
+attr roofTiles = wall.roofTiles
+
+#defines that the floor volumes to not jump forward and backwards slightly to simulate construction flaws "0 = most expensive construction"
+scatterMultiplier =
+	case socialLevelType == "high"  : 0
+	else: 1
+
+
+@Group("CONSTRUCTION DETAILS")
+@Range("high", "low")
+@Order(5)
+attr socialLevelType = case p(0.5) : "high"
+	else: "low"
+
+socialLevelTypeFunction =
+	case socialLevelType != "" :  #not mapped
+		socialLevelType
+	else :
+		70% :
+			"low"
+		else :
+			"high"
+
+@Group("CONSTRUCTION DETAILS")
+@Range(stone = "stone", framework = "framework", plaster = "plaster", wood = "wood")
+attr buildingMaterial =
+	case socialLevelType == "high":
+		60%: "stone"
+		30%: "framework"
+		10%: "plaster"
+		else: "wood" # no high wood !
+	else:
+		20%: "stone"
+		10%: "framework"
+		10%: "plaster"
+		else: "wood"
+		
+##############################################
+# functions
+##############################################	
+
+@Hidden
+attr type = ""
+
+sidewalkHeight = .15
+sideWalkStoneWidth = .24
+sideStoneWidth = rand(.3,.5)
+
+const streetLampAsset  = fileRandom("assets/streets/sidewalkLamps/*.obj")
+const streetLampTexture = fileRandom("assets/streets/sidewalkLamps/*.png")
+
+Junction                      --> Street
+JunctionEntry                 --> Street  
+Freeway                       --> Street
+FreewayEntry                  --> Street
+Joint                         --> Street
+Roundabout                    --> Street
+RoundaboutIsland              --> Street
+RoundaboutEntry               --> Street
+
+SidewalkSurface --> SidewalkMainTexturing
+Crossing -->
+	alignScopeToAxes(y)
+	t(0,-sidewalkHeight,0)
+	StoneStepTexturing
+	
+Sidewalk -->
+	SidewalkLamps
+	split(v, unitSpace, 0){sideWalkStoneWidth : t(0,-sidewalkHeight+.102,0) SidewalkStones | ~1 : SidewalkPutBlocks}
+
+##############################################
+# SidewalkLamps
+##############################################		
+
+SidewalkLamps -->
+	split(v, unitSpace, 0){.5: LampBand | ~1: NIL }
+
+LampBand -->
+	split(u, unitSpace, 0){{~2.5:  NIL | .5: PlaceLampAsset}* | ~2.5: NIL}
+
+PlaceLampAsset -->
+	case type == "MAJOR":
+		80%:
+			alignScopeToGeometry(yUp, any, longest) s(0,0,0) center(xz) alignScopeToAxes(y) i(streetLampAsset) texture(streetLampTexture) StreetLamp.
+		else: NIL	
+	else:
+		20%:
+			alignScopeToGeometry(yUp, any, longest) s(0,0,0) center(xz) alignScopeToAxes(y) i(streetLampAsset) texture(streetLampTexture) StreetLamp.
+		else: NIL		
+
+##############################################
+# Sidewalk Blocks
+##############################################	
+			
+SidewalkPutBlocks -->
+	StreetFurniture
+	SidewalkExtrusion
+	
+	
+SidewalkExtrusion -->
+	alignScopeToAxes(y)
+	t(0,-5,0)
+	extrude(world.up, 5+.102/*from complete_street.cga*/)
+	comp(f){top: SidewalkMainTexturing | side: BlockTexturing }	
+
+SidewalkMainTexturing -->
+	comp(f){all:
+		alignScopeToGeometry(zUp, any, longest)
+		setupProjection(0, scope.xy, 7,7)
+		projectUV(0)
+		texture("assets/streets/StoneFloor_2.jpg")
+		translateUV(0, rand(1), rand(1))
+		setupProjection(2,scope.xy, 20, 20)
+		projectUV(2)
+		set(material.dirtmap, "assets/streets/dirtMaps/dirtMap_1.jpg")
+		Sidewalk.
+	}
+
+SidewalkStones -->
+	case highLOD == true:
+		case scope.sx > sideStoneWidth * 1.6:
+			split(u, unitSpace, 0){~1: SidewalkStones| ~1: SidewalkStones}*
+		else:
+			# double the geo to keep all watertight
+			[
+			extrude(sidewalkHeight)
+			comp(f){side : SidewalkStoneTexturing | top: SidewalkStoneTexturing}
+			]
+			# place stones
+			extrude(sidewalkHeight)
+			alignScopeToGeometry(zUp, world.lowest, longest)
+			alignScopeToAxes(y)
+			s('rand(.93,1.02), 'rand(1.15,1.35),'rand(1.2,1.3))
+			center(xz)
+			i(fileRandom("assets/streets/sidewalk/*.obj")) Stone.
+	else:
+		extrude(sidewalkHeight)
+		comp(f){side : SidewalkStoneTexturing | top: SidewalkStoneTexturing}
+
+SidewalkStoneTexturing -->
+	setupProjection(0, scope.xy, 6,6)
+	projectUV(0)
+	translateUV(0, rand(1), rand(1))
+	rotateUV(0, rand(360))
+	texture("assets/streets/sidewalk/stoneColor.png")
+	SidewalkStone.			
+
+
+
+const RandomStepHeight = rand(.12,.22)
+diagFactor = 2.5
+
+slopeValueDegreesCurved = atan (scope.sy / geometry.du(0,unitSpace))
+
+Street -->
+	alignScopeToGeometry(zUp, any, world.lowest)
+	alignScopeToAxes(y)
+	t(0,-0,0)
+	StreetAligned
+
+StreetAligned -->
+	case slopeValueDegreesCurved >= 3:
+		PlateauSteps
+	else:
+		StreetFurniture
+		StoneStepTexturing
+
+PlateauSteps -->
+	case (geometry.du(0,unitSpace) >= RandomStepHeight * diagFactor * 22):
+		split(u, unitSpace, 0){RandomStepHeight *diagFactor*floor(rand(6,16)): SteigungExtruded | ~1: PlateauSteps }
+	case (geometry.du(0,unitSpace) >= RandomStepHeight *diagFactor* 15):
+		split(u, unitSpace, 0){RandomStepHeight *diagFactor* floor(rand(6,9)): SteigungExtruded | ~1: PlateauSteps }
+	else:
+		SteigungExtruded
+		
+SteigungExtruded-->
+	alignScopeToAxes(y)
+	split(y){'0.75: s('1,'1.33333,'1) split(y){~RandomStepHeight: StoneStep(scope.sy) }*| ~1: alignScopeToAxes(y) t(0,'1,0) s('1,0,'1) t(0,-5,0) extrude(world.up, 5) comp(f){ top: StoneStepTexturing | left: StoneStepTexturing | right: StoneStepTexturing}}	
+		
+StoneStep(height) -->		
+	alignScopeToAxes(y)
+	s('1,0,'1)
+	extrude(world.up, height)
+	comp(f){top: StreetFurniture StoneStepTexturing | front: StoneStepTexturing | side: s('1,scope.sy * 5,'1) t(0,-scope.sy / 5 * 4,0) StoneStepTexturing}
+
+StoneStepTexturing -->
+	alignScopeToGeometry(zUp, 0)
+	setupProjection(0, scope.xy, 8,8, rand(1), rand(1))
+	projectUV(0)
+	texture("assets/streets/StoneFloor_1.jpg")
+	setupProjection(2,scope.xy, 50, 50)
+	projectUV(2)
+	set(material.dirtmap, "assets/streets/dirtMaps/dirtMap_1.jpg")
+	Street.
+
+StreetFurniture -->
+	scatter(surface, (geometry.area / 50) , uniform) { PutStreetFurnitureAsset }
+	NIL
+	
+PutStreetFurnitureAsset -->
+	alignScopeToAxes(y)
+	s(assetSize("assets/streetFurniture/chicken.obj", "x"),assetSize("assets/streetFurniture/chicken.obj", "y"),assetSize("assets/streetFurniture/chicken.obj", "z"))
+	r(scopeCenter, 0,rand(360),0)
+	i("assets/streetFurniture/chicken.obj")
+	texture(fileRandom("assets/streetFurniture/chicken_*.png"))
+	SidewalkFurnitureAsset.
+
+##############################################
+# Start
+##############################################	
+
+
+LotInner -->
+	case p(0.5):
+		LotType("inner")
+	else:
+		LotType("lot")
+
+xzDiagonal = sqrt( (scope.sx * scope.sx) + (scope.sz * scope.sz) )
+slopeValueDegrees = atan (scope.sy / xzDiagonal)
+
+lotBaseValue = 8
+vegetationSlopeValue = 22
+
+@Startrule
+Lot -->
+	LotType("lot")
+
+LotType(type) -->
+	set (socialLevelType, socialLevelTypeFunction)
+	EvalTexture(mainFacadeTexture) 
+	alignScopeToAxes(y)
+	LotAligned(type, scope.sy)
+	
+LotAligned(type, YScope) -->
+	case slopeValueDegrees <= lotBaseValue:
+	# building with base
+		case type == "lot":
+			alignScopeToAxes(y)
+			s('1,0,'1)
+			t(0,YScope*0.3,0)
+			LotBase(YScope)
+			BaseCreation
+		else:
+			20%:
+				CourtYardTexturing
+				landscape.GreenTrees
+			15%:
+				landscape.Green
+				landscape.GreenTrees
+			12%:
+				landscape.Garden
+				landscape.GreenTrees
+			else:
+				60%:
+					CourtYardTexturing
+					landscape.GreenTrees
+				25%:
+					shapeL(6,6) { shape : 
+						alignScopeToAxes(y)
+						s('1,0,'1)
+						t(0,YScope*0.3,0)
+						LotBase(YScope)
+						BaseCreation
+					| remainder:
+						CourtYardTexturing
+					}
+				else:
+					LotBase(YScope)
+					BaseCreation	
+			
+	case slopeValueDegrees <= vegetationSlopeValue:
+	# too steep for building, make veggies
+		landscape.Green
+		landscape.GreenTrees
+	else:
+	# too steep for veggies, make rock
+		landscape.GreenTrees
+		alignScopeToGeometry(zUp, any, world.lowest)
+		setupProjection(0,scope.xy, 40, 40)
+		projectUV(0)
+		translateUV(0,rand(1), rand(1))
+		texture("assets/landscape/rock/rock_1.jpg")
+		Rock.
+
+BaseCreation -->
+	t(0,-5,0)
+	extrude(world.up, 5)
+	comp(f){side: BlockTexturing}
+	
+		
+LotBase(YScope) -->
+	case geometry.nVertices == 4 && geometry.isRectangular(30):
+	# put alleys only where the Lots are "kinda square"	
+		case alleyProbability == true :
+		# in 20% of the cases, split off an alley
+			50%:
+			# split off left
+				split(x){randAlleyWith : SidewalkSurface | ~1: LotNextToAlley(YScope)}
+			else:
+			# or right side
+				split(x){~1: LotNextToAlley(YScope) | randAlleyWith : SidewalkSurface}
+		else:
+			LotNextToAlley(YScope)
+	else:
+		LotNextToAlley(YScope)	
+
+
+LotNextToAlley(YScope) -->
+	case (scope.sx >= 2) && (scope.sz >= 2) && (geometry.area > 2.5):
+				# create area in front of house : Sidewalk part of little area for stuff
+				case YScope < 0.1:
+					setback(rand(0.4,0.65)){streetSide : RestArea | remainder : LotDesigned}
+				case YScope < 0.4:
+					setback(rand(0.6,0.85)){streetSide : RestArea | remainder : LotDesigned}
+				case YScope < 1.2:
+					setback(rand(1,1.4)){streetSide : RestArea | remainder : LotDesigned}
+				else:
+					setback(rand(1.1,1.5)){streetSide : RestArea | remainder : LotDesigned}
+	else:
+		SidewalkSurface
+
+
+
+LotNextToAlleyOrig -->
+	case (scope.sx >= 2) && (scope.sz >= 2) && (geometry.area > 2.5):
+			60%: # leave 60% alone
+				# create area in front of house : Sidewalk part of little area for stuff
+				split(z){(rand(0.6,1)): RestArea| ~1: LotDesigned | (rand(0.6,1)): RestArea}
+			else:
+				LotDesigned
+	else:
+		SidewalkSurface
+	
+	
+LotDesigned -->
+	alignScopeToAxes(y)
+	s('1,0,'1)
+	extrude (y,groundFloorHeight + (numFloors - 1 ) * upperFloorHeight)
+	split(y){groundFloorHeight: Volume(0) | ~1 : split(y){upperFloorHeight: t(0,0,scatterMultiplier * rand(-.3,.3)) Volume(split.index + 1)}*}
+
+
+EvalTexture(tex) --> NIL # dummy rule to make sure const texture is evaluated the same for all LODs.
+
+##############################################
+# Volumes: ground, middle, upper
+##############################################	
+
+
+CourtYardTexturing -->
+	CourtYardTexturingMapDefined(fileRandom("assets/courtyards/*.jpg"))
+
+CourtYardTexturingMapDefined(chosenMap) -->
+	alignScopeToAxes(y)
+	setupProjection(0, scope.xz, rand(5,9),rand(5,9))
+	projectUV(0)
+	rotateUV(0, rand(360))	
+	translateUV(0, rand(1), rand(1))
+	texture(chosenMap)
+	set(material.bumpmap, chosenMap)
+	set(material.bumpValue, rand(-.25,-.55))
+	
+##############################################
+# Volumes: ground, middle, upper
+##############################################	
+
+randBalconyDepth = rand(.6,1.1)
+randArcadeDepth = rand(1.2,2)
+
+@Group("LEVEL OF DETAIL")
+attr frontBackOnly = true
+
+const makeArcade = p(0.18)
+
+Volume(splitIndexNew) -->
+# split the roofs off the volumes
+	case splitIndexNew == 0:
+		comp(f){top:offset(-1.2) comp(f){border: roofs.FlatRoofTexturing} | bottom: comp(f){border: roofs.FlatRoofTexturing}}
+		VolumeToBalconies(splitIndexNew)	
+	case splitIndexNew == split.total:
+		comp(f){top: RoofBase | bottom: offset(-1.2) comp(f){border: roofs.FlatRoofTexturing}}
+		VolumeToBalconies(splitIndexNew)
+	else:
+		comp(f){top:offset(-1.2) comp(f){border: roofs.FlatRoofTexturing} | bottom: offset(-1.2) comp(f){border: roofs.FlatRoofTexturing}}
+		VolumeToBalconies(splitIndexNew)
+			
+	
+
+VolumeToBalconies(splitIndexNew) -->
+# split the volumes of ground and upper floors in balconies and arcade.
+	# eliminate complex shapes
+	case geometry.isConcave == false:
+		# upper floor balconies front and back
+		case splitIndexNew != 0:
+			case buildingMaterial != "framework" :
+			# no balconies on framework buildings.
+				8%:
+					split(z){~1: FacadeDefinition("hasFrontBalcony") | randBalconyDepth: BalconyVolume("front")}
+				8%:
+					split(z){randBalconyDepth: BalconyVolume("back") | ~1: FacadeDefinition("hasBackBalcony")}
+ 				else:
+ 					FacadeDefinition("upperFloorFacade")
+ 			else:
+ 				FacadeDefinition("upperFloorFacade")
+ 		# arcade on ground floor
+		else:
+			case makeArcade == true:
+				split(z){~1: FacadeDefinition("hasArcadeFacade") | randArcadeDepth: ArcadeVolume}
+ 			else:
+ 				FacadeDefinition("groundFloorFacade")
+	else:
+		# no balcony or arcade: upper floor
+		case splitIndexNew != 0:
+			FacadeDefinition("upperFloorFacade")
+		# no balcony or arcade: ground floor
+		else:
+			FacadeDefinition("groundFloorFacade")
+
+
+FacadeDefinition(facadeType) -->
+	case frontBackOnly == true:
+		case facadeType == "hasFrontBalcony":
+			comp(f){front: FacadeUVs("balcony") | back: FacadeSideOrnaments("upperFloorFacade") | side: FacadeUVs("wall")}	
+		case facadeType == "hasBackBalcony":
+			comp(f){back: FacadeUVs("balcony") | front: FacadeSideOrnaments("upperFloorFacade") | side: FacadeUVs("wall")}	
+		case facadeType == "hasArcadeFacade":
+			comp(f){front: FacadeSideOrnaments("groundFloorFacade") | back: FacadeSideOrnaments("groundFloorFacade") | side: FacadeUVs("wall")}	
+		case facadeType == "upperFloorFacade":
+			comp(f){front: FacadeSideOrnaments("upperFloorFacade") | back: FacadeSideOrnaments("upperFloorFacade") | side: FacadeUVs("wall")}	
+		case facadeType == "groundFloorFacade":
+			comp(f){front: FacadeSideOrnaments("groundFloorFacade") | back: FacadeSideOrnaments("groundFloorFacade") | side: FacadeUVs("wall")}	
+		else:
+			color("#000000")
+	else:
+		case facadeType == "hasFrontBalcony":
+			comp(f){front: FacadeUVs("balcony") | side: FacadeSideOrnaments("upperFloorFacade")}	
+		case facadeType == "hasBackBalcony":
+			comp(f){back: FacadeUVs("balcony") | side: FacadeSideOrnaments("upperFloorFacade")}	
+		case facadeType == "hasArcadeFacade":
+			comp(f){front: FacadeSideOrnaments("groundFloorFacade") | side: FacadeSideOrnaments("groundFloorFacade")}	
+		case facadeType == "upperFloorFacade":
+			comp(f){side: FacadeSideOrnaments("upperFloorFacade")}	
+		case facadeType == "groundFloorFacade":
+			comp(f){side: FacadeSideOrnaments("groundFloorFacade")}	
+		else:
+			color("#000000")	
+				
+##############################################
+# Balconies
+##############################################	
+	
+const balconyHeight = rand(.8,.9)
+const balconyRailingHandHeight = rand(.06,.08)
+const balconyPoleAsset = fileRandom("assets/facade/balconyRailingPoles/*.obj")
+const balconyRailingTexture = fileRandom("assets/facade/balconyRailingTex/*.png")
+verticalBeamDist = rand(1,3)
+
+BalconyVolume(orientation) -->
+	case orientation == "front":
+		comp(f){front: BalconyVerticalBeams BalconyRailing | left : BalconyRailing | right: BalconyRailing | top: ArcadeCeiling | bottom: BalconyFloor}
+	else:
+		comp(f){back:BalconyVerticalBeams  BalconyRailing | left : BalconyRailing | right: BalconyRailing | top: ArcadeCeiling | bottom: BalconyFloor}		
+
+BalconyVerticalBeams -->
+	case highLOD == true:
+		split(x){{~verticalBeamDist: NIL | 0.2: t(0,0,-.26) extrude(.14)  alignScopeToAxes(y) comp(f){side: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}}* | ~verticalBeamDist: NIL}
+	else:
+		split(x){{~verticalBeamDist: NIL | 0.2: t(0,0,-.26) extrude(.14)  alignScopeToAxes(y) comp(f){front: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}}* | ~verticalBeamDist: NIL}
+	
+BalconyRailing -->
+	split(y){balconyHeight : t(0,0,-.06) split(x){0.06: NIL | ~1: BalconyRailingSurface | 0.06: NIL} | ~1: NIL}
+
+BalconyRailingSurface -->
+	case highLOD == true:
+		split(y){~1: BalconyPoles | ~balconyRailingHandHeight: t(0,0,-.04) s('1,'1,.08) primitiveCube() comp(f){left: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/PlankTop*.png")) | right: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/PlankTop*.png")) | all: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))} }
+	else:
+		setupProjection(0, scope.xy, ~.22, '1)
+		projectUV(0)
+		texture(balconyRailingTexture)
+		Balcony.
+		
+BalconyPoles -->
+	case socialLevelType == "high":
+		split(x){{0.1: NIL | 0.06: t(0,0,-.03) s('1,scope.sy,0.06) i(balconyPoleAsset) texture(fileRandom("assets/outerWall/PlankTop*.png")) Pole.}* | 0.1: NIL}
+	else:
+		split(x){{0.1: NIL | 0.06: t(0,0,-.03) s('1,scope.sy - .06,0.06) t(0,0.06,0) i(balconyPoleAsset) texture(fileRandom("assets/outerWall/PlankTop*.png")) translateUV(0, rand(1), rand(1)) r(scopeCenter, rand(-3,3), rand(-3,3), rand(-3,3)) PoleCreation}* | 0.1: NIL}
+
+PoleCreation -->
+	85%: 
+		Pole.
+	else:	
+		NIL
+	
+BalconyFloor -->
+	case highLOD == true:
+		[
+		reverseNormals
+		t(0,0,.005)
+		plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))
+		]
+		reverseNormals
+		split(y){~0.25: s(scope.sx - 0.07, '1, 0) center(x) extrude(0.07) s('1, '1, scope.sz - 0.02) center(z) alignScopeToAxes(y) comp(f){bottom: NIL | left: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/PlankTop*.png")) | right: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/PlankTop*.png")) | all: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}}*
+	else:
+		reverseNormals
+		t(0,0,-.01)
+		plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))
+
+	
+##############################################
+# Arcades
+##############################################
+
+arcadeBlockHeight = rand(.4,.65)
+const arcadeTopConstructionHeight = rand(.2,.45)
+const randTopBlockThickness = rand(.04,.08)
+const randTopBlockWidth = rand(1.4,3.5)
+const randBottomBlockWidth = rand(2.5,5)
+constrandBlockGap = 0.025
+const columnDim = rand(.4,.6)
+const columnDist = rand(1.5,2.6)
+const constColumn = fileRandom("assets/facade/columns/*obj")
+const columnTexture = fileRandom("assets/facade/columns/*.jpg")
+randRotate90deg = 25%: 90 25%: 180 25%: 270 else: 0
+
+ArcadeVolume -->
+	# 50%: wood on top to hold upper floors
+	50%:
+		comp(f){top: ArcadeCeiling}
+		comp(f){front: split(y){~1 : ArcadeSurface | arcadeTopConstructionHeight: extrude(columnDim * 1.1) alignScopeToAxes(y) t(0,0,(-scope.sz + rand(-.03,.03))) comp(f){left: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/PlankTop*.png")) | right: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/PlankTop*.png")) | all: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}}}
+	# 50%: stone on top to hold upper floors
+	else:
+		comp(f){top: ArcadeCeiling}
+		comp(f){front: split(y){~1 : ArcadeSurface | arcadeTopConstructionHeight: extrude(columnDim * 1.1) alignScopeToAxes(y) t(0,0,(-scope.sz + rand(-.03,.03))) UpperBlock}}
+
+
+ArcadeCeiling -->
+	case highLOD == true:
+		[
+		t(0,0,-.005)
+		plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))
+		]
+		split(y){~0.25: t(0,0,-.07) s(scope.sx - 0.07, '1, 0) center(x)extrude(0.07) s('1, '1, scope.sz - 0.02) center(z) alignScopeToAxes(y) comp(f){top: NIL | left: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/PlankTop*.png")) | right: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/PlankTop*.png")) | all: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}}*
+		
+	else:
+		t(0,0,-.005)
+		plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))
+		
+ArcadeSurface -->
+	#small arcades create no block
+	case scope.sx < 2.5:
+		PutColumns
+	else:
+		55%:
+		# 50% side gap of 80 cm and block
+			split(x){0.8: NIL | ~1:  split(y){arcadeBlockHeight: extrude(columnDim * 1.1) alignScopeToAxes(y) t(0,0,'-1) ColumnBlock | ~1: PutColumns} | 0.8: NIL }
+		30%:
+		# no side gap and block
+			split(y){arcadeBlockHeight: extrude(columnDim * 1.1) alignScopeToAxes(y) t(0,0,'-1) ColumnBlock | ~1: PutColumns}
+		else:
+		# no block
+			PutColumns
+
+ColumnBlock -->
+	case highLOD == true:
+		alignScopeToAxes(y)
+		split(y){~1: BottomBlock | randTopBlockThickness: TopBlock}
+	else:
+		comp(f){bottom: NIL | all: BlockTexturing }
+
+
+UpperBlock -->
+	case highLOD == true:
+		split(x){~randBottomBlockWidth: comp(f){top: NIL | all: BlockTexturing } | constrandBlockGap: NIL }*
+	else:
+		comp(f){top: NIL | all: BlockTexturing }
+
+BottomBlock -->
+	split(x){~randBottomBlockWidth: comp(f){bottom: NIL | all: BlockTexturing } | constrandBlockGap: NIL }*
+	
+TopBlock -->		
+	s(scope.sx + 0.1, '1, scope.sz + 0.1) center(xz) split(x){randTopBlockWidth: comp(f){bottom: NIL | all: BlockTexturing } | constrandBlockGap: NIL }*
+
+BlockTexturing -->
+	setupProjection(0, scope.xy, 3,3)
+	projectUV(0)
+	translateUV(0, rand(1), rand(1))
+	texture(columnTexture) Block.
+	
+PutColumns -->
+	case scope.sx < 2:
+		set(trim.vertical, false)
+		split(x){{columnDim : s('1, '1, scope.sx) t(0,0,'-1) r(scopeCenter, 0,randRotate90deg,0) i(constColumn) Column | ~columnDist : NIL}* | columnDim : s('1, '1, scope.sx) t(0,0,'-1) r(scopeCenter, 0,randRotate90deg,0) i(constColumn) Column}
+	else:
+		70%:
+			set(trim.vertical, false)
+			split(x){~columnDist/6 : NIL  | {columnDim : s('1, '1, scope.sx) t(0,0,'-1) r(scopeCenter, 0,randRotate90deg,0) i(constColumn) Column  | ~columnDist : NIL | columnDim : s('1, '1, scope.sx) t(0,0,'-1) r(scopeCenter, 0,randRotate90deg,0) i(constColumn) Column}* | ~columnDist/6 : NIL}
+	
+		else:
+			set(trim.vertical, false)
+			split(x){columnDist/6 : NIL  | ~1 : split(x) {columnDim : s('1, '1, scope.sx) t(0,0,'-1) r(scopeCenter, 0,randRotate90deg,0) i(constColumn) Column | columnDist : NIL | columnDim : s('1, '1, scope.sx) t(0,0,'-1) r(scopeCenter, 0,randRotate90deg,0) i(constColumn) Column } | columnDist/6 : NIL}*
+//			split(x){columnDist/6 : NIL  
+//					| ~1 : split(x) {columnDim : s('1, '1, scope.sx) t(0,0,'-1) r(scopeCenter, 0,randRotate90deg,0) i(constColumn) Column
+//						  | columnDist : NIL 
+//						  | columnDim : s('1, '1, scope.sx) t(0,0,'-1) r(scopeCenter, 0,randRotate90deg,0) i(constColumn) Column }
+//					| columnDist/6 : NIL}*
+
+
+Column -->
+	case highLOD == true:
+		texture(columnTexture)
+	else:
+		s('0.66,'1,'0.66)
+		center(xz)
+		primitiveCube()	
+		texture(columnTexture)
+		comp(f){side : Column.}
+			
+##############################################
+# RestArea
+##############################################
+
+RestArea -->
+	SidewalkMainTexturing
+
+RestAreaFacadeSurface -->
+	case convert(y,scope,object,pos,0,0,0) < 1.5 && makeArcade == false:
+		RestAreaSurfaceGroundFloor
+	else:
+		NIL
+
+RestAreaSurfaceGroundFloor -->
+	s('1,.5,.5)
+	primitiveCube()
+	alignScopeToAxes(y)
+	comp(f){bottom: reverseNormals RestAreaSurface}
+	#NIL
+	
+RestAreaSurface -->
+	case scope.sx < .2:
+		NIL
+	else:
+		t(0,rand(.1,.3),0)
+		split(x){~(rand(0.5,3)): RestAreaAsset(assetApproxSize("assets/restAreaAssets/*.obj","x",3))}*
+	
+RestAreaAsset(chosenAsset) -->
+	10%:
+		set(trim.vertical, false)
+		alignScopeToAxes(y)
+		s(assetSize(chosenAsset, "x"),assetSize(chosenAsset, "y"),assetSize(chosenAsset, "z"))
+		center(x)
+		r(scopeCenter, 0,rand(-4,4),0)
+		i(chosenAsset)
+		SidewalkFurnitureAsset.
+	else:
+		NIL
+##############################################
+# SideOrnaments
+##############################################
+	
+const createSideOrnaments =
+	case buildingMaterial == "stone":
+		60%: true else:	false
+	case buildingMaterial == "framework":
+		20%: true else:	false
+	case buildingMaterial == "plaster":
+		50%: true else:	false
+	else:
+		false
+const sideOrnamentWidth = rand(0.3, 0.55)
+const sideOrnamemtMaterial =
+	case buildingMaterial == "stone":
+		65%: mainFacadeTexture else: fileRandom("assets/facade/stone/*.jpg")
+	case buildingMaterial == "framework":
+		fileRandom("assets/facade/stone/*.jpg")
+	else:
+		fileRandom("assets/facade/stone/*.jpg")
+		
+		
+FacadeSideOrnaments(facadeType) -->
+	case createSideOrnaments && scope.sx > 4:
+		split(x){sideOrnamentWidth: SideOrnament | ~ 1: FacadeUVs(facadeType) | sideOrnamentWidth: SideOrnament}
+	else:
+		FacadeUVs(facadeType)
+
+SideOrnament -->
+	case highLOD == true:
+	[
+		setupProjection(0, scope.xy, rand(4,8),rand(4,8))
+		projectUV(0)
+		texture(sideOrnamemtMaterial)
+		SideOrnament.
+		]
+		set(trim.vertical, false)
+		split(y){(rand(.2,.4)):
+			s('rand(.95,1.05),'rand(.95,1.15),.3) center(xy)
+			t(rand(-.06,.06),0,'-.75)
+			i(fileRandom("assets/streets/sidewalk/*.obj"))
+			setupProjection(0, scope.xy, rand(10,20),rand(10,20),1)
+			projectUV(0)
+			translateUV(0,rand(1), rand(1))
+			texture(sideOrnamemtMaterial) Stone.
+		}*
+		
+	else:
+		setupProjection(0, scope.xy, rand(4,8),rand(4,8))
+		projectUV(0)
+		texture(sideOrnamemtMaterial)
+		SideOrnament.		
+
+##############################################
+# FacadeUVs
+##############################################
+
+const mainFacadeTexture =
+	fileRandom("assets/facade/" + buildingMaterial + "/" + socialLevelType + "/*/*.jpg")	
+
+facadeTexInfo(texName, input) =
+# low stone
+	case (find(texName,("/assets/facade/stone/low/1/"),0)) == 0:	case input == "w" : 9 else : 9
+	case (find(texName,("/assets/facade/stone/low/2/"),0)) == 0:	case input == "w" : 4 else : 6
+	case (find(texName,("/assets/facade/stone/low/3/"),0)) == 0:	case input == "w" : 8 else : 6
+	case (find(texName,("/assets/facade/stone/low/4/"),0)) == 0:	case input == "w" : 10 else : 7
+# high stone
+	case (find(texName,("/assets/facade/stone/high/1/"),0)) == 0:	case input == "w" : 10 else : 11
+	case (find(texName,("/assets/facade/stone/high/2/"),0)) == 0:	case input == "w" : 8 else : 12
+	case (find(texName,("/assets/facade/stone/high/3/"),0)) == 0:	case input == "w" : 8 else : 12
+	case (find(texName,("/assets/facade/stone/high/4/"),0)) == 0:	case input == "w" : 7 else : 7
+	
+	
+# low framework
+	case (find(texName,("/assets/facade/framework/low/1/"),0)) == 0:	case input == "w" : 6 else : 3.5
+	case (find(texName,("/assets/facade/framework/low/2/"),0)) == 0:	case input == "w" : 6 else : 3.5
+	case (find(texName,("/assets/facade/framework/low/3/"),0)) == 0:	case input == "w" : 6 else : 3.5
+# high framework
+	case (find(texName,("/assets/facade/framework/high/1/"),0)) == 0:	case input == "w" : 6 else : 3.5
+	case (find(texName,("/assets/facade/framework/high/2/"),0)) == 0:	case input == "w" : 6 else : 3.5
+	case (find(texName,("/assets/facade/framework/high/3/"),0)) == 0:	case input == "w" : 6 else : 3.5
+	
+		
+# low plaster
+	case (find(texName,("/assets/facade/plaster/low/1/"),0)) == 0:	case input == "w" : 8 else : 8	
+	case (find(texName,("/assets/facade/plaster/low/2/"),0)) == 0:	case input == "w" : 8 else : 8	
+	case (find(texName,("/assets/facade/plaster/low/1/"),0)) == 0:	case input == "w" : 6 else : 9	
+# high plaster
+	case (find(texName,("/assets/facade/plaster/high/1/"),0)) == 0:	case input == "w" : 4 else : 5.5	
+	case (find(texName,("/assets/facade/plaster/high/1/"),0)) == 0:	case input == "w" : 7 else : 7
+
+
+# low wood
+	case (find(texName,("/assets/facade/wood/low/1/"),0)) == 0:	case input == "w" : 4 else : 5.5
+	case (find(texName,("/assets/facade/wood/low/2/"),0)) == 0:	case input == "w" : 6 else : 6
+	case (find(texName,("/assets/facade/wood/low/3/"),0)) == 0:	case input == "w" : 8 else : 10
+	case (find(texName,("/assets/facade/wood/low/4/"),0)) == 0:	case input == "w" : 4 else : 7
+	else: 8
+	
+frameworkTileNumber(scopeDim) =
+	rint(scopeDim/frameWorkTileWidth)
+
+frameworkProjWidth(scopeDim) =
+	(scopeDim / frameworkTileNumber(scopeDim)) * frameWorkTileNum
+
+randUVOffsetQuarter = 25%: 0.25 25% :0.5 25% :0.75 else: 0
+const frameWorkTileWidth = rand(1.2,1.8)
+const frameWorkTileNum = 4
+		
+FacadeUVs(facadeType) -->
+# set up all texturing to the full facades
+	case buildingMaterial == "framework":
+		case scope.sx < 1:
+		# small facade parts
+			alignScopeToGeometry(zUp, any, world.lowest)
+			setupProjection(0, scope.xy, facadeTexInfo(mainFacadeTexture, "w") / 2,facadeTexInfo(mainFacadeTexture, "h") * .75,0)
+			projectUV(0)
+			translateUV(0,randUVOffsetQuarter,0)
+			FacadeGazebos(facadeType)
+		else:
+		# standard parts
+			alignScopeToGeometry(zUp, any, world.lowest)
+			setupProjection(0, scope.xy, frameworkProjWidth(scope.sx), '1,0)
+			projectUV(0)
+			translateUV(0,ceil(rand(rint(scope.sx / frameWorkTileWidth))) * (1 / frameWorkTileNum ),0)
+			FacadeGazebos(facadeType)
+	else:
+		alignScopeToGeometry(zUp, any, world.lowest)
+		setupProjection(0, scope.xy, rand(0.9, 1.1) * facadeTexInfo(mainFacadeTexture, "w"), rand(0.9, 1.1) * facadeTexInfo(mainFacadeTexture, "h"),0)
+		projectUV(0)
+		translateUV(0, rand(1),0)
+		FacadeGazebos(facadeType)	
+
+##############################################
+# Gazebos
+##############################################
+
+randGazeboWidth = rand(.8,1.7)
+const randGazeboDepth = rand(.4,.9)
+randGazebo = fileRandom("assets/facade/gazebo/*.obj")
+const randGazeboRelativeHeight = rand(0.7,0.8)
+const gazeboCrownDim = rand(.04,0.08)
+const gazeboConstrplankDim = rand(.3,0.45)
+const gazeboBeamType = fileRandom("assets/facade/gazeboBeams/gazeboBeam*.obj")
+	
+FacadeGazebos(facadeType) -->
+	case facadeType == "wall": Wall
+	case facadeType == "upperFloorFacade" &&  scope.sx > 2.5 && geometry.isRectangular(0.5) && geometry.area > 1:
+		#case scope.sx > 1.5:
+			20%:
+			# split off gazebo
+				33%:
+					# side 1
+					split(x){randGazeboWidth : MakeGazebo(facadeType) | ~1: FacadeSplitter(facadeType)}	
+				33%:
+					#side 2
+					split(x){~1: FacadeSplitter(facadeType) | randGazeboWidth : MakeGazebo(facadeType)}	
+				else:
+					#middle	
+					split(x){~1: FacadeSplitter(facadeType) | randGazeboWidth : MakeGazebo(facadeType) | ~1: FacadeSplitter(facadeType)}	
+			else: FacadeSplitter(facadeType)
+	else:
+		FacadeSplitter(facadeType)
+
+MakeGazebo(facadeType) -->
+	# back wall with door cut out
+	[
+	split(y){1.6: NIL | ~1: FacadeSplitter("wall")}
+	]
+	# gazebo geometry
+	alignScopeToAxes(y)
+	split(y){'randGazeboRelativeHeight:
+		s('1,'1,randGazeboDepth)
+		i(randGazebo)
+		comp(f){front: alignScopeToGeometry(zUp, any, world.lowest) FacadeUVs("gazebo") | left: alignScopeToGeometry(zUp, any, world.lowest) FacadeUVs("gazebo") | right: alignScopeToGeometry(zUp, any, world.lowest) FacadeUVs("gazebo") | top:  NIL | bottom: WoodUnderConstruction}
+	| ~1:
+	# gazebo roof
+		s('1.15,rand(.15,.35),1.15 * randGazeboDepth)
+		center(x)
+		i("assets/facade/gazeboRoof/gazeboRoof_1.obj")
+		comp(f){bottom: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/PlankTop*.png")) | vertical: alignScopeToGeometry(zUp, any, world.lowest) FacadeUVs("gazebo") | top: roofs.GazeboRoof }
+	}
+	
+WoodUnderConstruction -->
+	case highLOD == true:
+	# make area construction
+		[
+		alignScopeToAxes(y)		
+		t(0,-.06,0)
+		extrude(world.up, 0.06)
+		alignScopeToAxes(y)
+		#set(trim.vertical, true)
+		set(trim.horizontal, true)
+		reverseNormals
+		comp(f){bottom: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_v*.png")) | side: s('1.5,'1,gazeboCrownDim) center(x) primitiveCube() comp(f){all: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_v*.png"))}}
+		]
+	# put construction beams below
+		alignScopeToGeometry(zUp, world.lowest, longest)
+		alignScopeToAxes(y)
+		UnderConstruction.
+		t(0,-0.26,0)
+		reverseNormals
+		split(x){{~ .2: NIL | 0.12: extrude(.2) s('1,'1,gazeboConstrplankDim) i(gazeboBeamType) comp(f){front: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/PlankTop*.png")) | all: plankTexturing.PlankTexturing("nailed", fileRandom("assets/outerWall/Plank_v*.png"))} }* | ~0.2: NIL}		
+	else:
+		plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))
+
+##############################################
+# Roofs
+##############################################			
+
+@Group("ROOF DETAILS")
+@Range(gable = "gable", hip = "hip", pyramid = "pyramid", flat = "flat")	
+attr roofType = 
+	case geometry.nVertices >= 10 && geometry.isConcave && geometry.area > 1:
+		"flat"
+	else:
+		50% : "gable"
+		30% : "hip"
+		else:
+			case geometry.nVertices <=4: "pyramid"
+			else: "gable"
+	
+			
+RoofBase -->
+	case roofType == "flat": roofs.FlatRoof
+	case roofType == "pyramid": roofs.PyramidRoof
+	case roofType == "gable": roofs.GableRoof 
+	else: roofs.HipRoof 
+
+##############################################
+# get geometries from roofs which are part of the facades !
+##############################################		
+
+roofs.FacadeOnRoof -->
+	split(y){upperFloorHeight: FacadeUVs("upperFloorFacade")}*
+
+roofs.GabledDormerWin -->
+	projectUV(0)
+	translateUV(0, rand(1),0)
+	FacadeUVs("gabledDormer")
+
+
+##############################################
+# FacadeSplitter
+##############################################	
+
+
+const baseHeight =	
+	case socialLevelType == "high": rand(.2,.4)
+	else: rand(.4,.6)
+const baseAsset = fileRandom("assets/facade/stoneBase/*.obj")
+const baseDepth = rand(.1,.2)
+const baseBlockWidth = rand(1.2,3)
+
+totalTileNum(scope) = (rint(scope / frameWorkTileWidth))
+randTileNum(scope) = rint(rand(rint(scope.sx / frameWorkTileWidth)))
+
+FacadeSplitter(facadeType) -->
+	#texture(mainFacadeTexture)
+	FacadeSplitterTexOK(facadeType)
+
+const createFacadeBase =
+	case buildingMaterial == "stone":
+		80%: true else: false
+	case buildingMaterial == "framework":
+		40%: true else: false
+	case buildingMaterial == "plaster":
+		80%: true else: false
+	else:
+		60%: true else: false	
+		
+
+FacadeSplitterTexOK(facadeType) -->
+# wall = end shape.
+	case facadeType == "wall":
+		Wall
+# split up special case gabledDormer.
+	case facadeType == "gabledDormer":
+		case scope.sx < 0.55:
+			split(y){	0.2	: Wall | ~1 : WindowFrame(facadeType, "simpleWood","n",false, "wood")| 0.15 : Wall}
+		else:
+			split(y){	0.2	: Wall | ~1 : split(x){~.4: WindowFrame(facadeType,"simpleWood","n",false, "wood")}* | 0.15 : Wall}
+# split up special case gazebo			
+	case facadeType == "gazebo":
+		case scope.sx < 0.55:
+			split(y){ .85 	: Wall | ~1 : WindowFrame(facadeType,"simpleWood","single",false, "wood")| 0.25 : Wall}
+		else:
+			split(y){ .85 	: Wall | ~1 : split(x){~.4: WindowFrame(facadeType,"simpleWood","single",false, "wood")} | 0.25 : Wall}
+	
+# handle the normal facade cases
+	case facadeType == "upperFloorFacade":
+		MakeVariatingFacade(facadeType, false, totalTileNum(scope.sx), randTileNum(scope.sx), shutterCreation)
+	case facadeType == "groundFloorFacade":	
+		MakeVariatingFacade(facadeType, true, totalTileNum(scope.sx), randTileNum(scope.sx), shutterCreation)
+	case facadeType == "arcadeFacade":	
+		MakeVariatingFacade(facadeType, true, totalTileNum(scope.sx), randTileNum(scope.sx), shutterCreation)
+	case facadeType == "balcony":	
+		MakeVariatingFacade(facadeType, true, (rint(scope.sx / frameWorkTileWidth)), rint(rand(rint(scope.sx / frameWorkTileWidth))), shutterCreation)
+	else:
+		Wall
+
+##############################################
+# MakeVariatingFacade
+##############################################
+
+const floorTopLedgeHeight = rand(.2,.35)
+
+MakeVariatingFacade(facadeType, doorInfo, totalNum, randNum, shutterCreationValue) -->
+		case doorInfo == true:
+		# make a door --> ground floor, arcade or balcony facade	
+			case totalNum >= 3:
+			# can put door
+				case highLOD == true:
+				# split off top ledge above floor
+					split(y){~1: 
+					split(x){~randNum: RestAreaFacadeSurface SymmetricGroundFacade(facadeType, doorInfo, totalTileNum(scope.sx), randTileNum(scope.sx), shutterCreationValue) | ~1: DoorTile(facadeType) | ~(totalNum - 1 - randNum): RestAreaFacadeSurface SymmetricGroundFacade(facadeType, false,  totalTileNum(scope.sx), randTileNum(scope.sx), shutterCreationValue)  }
+						| floorTopLedgeHeight : floorTopLedge}
+				else:
+				# do not split off top ledge above floor
+					split(y){~1: 
+					split(x){~randNum: RestAreaFacadeSurface SymmetricGroundFacade(facadeType, doorInfo, totalTileNum(scope.sx), randTileNum(scope.sx), shutterCreationValue) | ~1: DoorTile(facadeType) | ~(totalNum - 1 - randNum): RestAreaFacadeSurface SymmetricGroundFacade(facadeType, false,  totalTileNum(scope.sx), randTileNum(scope.sx), shutterCreationValue)  }
+						| 0 : floorTopLedge}
+				else:
+			 #cannot put door
+				case highLOD == true:
+				# split off top ledge above floor
+					split(y){~1: RestAreaFacadeSurface SymmetricGroundFacade(facadeType, doorInfo, totalTileNum(scope.sx), randTileNum(scope.sx), shutterCreationValue)| floorTopLedgeHeight : floorTopLedge}
+				else:
+					split(y){~1: RestAreaFacadeSurface SymmetricGroundFacade(facadeType, doorInfo, totalTileNum(scope.sx), randTileNum(scope.sx), shutterCreationValue)| 0 : floorTopLedge}
+		else:
+			RestAreaFacadeSurface SymmetricFacadeNormal(facadeType, 0, shutterCreationValue)
+				
+##############################################
+# SymmetricGroundFacade
+##############################################
+
+# calculate which window types appear
+makeSingleWin =
+	case buildingMaterial == "stone": 0.7 case buildingMaterial == "framework": 0.5 case buildingMaterial == "plaster": 0.5 else: 0 
+makeDoubleWin =
+	case buildingMaterial == "stone": 0.2 case buildingMaterial == "framework": 0.3 case buildingMaterial == "plaster": 0.4 else: 0 
+make_n_Win =
+	case buildingMaterial == "stone": 0.1 case buildingMaterial == "framework": 0.2 case buildingMaterial == "plaster": 0.1 else: 0
+	
+makeSingleWinProb = p(makeSingleWin)
+makeDoubleWinProb = p(makeDoubleWin)
+make_n_WinProb 	  = p(make_n_Win)
+
+
+SymmetricGroundFacade(facadeType, doorInfo, totalNum, randNum, shutterCreationValue) -->
+# on groundfloors and arcade facades create a stone base and give along the height value
+	case facadeType == "arcadeFacade" || facadeType == "groundFloorFacade" && createFacadeBase:
+	# ground floor
+		split(y){baseHeight: Base | ~1: SymmetricFacadeNormal(facadeType, baseHeight, shutterCreationValue)}
+	# upper floors	
+	else :
+		SymmetricFacadeNormal(facadeType, 0, shutterCreationValue)
+
+SymmetricFacadeNormal(facadeType, baseHeightValue, shutterCreationValue) -->
+# create window scopes
+
+	# small triangular
+	case ( scope.sy <= frameWorkTileWidth || scope.sx <= frameWorkTileWidth) && geometry.nVertices != 4:	
+		Wall
+	# small rectangular
+	case ( scope.sy <= frameWorkTileWidth && scope.sx <= frameWorkTileWidth):
+		Wall
+	# big triangular
+	case ( scope.sy > frameWorkTileWidth || scope.sx > frameWorkTileWidth) && geometry.nVertices != 4:
+		split(x){~1: Wall | smallWindowWidth : split(y){(smallWindowHeightAboveFloor -  baseHeightValue) / 2: Wall | smallWindowHeight : WindowFrame(facadeType,"simpleWood","single", shutterCreationValue, "global") | ~1: Wall} | ~1: Wall}
+	# high enough but not wide enough : small window
+	case ( scope.sy > frameWorkTileWidth && scope.sx <= frameWorkTileWidth /2  && scope.sx > 0.8):
+		split(x){~1: Wall | smallWindowWidth : split(y){(smallWindowHeightAboveFloor -  baseHeightValue) / 2: Wall | smallWindowHeight : WindowFrame(facadeType,"simpleWood","single", shutterCreationValue, "global") | ~1: Wall} | ~1: Wall}
+
+
+# split in sense making subtiles
+#1
+	case frameworkTileNumber(scope.sx) == 1:
+		SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)
+#2
+	case frameworkTileNumber(scope.sx) == 2:
+		50%: SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)
+		else: split(x){~frameWorkTileWidth : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+#3
+	case frameworkTileNumber(scope.sx) == 3:
+		50%: SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)
+		else: split(x){~frameWorkTileWidth : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+#4
+	case frameworkTileNumber(scope.sx) == 4:	
+	# leave
+		20%: SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)
+	# doubles
+		40%: split(x){~ (2 * frameWorkTileWidth) : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+	# singles
+		else: split(x){~ frameWorkTileWidth : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+#5
+	case frameworkTileNumber(scope.sx) == 5:
+	# leave
+		30%: SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)
+	# singles
+		else: split(x){~ frameWorkTileWidth : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+#6
+	case frameworkTileNumber(scope.sx) == 6:
+	# singles
+		30%: split(x){~ frameWorkTileWidth : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+	# thirds
+		else: split(x){~  (3 * frameWorkTileWidth) : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+	# rest i forgot.
+
+#7
+	case frameworkTileNumber(scope.sx) == 7:
+	# singles
+		split(x){~ frameWorkTileWidth : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+#8	
+	case frameworkTileNumber(scope.sx) == 8:
+	# singles
+		10%: split(x){~ frameWorkTileWidth : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+	# doubles	
+		60%: split(x){~ (2 * frameWorkTileWidth) : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+	# quads	
+		else: split(x){~ (4 * frameWorkTileWidth) : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+#9	
+	case frameworkTileNumber(scope.sx) == 9:
+	# singles
+		10%: split(x){~ frameWorkTileWidth : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+	# thirds
+		else: split(x){~  (3 * frameWorkTileWidth) : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+#10
+	case frameworkTileNumber(scope.sx) == 10:
+	# singles
+		2%: split(x){~ frameWorkTileWidth : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+	# doubles	
+		80%: split(x){~ (2 * frameWorkTileWidth) : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+	# fives	
+		else: split(x){~ (5 * frameWorkTileWidth) : SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue)}*
+# else		
+	else: Wall
+
+
+SymmetricFacadeNormalTiled(facadeType, baseHeightValue, shutterCreationValue) -->
+# trigger the different window types depending on their appearing probability.
+	case geometry.nVertices == 4 && geometry.isRectangular(1):
+		# n windows
+		case make_n_WinProb == true && frameworkTileNumber(scope.sx) >= 1 && frameworkTileNumber(scope.sx) <= 2 :
+			split(x){windowSideDistance: Wall | ~1:
+			split(y){ (windowHeightAboveFloor -  baseHeightValue):Wall |  (windowTotalDim("n", "vert")): WindowFrame(facadeType,"topBottom","n", shutterCreationValue, "global") | ~1: Wall}
+			| windowSideDistance: Wall}			
+
+		# double windows
+		case makeDoubleWinProb == true && scope.sx > (windowTotalDim("double","hor")):
+			split(x){~1: Wall | (windowTotalDim("double", "hor")):
+			split(y){ (windowHeightAboveFloor -  baseHeightValue):Wall | (windowTotalDim("double", "vert")): WindowFrame(facadeType,"topBottom","double", shutterCreationValue, "global") | ~1: Wall}
+			| ~1: Wall}	
+					
+		# single windows	
+		case makeSingleWinProb == true && scope.sx > 0.6:
+			split(x){~1: Wall | (windowTotalDim("single", "hor")):
+			split(y){ (windowHeightAboveFloor -  baseHeightValue):Wall | (windowTotalDim("single", "vert")): WindowFrame(facadeType,"topBottom","single", shutterCreationValue, "global") | ~1: Wall}
+			| ~1: Wall}
+		
+		# else trigger a single window.	
+		else:
+			split(x){~1: Wall | (windowTotalDim("single", "hor")):
+			split(y){ (windowHeightAboveFloor -  baseHeightValue):Wall | (windowTotalDim("single", "vert")): WindowFrame(facadeType,"topBottom","single", shutterCreationValue, "global") | ~1: Wall}
+			| ~1: Wall}
+	else:
+		Wall
+
+##############################################
+# Wall
+##############################################
+
+Wall -->
+	texture(mainFacadeTexture)
+	set(material.bumpmap, mainFacadeTexture)
+	set(material.bumpValue, rand(-.15,-.45))
+
+##############################################
+# Base
+##############################################
+
+Base -->
+	case highLOD == true:
+		Wall
+		split(x){~ baseBlockWidth : BaseBlock | {0.02: NIL | ~ baseBlockWidth : BaseBlock} | 0.02: NIL | ~ baseBlockWidth : BaseBlock}
+	else:
+		BlockTexturing
+
+BaseBlock -->
+		s('1, '(rand(.96,1.04)), baseDepth)
+		i(baseAsset)
+		comp(f){all: BlockTexturing}
+
+##############################################
+# DoorStep
+##############################################
+
+DoorStep -->
+	case highLOD == false :
+		DoorStep.
+	else:
+		t(0,0,-.27)
+		extrude(rand(.25,.4))
+		i(fileRandom("assets/facade/stoneBlocks/*.obj"))
+		comp(f){all: setupProjection(0, scope.xy, 2,2) projectUV(0)
+		texture(fileRandom("assets/facade/columns/*.jpg"))
+		DoorStep.}
+
+floorTopLedge -->
+	s('1.1, '1, 0.07)
+	center(x)
+	primitiveCube()
+	comp(f){front: plankTexturing.PlankTexturing("construction", fileRandom("assets/facade/constructionPlanks/*.jpg")) | 
+			top: plankTexturing.PlankTexturing("construction", fileRandom("assets/facade/constructionPlanks/*.jpg")) |
+			bottom: plankTexturing.PlankTexturing("construction", fileRandom("assets/facade/constructionPlanks/*.jpg")) }
+	
+
+##############################################
+# Doors
+##############################################	
+
+doorFrameWidth = rand(.04,.08)
+
+doorStepHeight(facadeType)=
+	case facadeType == "upperFloorFacade" : 0
+	case facadeType == "balcony": 0
+	else: rand(.04,.08)
+
+doorFrameHeight= rand(.04,.08)
+doorWidth = case socialLevelType == "high" : rand(1,1.25) else: rand(.9,1)
+doorHeight = case socialLevelType == "high" : rand(1.75,1.85) else: rand(1.85,1.95)
+
+
+DoorTile(facadeType) -->
+	case highLOD == true :
+		split(x){~1: Wall | doorWidth :
+		split(y){(doorStepHeight(facadeType)) : DoorStep | doorHeight: DoorFrame("default") | ~1: PutSignOrLamp(randSignNumber) Wall}
+		| ~1: Wall }
+	else:
+		split(x){~1: Wall | doorWidth :
+		split(y){doorHeight: DoorFrame("default") | ~1: PutSignOrLamp(randSignNumber) Wall}
+		| ~1: Wall }
+		
+DoorFrame(doorType) -->
+	case highLOD == true :
+		case doorType == "default":
+			split(x){doorFrameWidth :
+				t (0,0,-.2)
+				extrude(.26)
+				s('1.1,'1,'1)
+				center(x)
+				alignScopeToAxes(y)
+				comp(f){top: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | back: NIL | side: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}
+			| ~1: split(y){~1: Door |
+			doorFrameHeight:
+				t (0,0,-.2)
+				extrude(.26)
+				alignScopeToAxes(y)
+				comp(f){top: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | bottom: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | front: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | all : NIL}}
+				|
+			doorFrameWidth :
+				t(0,0,-.2)
+				extrude(.26)
+				s('1.1,'1,'1)
+				center(x)
+				alignScopeToAxes(y)
+				comp(f){top: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | back: NIL | side: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}}
+		else: DoorFrame.
+	else:
+		Door
+
+doorTex =
+	case socialLevelType == "high":
+		fileRandom("assets/facade/door_high/*.png")
+	else:
+		fileRandom("assets/facade/door_low/*.png")
+
+Door -->
+	case highLOD == true:
+		t(0,0,-.2)
+		setupProjection(0, scope.xy, '1,'1)
+		projectUV(0)
+		texture(doorTex)
+	else:
+		setupProjection(0, scope.xy, '1,'1)
+		projectUV(0)
+		texture(doorTex)			
+
+##############################################
+# Windows
+##############################################
+
+const frameConstructionMaterial =
+	case buildingMaterial == "stone": 80%: "stone" else: "wood"
+	case buildingMaterial == "framework": 90%: "wood" else: "stone"
+	case buildingMaterial == "plaster": 50%: "stone" else: "wood"
+	else: "wood"	
+
+smallWindowWidth = rand(.2,.3)
+smallWindowHeight = rand(.4,.8)
+smallWindowHeightAboveFloor = rand(1.,1.35)
+
+windowHeightAboveFloor = .95
+
+const singleHorWingDim = rand(.25,.4)
+const singleVertWingDim = rand(.6,.85)
+const doubleHorWingDim = rand(.5,.6)
+const doubleVertWingDim = rand(.6,.85)
+const nVertWingDim = rand(.6,.85)
+
+
+windowWingDimensions(type, orientation) =
+	case type == "single": case orientation == "hor": singleHorWingDim else: singleVertWingDim
+	case type == "double": case orientation == "hor": doubleHorWingDim  else: doubleVertWingDim
+	else				 : nVertWingDim
+
+frameThickness(material, dimension) =
+	case material == "wood":
+		case dimension == "hor": 0.07
+		else: 0.05
+	else:
+		case dimension == "vertTop": 0.12
+		else: 0.07
+		
+windowTotalDim(type, orientation) =
+	case type == "single":
+		case orientation == "hor":
+			windowWingDimensions(type, orientation) + 2 * (frameThickness(frameConstructionMaterial, orientation))
+		else:
+			windowWingDimensions(type, orientation) + 2 * (frameThickness(frameConstructionMaterial, orientation))	
+	case type == "double":
+		case orientation == "hor":
+			2 * windowWingDimensions(type, orientation) + 2 * (frameThickness(frameConstructionMaterial, orientation))
+		else:
+			windowWingDimensions(type, orientation) + 2 * (frameThickness(frameConstructionMaterial, orientation))	
+	else:
+		windowWingDimensions(type, orientation) + 2 * (frameThickness(frameConstructionMaterial, orientation))	 
+	
+windowSideDistance = rand(0.15,0.3)
+
+windowFrameDepth(type) = 
+	case type == "top": 0.07
+	case type == "bottom" : 0.04
+	else: 0.05
+	
+const windowDepth = rand(.2, 0.35)
+
+bestRatioWindowsAsset =
+	assetBestRatio("assets/windows/frames/*.obj", "xy")
+
+bestWinTexture(asset) =
+	case count(asset, "/assets/windows/frames/winFrame_1.obj") == 1: "assets/windows/lowLODWindows/winFrame_1.png"
+	case count(asset, "/assets/windows/frames/winFrame_2.obj") == 1: "assets/windows/lowLODWindows/winFrame_2.png"
+	case count(asset, "/assets/windows/frames/winFrame_3.obj") == 1: "assets/windows/lowLODWindows/winFrame_3.png"
+	case count(asset, "/assets/windows/frames/winFrame_4.obj") == 1: "assets/windows/lowLODWindows/winFrame_4.png"
+	case count(asset, "/assets/windows/frames/winFrame_5.obj") == 1: "assets/windows/lowLODWindows/winFrame_5.png"
+	case count(asset, "/assets/windows/frames/winFrame_6.obj") == 1: "assets/windows/lowLODWindows/winFrame_6.png"
+	case count(asset, "/assets/windows/frames/winFrame_7.obj") == 1: "assets/windows/lowLODWindows/winFrame_7.png"
+	case count(asset, "/assets/windows/frames/winFrame_8.obj") == 1: "assets/windows/lowLODWindows/winFrame_8.png"
+	case count(asset, "/assets/windows/frames/winFrame_9.obj") == 1: "assets/windows/lowLODWindows/winFrame_9.png"
+	else: "assets/windows/lowLODWindows/winFrame_10.png"
+
+
+const frameTexture = fileRandom("assets/windows/frameTextures/*.png")
+lowLODFrameTexture = fileRandom("assets/windows/lowLODWindows/*.png")
+
+
+WindowInner(facadeType, frameForm,windowType, shutterCreationValue, materialInfo, winDepth) -->
+	case windowType == "single":
+		50%:
+			set(trim.vertical, false)
+			set(trim.horizontal, false)
+			t(0,0,-winDepth)
+			Window(facadeType,  frameForm,windowType, shutterCreationValue, materialInfo, winDepth, "leftSingleShutter", shutterAngle)
+		else:
+			set(trim.vertical, false)
+			set(trim.horizontal, false)
+			t(0,0,-winDepth)
+			Window(facadeType,  frameForm,windowType, shutterCreationValue, materialInfo, winDepth, "rightSingleShutter", shutterAngle)			
+	case windowType == "double":
+		set(trim.vertical, false)
+		set(trim.horizontal, false)
+		t(0,0,-winDepth)
+		split(x){~1: Window(facadeType, frameForm,windowType, shutterCreationValue, materialInfo, winDepth, "leftDoubleShutter", shutterAngle) | 0.08 :  extrude(winDepth * 0.6) ConstructionPlank(materialInfo) | ~1: Window(facadeType, frameForm,windowType, shutterCreationValue, materialInfo, winDepth, "rightDoubleShutter", shutterAngle)}
+	else:
+		set(trim.vertical, false)
+		set(trim.horizontal, false)
+		t(0,0,-winDepth)
+		split(x){{~(windowWingDimensions("n", "hor")): Window(facadeType, frameForm,windowType, shutterCreationValue, materialInfo, winDepth, "noShutter", shutterAngle) | 0.08 : extrude(winDepth * 0.6) ConstructionPlank(materialInfo)}* | ~(windowWingDimensions("n", "hor")): Window(facadeType, frameForm,windowType, shutterCreationValue, materialInfo, winDepth, "noShutter", shutterAngle)}
+
+
+WindowFrame(facadeType,frameForm, windowType, shutterCreationValue, materialInfo) -->
+# create different frames for two LODs.
+	case highLOD == true:
+		case frameForm == "simpleWood":
+			split(x){(frameThickness("wood", "hor")): FrameElement("std", materialInfo,0) | ~1: 	split(y){(frameThickness("wood", "vert")): FrameElement("std", materialInfo, 0) | ~1: WindowInner(facadeType, frameForm, windowType, shutterCreationValue, materialInfo, 0) | (frameThickness("wood", "vert")): FrameElement("std", materialInfo, 0)} | (frameThickness("wood", "hor")): FrameElement("std", materialInfo, 0)}	
+		case frameForm == "topBottom":
+			[t(0,0,-windowDepth) extrude(windowDepth) alignScopeToAxes(y) comp(f){left: FacadeUVs("wall") | right : FacadeUVs("wall")}]
+			split(y){(frameThickness("topBottom", "vert")): FrameElement("scaled", materialInfo, windowDepth) | ~1: WindowInner(facadeType,  frameForm,windowType, shutterCreationValue, materialInfo, windowDepth) | (frameThickness("topBottom", "vertTop")): FrameElement("scaled",materialInfo, windowDepth)}
+
+		else:
+			color("#ff0000") LowLODWindowTexturing.(windowType)
+			
+# low LOD.	
+	else:
+		# lowLOD shutters
+		case windowType == "single" :
+			50%:
+				Shutters(frameForm,shutterCreationValue, windowType, "leftSingleShutter", shutterAngle)
+				[
+				setupProjection(0, scope.xy , '1,'1)
+				texture(bestWinTexture(bestRatioWindowsAsset))
+				projectUV(0)
+				WindowLowLODTexturing
+				]
+			else:
+				Shutters(frameForm,shutterCreationValue, windowType, "rightSingleShutter", shutterAngle)
+				[
+				setupProjection(0, scope.xy , '1,'1)
+				texture(bestWinTexture(bestRatioWindowsAsset))
+				projectUV(0)
+				WindowLowLODTexturing
+				]			
+			
+		case windowType == "double":
+			split(x){~1: Shutters(frameForm,shutterCreationValue, windowType, "leftDoubleShutter", shutterAngle) | ~1: Shutters(frameForm,shutterCreationValue, windowType, "rightDoubleShutter", shutterAngle)}
+			[
+			setupProjection(0, scope.xy , '1,'1)
+			texture(bestWinTexture(bestRatioWindowsAsset))
+			projectUV(0)
+			WindowLowLODTexturing
+			]
+		else: WindowLowLODTexturing
+
+
+
+FrameElement(elementType, materialInfo, winDepth) -->
+	case elementType == "scaled":
+		t(0,0,-winDepth)
+		extrude(winDepth + windowFrameDepth(elementType))
+		s('1.1,'1,'1)
+		center(x)
+		comp(f){all: FrameMaterial(materialInfo)}
+	else:
+		t(0,0,-winDepth)
+		extrude(winDepth + windowFrameDepth(elementType))
+		comp(f){all: FrameMaterial(materialInfo)}
+		
+FrameMaterial(materialInfo) -->
+	case materialInfo == "global":
+		case frameConstructionMaterial == "wood":
+			plankTexturing.PlankTexturing("construction", fileRandom("assets/facade/constructionPlanks/*.jpg"))
+		else:  
+			BlockTexturing
+	else:
+		plankTexturing.PlankTexturing("construction", fileRandom("assets/facade/constructionPlanks/*.jpg"))
+	
+
+ConstructionPlank(materialInfo) -->
+	case materialInfo == "global":
+		case frameConstructionMaterial == "wood":
+			comp(f){all: plankTexturing.PlankTexturing("construction", fileRandom("assets/facade/constructionPlanks/*.jpg"))}
+		else:
+			comp(f){all: BlockTexturing}
+	else:
+		comp(f){all: plankTexturing.PlankTexturing("construction", fileRandom("assets/facade/constructionPlanks/*.jpg"))}
+
+
+Window(facadeType, frameForm,windowType, shutterCreationValue, materialInfo, winDepth, shutterType, chosenShutterAngle) -->
+	
+	Shutters(frameForm,shutterCreationValue, windowType, shutterType, chosenShutterAngle)
+		[
+	t(0,0,-.03)
+	setupProjection(0, scope.xy, '1,'1,0)
+	projectUV(0)
+	texture(fileRandom("assets/windows/interiors/*.png"))
+	set(material.name, "glass")
+
+	# specularity
+	set(material.specular.r,70) # for the looks in the CityEngine we add some over-exagerated specularity (otherwise the model is too dark for opengl...)
+	set(material.specular.g,70)
+	set(material.specular.b,70)		
+	#set(material.specularmap,"assets/scifi_texture_street_dark.jpg")
+	set(material.shininess,20)
+	# reflectivity
+	set(material.reflectivity, .3)
+	# opacity
+	set(material.opacity, 0.85)
+	Glass.
+	]
+
+	t(0,0,-.03)
+	s('1,'1,0.04)
+	i(bestRatioWindowsAsset)
+	texture(frameTexture)
+	set(material.name, "raehmli")
+	Frame.
+	
+WindowLowLODTexturing -->
+	setupProjection(0, scope.xy, ~0.25, ~0.25)
+	projectUV(0)
+	texture(lowLODFrameTexture)
+	# specularity
+	set(material.specular.r,70) # for the looks in the CityEngine we add some over-exagerated specularity (otherwise the model is too dark for opengl...)
+	set(material.specular.g,70)
+	set(material.specular.b,70)		
+	#set(material.specularmap,"assets/scifi_texture_street_dark.jpg")
+	set(material.shininess,20)
+	# reflectivity
+	set(material.reflectivity, .3)
+	
+##############################################
+# Shutters
+##############################################
+
+
+const shutterCreationPerBuilding = 70%: true else: false
+shutterCreationPerFloor = 60%: true else: false
+
+shutterCreation =
+	case shutterCreationPerBuilding == true:
+		case shutterCreationPerFloor == true:
+			true
+		else:
+			false
+	else:
+		false
+shutterClosed =  10%: true else: false
+
+@Group("SHUTTER GADGETS")
+attr shutterAngle =
+	case shutterClosed == true: 0
+	else: rand(160,175)
+	
+const shutterTexture =
+	case highLOD == true:
+		fileRandom("assets/facade/shutters/high/*.png")
+	else:
+		fileRandom("assets/facade/shutters/low/*.png")
+
+
+Shutters(frameForm,shutterCreationValue, windowType, shutterType, chosenshutterAngle) -->
+	case highLOD == true:
+		t(0,0,windowDepth + .025)
+		ShuttersMoved(frameForm,shutterCreationValue, windowType, shutterType, chosenshutterAngle) 
+	else:
+		t(0,0,0.01)
+		ShuttersMoved(frameForm,shutterCreationValue, windowType, shutterType, chosenshutterAngle) 
+
+		
+ShuttersMoved(frameForm,shutterCreationValue, windowType, shutterType, chosenshutterAngle) -->
+		case frameForm == "simpleWood" || shutterType == "noShutter" || scope.sx > 0.7:
+			NIL
+		case windowType == "single":
+			case shutterCreationValue == true:
+				case shutterType == "leftSingleShutter":
+					# single left
+						setupProjection(0, scope.xy, '1,'1,1)
+						projectUV(0)
+						texture(shutterTexture)
+						s('1.05,'0.96,'1)
+						center(xy)
+					
+						r(0,-chosenshutterAngle,0)
+						ShutterLOD(frameForm,shutterCreationValue, windowType, shutterType, chosenshutterAngle)				
+				else:
+					# single  right
+						setupProjection(0, scope.xy, '1,'1,1)
+						projectUV(0)
+						texture(shutterTexture)
+						s('1.05,'0.96,'1)
+						center(xy)				
+						rotateScope(0, 180, 0)
+						r(0,chosenshutterAngle,0)
+						ShutterLOD(frameForm,shutterCreationValue, windowType, shutterType, chosenshutterAngle)
+					
+			else:
+				NIL 
+		case windowType == "double":
+			case shutterCreationValue == true:
+				case shutterType == "leftDoubleShutter":
+					# double left
+						setupProjection(0, scope.xy, '1,'1,1)
+						projectUV(0)
+						texture(shutterTexture)
+						s('1.05,'0.96,'1)
+						center(xy)
+						r(0,-chosenshutterAngle,0)
+						ShutterLOD(frameForm,shutterCreationValue, windowType, shutterType, chosenshutterAngle)
+
+				else :
+					# double right			
+						setupProjection(0, scope.xy, '1,'1,1)
+						projectUV(0)
+						texture(shutterTexture)
+						s('1.05,'0.96,'1)
+						center(xy)
+						rotateScope(0, 180, 0)
+						r(0,chosenshutterAngle,0)
+						ShutterLOD(frameForm,shutterCreationValue, windowType, shutterType, chosenshutterAngle)
+			else:
+				NIL 
+		else:
+			NIL
+
+ShutterLOD(frameForm,shutterCreationValue, windowType, shutterType, chosenshutterAngle) -->
+	ShutterExtrude(frameForm,shutterCreationValue, windowType, shutterType, chosenshutterAngle)
+
+ShutterExtrude(frameForm,shutterCreationValue, windowType, shutterType, chosenshutterAngle) -->
+	case highLOD == true:
+		s('1,'1,0.03)
+		center(z)
+		primitiveCube()
+		Shutter.
+	else:
+	Shutter.
+	
+
+
+##############################################
+# Assets
+##############################################
+
+const randSignNumber = ceil(rand(6))
+
+assetSize(asset, dim) =
+	case dim == "x" : assetInfo(asset, sx)
+	case dim == "y" : assetInfo(asset, sy)
+	else		  : assetInfo(asset, sz)
+
+PutSignOrLamp(signAssetNumber) -->
+	50%:
+		case convert(y,scope,object,pos,0,0,0) < 3.5: # get rid of signs on top floors
+			s(assetSize("assets/facade/signs/sign_" + signAssetNumber + ".obj", "x"),assetSize("assets/facade/signs/sign_" + signAssetNumber + ".obj", "y"),assetSize("assets/facade/signs/sign_" + signAssetNumber + ".obj", "z"))
+			center(x)
+			i(fileRandom("assets/facade/signs/sign_" + signAssetNumber + ".obj"))
+			texture("assets/facade/signs/sign_" + signAssetNumber + ".png")
+			set(material.color.a, 0.99)
+			Sign.
+		else:
+			NIL
+	else:
+		NIL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,59 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+
+
+
+parcelTex = "assets/parcelTexture/parcelTexture.jpg"
+parcelTex_normal = "assets/parcelTexture/parcelTexture_normal.jpg"
+
+
+attr mappingSizeX = 120
+attr mappingSizeZ = 80
+
+
+LotInner -->
+	Lot
+
+const U_Offset = rand(1)
+const V_Offset = rand(1)
+
+
+@StartRule
+Lot -->
+	setupProjection(0, scope.xz, mappingSizeX, mappingSizeZ)
+	setupProjection(5, scope.xz, mappingSizeX, mappingSizeZ)
+	projectUV(0)
+	projectUV(5)
+	offsetUV(0,U_Offset, V_Offset)
+	offsetUV(5,U_Offset, V_Offset)
+	texture(parcelTex)
+	set (material.normalmap, parcelTex_normal)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

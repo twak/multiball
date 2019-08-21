@@ -1,0 +1,359 @@
+/**
+ * File:    parking_test.cga
+ * Created: 26 Mar 2015 14:07:57 GMT
+ * Author:  geof7015
+ */
+ 
+version "2015.0"
+
+## Asset Mapping ##
+
+#Vehicles
+const assetPath = "Streets_Parking/"
+const vehicleAssetPath = "3DModels_from_LowPolygon3D.com/LowPolygon3D.com_Vehicles/"
+vehicleAsset = fileRandom(vehicleAssetPath + vehicleType + "/*.obj")
+
+#Street & Parking Textures
+const streetTextures = assetPath + "Lanes/"
+const grassTextures = assetPath + "Sidewalks/Grass/"
+const sidewalkTextures = assetPath + "Sidewalks/"
+const parkingTexture =
+	case parkingType == "Pervious": streetTextures + "ParallelParkMidPervious" + ".jpg"
+	else: streetTextures + "parkingWhiteSingleLine" + ".jpg"
+
+## Attributes##
+@Group("DEFAULT SETTINGS", 1) @Order(1)
+@Range (-360, 720)
+attr parkingRotate = 0
+
+@Group("DEFAULT SETTINGS", 1) @Order(2)
+@Range(5,10)
+attr streetWidth = 6
+
+@Group("DEFAULT SETTINGS", 4) @Order(3)
+@Range(5,6)
+attr parkingLength = 5.5
+
+@Group("DEFAULT SETTINGS", 1) @Order(4)
+@Range (2,3)
+attr parkingWidth = 2.2
+
+@Group("DEFAULT SETTINGS", 1) @Order(5)
+@Range (0,45)
+attr angledparkingpercent = 0
+
+@Group("DEFAULT SETTINGS", 1) @Order(6)
+attr showCars = false
+
+@Range ("car","bus","taxi")
+attr vehicleType = "car"
+
+@Order(7)@Range(0,1) @Description("Higher the percentage, the higher the parking occupancy.")
+attr parkedCarPercentage = 0.3
+
+@Group("CENTER ISLAND SETTINGS",2) @Order(1)
+attr centerIsland = false
+
+@Group("CENTER ISLAND SETTINGS",1) @Order(2)
+@Range (0.5,10)
+attr islandWidth = 3
+
+@Group("CENTER ISLAND SETTINGS",2) @Order(3)
+@Range (0.1,0.4)
+attr islandHeight = 0.2
+
+@Group("CENTER ISLAND SETTINGS",2) @Order(4)
+attr greenCenterIsland = true
+
+@Group("CENTER ISLAND SETTINGS",2) @Order(5)
+@Range("Bermuda 1","Bermuda 2","Bermuda Dark","Bluegrass 1","Bluegrass 2","Grass Short","Grass Thick","Lawn 1","Lawn 2","Light Rye","Park","Standard Grass","St Augustine 1","St Augustine 2")
+attr grassType = "Bermuda 1"
+
+@Group("CENTER ISLAND SETTINGS",2) @Order(6)
+@Range(0.1,10)
+attr grassTextureScale = 1
+
+@Group("CENTER ISLAND SETTINGS",2) @Order(7)
+@Range("Brick Brown No Mortar Rough Running Bond","Brick Brown No Mortar Running Bond","Brick Brown Running Bond","Brick Brown Stack Bond","Brick Grey Running Bond","Brick Red High Contrast Running Bond","Brick Red No Mortar Running Bond","Brick Red Purple Running Bond","Brick Red Recessed Mortar Running Bond","Brick Red Running Bond","Brick Red Stack Bond","Brick Varied Brown Running Bond","Brick White Dirty Running Bond","Brick White Painted Running Bond","Brick White Rough Running Bond","Brick Yellow No Mortar Running Bond","Cement Block Dark Grey Running Bond","Cement Block Grey Running Bond","Cement Block Grey Specks Running Bond","Cement Block Light Running Bond","Cement Block Square Grey Stack Bond","Concrete Aggregate","Concrete Aggregate Light","Concrete Bright","Concrete Bright White","Concrete Clean Dark","Concrete Clean Light","Concrete Composite","Concrete Horizontal Lines","Concrete Old","Concrete Rough Dark","Concrete Rough Light","Concrete Rough Scratched","Concrete Square Tiles","Paver Blue Herringbone","Paver Brick Red Basket Weave","Paver Brick Red Herringbone","Paver Brown Octagon Tile","Paver Grey Ashlar","Paver Grey Herringbone","Paver Grey Hexagon","Paver Grey Square Stack Bond","Paver Grey Variable Running Bond","Paver Purple Octagon Tile","Paver Red Herringbone","Paver Red Octagon Tile","Paver Stone Varied","Paver Terracotta Herringbone","Paver Yellow Octagon Tile")
+attr hardscapeType = "Concrete Bright White"
+
+@Group("DEFAULT SETTINGS",1) @Order(11)
+@Range(0.5,10)
+attr hardscapeTextureScale = 3
+
+@Group("DEFAULT SETTINGS",1) @Order(11)
+@Range(-720,720)
+attr hardscapeTextureRotate = 0
+
+@Group("DEFAULT SETTINGS",1) @Order(12)
+@Range("Pervious","Impervious")
+attr parkingType = "Pervious"
+	
+@Group(METRICS, 5)@Order(2)
+@Range (1,20)
+attr streetCost = 2
+
+@Group(METRICS, 5)@Order(3)
+@Range (1,20)
+attr parkingCost = 3
+
+@Group(METRICS, 5)@Order(4)
+@Range (1,60)
+attr DailyParkingCost = 10
+
+@Group(METRICS, 5)@Order(5)
+@Range (1,360)
+attr ParkingDuration = 360
+
+@Range (0,6)
+attr streetCuts = 3
+
+@Range ("None","Street Only","Street + Island","Street + Parking","Street + Parking + Island")
+attr streetCutsEnd = "Street Only"
+
+@Hidden
+attr streetCutSpacing = 99999999999
+
+@StartRule
+ParkingLot-->
+rotateScope(0, parkingRotate, 0)
+StreetCutsEnd
+
+StreetCutsEnd-->
+	case streetCutsEnd == "None" : StreetCutsCenter
+	case streetCutsEnd == "Street Only" :		split(z){streetWidth 		: Street |
+			  											~streetCutSpacing	: StreetCutsCenter|
+			  											streetWidth 		: Street }
+			  											##Need parking to rotate to other direction.
+	case streetCutsEnd == "Street + Parking" :	split(z){parkingLength		: ParkingLotZ|
+														streetWidth 		: Street |
+			  											~streetCutSpacing	: StreetCutsCenter|
+			  											streetWidth 		: Street |
+			  											parkingLength		: ParkingLotZ}
+	case streetCutsEnd == "Street + Island" :	split(z){islandWidth	 : CenterIsland |
+														streetWidth 		: Street |
+			  											~streetCutSpacing	: StreetCutsCenter|
+			  											streetWidth 		: Street |
+			  											islandWidth	 : CenterIsland}
+	case streetCutsEnd == "Street + Parking + Island" :	split(z){islandWidth	 : CenterIsland |
+																parkingLength		: ParkingLotZ|
+																streetWidth 		: Street |
+			  													~streetCutSpacing	: StreetCutsCenter|
+			  													streetWidth 		: Street |
+			  													parkingLength		: ParkingLotZ |
+			  													islandWidth	 : CenterIsland}
+	else: NIL
+	
+
+StreetCutsCenter-->
+	case streetCuts == 0:	ParkingLotX			 	
+	case streetCuts == 1:	split(z){~streetCutSpacing  : ParkingLotX | 
+									streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX}
+	case streetCuts == 2:	split(z){~streetCutSpacing 	: ParkingLotX | 
+									streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX}
+	case streetCuts == 3:	split(z){~streetCutSpacing  	: ParkingLotX | 
+									streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX}
+	case streetCuts == 4:	split(z){~streetCutSpacing  	: ParkingLotX | 
+									streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX}
+	case streetCuts == 5:	split(z){~streetCutSpacing  	: ParkingLotX | 
+									streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX|
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX}
+	case streetCuts == 6:	split(z){~streetCutSpacing  	: ParkingLotX | 
+									streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX |
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX|
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX|
+			  						streetWidth 		: Street |
+			  						~streetCutSpacing	: ParkingLotX}
+	else: NIL
+
+ParkingLotX-->
+	case centerIsland == true:
+		split(x){streetWidth : Street | 
+          	   parkingLength : ParkingRowDirection1 |
+          	   islandWidth	 : CenterIsland |
+               parkingLength : ParkingRowDirection2}*
+    else:
+		split(x){streetWidth : Street | 
+          	   parkingLength : ParkingRowDirection1 | 
+            	 parkingLength : ParkingRowDirection2}*
+
+ParkingLotZ-->
+	case centerIsland == true:
+		split(z){streetWidth : Street | 
+          	   parkingLength : ParkingRowDirection1 |
+          	   islandWidth	 : CenterIsland |
+               parkingLength : ParkingRowDirection2}*
+    else:
+		split(z){parkingLength : ParkingRowSideDirection1}*
+
+CenterIsland-->
+	offset(-0.25) IslandSplit
+	
+IslandSplit   --> comp(f) { inside: IslandInner | border: IslandCurb }
+
+IslandCurb  --> 
+	extrude(islandHeight)
+	comp(f){object.top: IslandCurbSettings
+		| object.side: IslandCurbSettings
+		| object.bottom:  NIL }
+
+IslandCurbSettings-->
+	color("#D8D8D8")
+
+IslandInner  --> 
+	extrude(islandHeight - 0.010)
+	comp(f){object.top: IslandInnerSettings
+		| object.side: NIL
+		| object.bottom:  NIL }
+
+IslandInnerSettings  --> 
+	case greenCenterIsland:
+		setupProjection(0, scope.xy, grassTextureScale, grassTextureScale)
+		projectUV(0)
+		texture(grassTextures + grassType + ".jpg")
+	else: 
+		setupProjection(0, scope.xy, hardscapeTextureScale, hardscapeTextureScale)
+		projectUV(0)
+		texture(sidewalkTextures + hardscapeType + ".jpg")
+		
+		
+Street-->
+	case streetWidth < 3.5 :
+		setupProjection(0, scope.xz, 14, 14)
+		projectUV(0)
+		texture(streetTextures + "asphalt_14x14m.jpg")
+		StreetCalculator
+	case streetWidth >= 3.5: 
+		setupProjection(0, scope.xz, 14, 14)
+		projectUV(0)
+		texture(streetTextures + "asphalt_14x14m.jpg")
+		StreetCalculator
+	else: 
+		setupProjection(0, scope.xz, 14, 14)
+		projectUV(0)
+		texture(streetTextures + "asphalt_14x14m.jpg")
+		StreetCalculator
+
+ParkingRowDirection1-->
+	rotateScope(0, angledparkingpercent, 0)
+	split(z){parkingWidth : ParkingSpace | parkingWidth : ParkingSpace}*
+
+ParkingRowDirection2-->
+	rotateScope(0, 180 + angledparkingpercent, 0)
+	split(z){parkingWidth : ParkingSpace | parkingWidth : ParkingSpace}*
+
+ParkingRowSideDirection1-->
+	rotateScope(0, angledparkingpercent, 0)
+	split(x){parkingWidth : ParkingSpaceSide | parkingWidth : ParkingSpaceSide}*
+
+ParkingSpace-->
+	case geometry.area >= parkingLength * parkingWidth - 1:
+	ParkingCalculator
+	TextureParking
+	PlaceVehicle
+	else:
+	setupProjection(0, scope.xz, 7, 7)
+	projectUV(0)
+	offsetUV(0,rand(1), rand(1))
+	texture(streetTextures + "asphalt_painted_terracotta_7x7m.jpg")
+	report("Area Un-utilized Asphalt",geometry.area)
+	report("Cost Un-utilized Asphalt",geometry.area*parkingCost)
+	report("Daily Parking Loss",(geometry.area/(parkingWidth*parkingLength))*DailyParkingCost)
+	report("Duration Parking Loss",(geometry.area/(parkingWidth*parkingLength))*DailyParkingCost*ParkingDuration)
+	report("Un-utilized Asphalt Runoff",geometry.area)
+
+ParkingSpaceSide-->
+	case geometry.area >= parkingLength * parkingWidth - 1:
+	ParkingCalculator
+	TextureParking
+	PlaceVehicleSide
+	else:
+	setupProjection(0, scope.xz, 7, 7)
+	projectUV(0)
+	offsetUV(0,rand(1), rand(1))
+	texture(streetTextures + "asphalt_painted_terracotta_7x7m.jpg")
+	report("Area Un-utilized Asphalt",geometry.area)
+	report("Cost Un-utilized Asphalt",geometry.area*parkingCost)
+	report("Daily Parking Loss",(geometry.area/(parkingWidth*parkingLength))*DailyParkingCost)
+	report("Duration Parking Loss",(geometry.area/(parkingWidth*parkingLength))*DailyParkingCost*ParkingDuration)
+	report("Un-utilized Asphalt Runoff",geometry.area)
+
+## TODO Fix Texture Bug where switch disables textures
+TextureParking-->
+	setupProjection(0, scope.xz, scope.sx, scope.sz)
+	projectUV(0)
+	texture(parkingTexture)
+
+
+PlaceVehicle-->
+	case showCars && angledparkingpercent == 0 && p(parkedCarPercentage):
+		rotateScope(0,90,0)
+		t(parkingWidth / 2,0,parkingLength / 2)
+		s(0,0,0)
+		i(vehicleAsset)
+	case showCars && angledparkingpercent != 0 && p(parkedCarPercentage):
+		rotateScope(0,90,0)
+		t(parkingWidth / 2,0, (parkingLength / 2) + ((angledparkingpercent/90)*3))
+		s(0,0,0)
+		i(vehicleAsset)
+	else: NIL
+	
+##Added for Side Parking
+PlaceVehicleSide-->
+	case showCars && angledparkingpercent == 0 && p(parkedCarPercentage) && streetCutsEnd == "Street + Parking":
+		rotateScope(0,180,0)
+		t(parkingWidth / 2,0,parkingLength / 2)
+		s(0,0,0)
+		i(vehicleAsset)
+	case showCars && angledparkingpercent == 0 && p(parkedCarPercentage) && streetCutsEnd == "Street + Parking + Island":
+		rotateScope(0,180,0)
+		t(parkingWidth / 2,0,parkingLength / 2)
+		s(0,0,0)
+		i(vehicleAsset)
+	else: NIL
+	
+##REPORTING ELEMENT##
+ParkingCalculator-->
+	report("# Spaces",1)
+	report("Daily Parking Profit",DailyParkingCost)
+	report("Duration Parking Profit",DailyParkingCost*ParkingDuration)
+	report("Area Parking",geometry.area)
+	report("Cost Parking",geometry.area*parkingCost)
+	NIL
+
+StreetCalculator-->
+	report("# Streets",1)
+	report("Area Street",geometry.area)
+	report("Cost Street",geometry.area*streetCost)
+	

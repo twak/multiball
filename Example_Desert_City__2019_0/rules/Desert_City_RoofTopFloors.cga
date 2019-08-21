@@ -1,0 +1,769 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+
+###########################################################################################
+# Generic Attributes
+###########################################################################################
+
+attr LOD = "medium"
+attr buildingType = ""
+attr doOcclusionQueries = false
+
+###########################################################################################
+# Functions
+###########################################################################################
+
+smallerValue(input1, input2) = case input1 <= input2 : input1 else : input2
+
+
+####################################################
+###########################################################
+###########################################################################################
+# ROOF TOP FLOORS                                              #####################################
+###########################################################################################
+###########################################################
+####################################################
+
+RoofTopFloor -->
+	RoofTopFloorTexturing
+	AssetDistribution
+	BigVolumes
+
+
+###########################################################################################
+# BigVolumes
+###########################################################################################
+
+roofStepsProb = 0.05
+roofStepHeight = 80%: .15 else : 0.25
+
+minArea = 4
+minDim = 4
+bigVolumeProb = rand (0.02, 0.08)
+bigVolumeHeight = 60%: rand(.6,1.4) else : rand(2.05,2.5)
+
+BigVolumes -->
+	case LOD == "medium" || LOD == "high" :
+		BigVolumesSplit
+	else :
+		NIL
+
+BigVolumesSplit -->
+	case geometry.area > minArea && scope.sx > minDim :
+		50%:
+			split(x) { '0.3 : alignScopeToGeometry(yUp, any, longest) RoofTopFloorStepping | ~1 : alignScopeToGeometry(yUp, any, longest) RoofTopFloorStepping }
+		else :
+			split(x) { '0.3 : alignScopeToGeometry(yUp, any, longest) RoofTopFloorStepping | ~1 : alignScopeToGeometry(yUp, any, longest) RoofTopFloorStepping }
+	else :
+		case p(bigVolumeProb) :
+			BigVolumeUse
+		else :
+			NIL
+
+
+RoofTopFloorStepping -->
+	case p(roofStepsProb) && geometry.isRectangular(15) :
+		extrude(roofStepHeight)
+		comp(f) {
+			side 	: RoofTopFloorVerticalTexturing
+			| top 	: alignScopeToGeometry(yUp, any, longest)
+						RoofTopFloorTexturing
+						BigVolumesSplit}
+	else :
+		BigVolumesSplit		
+
+
+###########################################################################################
+# BigVolumeUse
+###########################################################################################
+
+BigVolumeUse -->
+	case buildingType == "religious" :
+		MinaretTower
+	else :
+	# put some towers also on other building types
+		99% :
+			BigVolumeExtrude
+		else :
+			MinaretTower
+
+
+###########################################################################################
+# BigVolumeExtrude
+###########################################################################################
+
+BigVolumeExtrude -->
+	offset(-.3, inside)
+	extrude(bigVolumeHeight)
+	BigVolume
+	CollisionMesh
+
+BigVolume -->
+	comp(f) {bottom : NIL | side : comp(f) {all : MetalSurfaceTexturing} | all : offset(.1, inside) roofPyramid(3) comp(f) {all : MetalSurfaceTexturing} }
+
+
+
+
+
+###########################################################################################
+# MinaretTower
+###########################################################################################
+
+attr Size = 0
+# object attribute for Minaret markers in Structures Layer of GDB !
+
+const minaretHeight =
+	case
+		Size >0 : Size
+	else:
+		70% : rand (5,12)  else : rand(10,25)
+towerDiameter = minaretHeight / 7
+towerFloorHeight = 5
+
+
+const towerFloorScaler = 60% : 1 else : rand(.75,.85)
+const minaretTexture1 = fileRandom("assets/minaretTower/wall_*.jpg")
+const minaretTexture2 = fileRandom("assets/minaretTower/wall_*.jpg")
+
+wallArcAsset = "assets/minaretTower/wallArc.obj"
+cylinderAsset = "assets/minaretTower/cylinder.obj"
+plateauAsset = "assets/minaretTower/plateau.obj"
+roofAsset =
+	50%:
+		"assets/minaretTower/pointyTip.obj"
+	30% :
+		"assets/minaretTower/roundPointyTip.obj"
+	else :
+		"assets/minaretTower/roundTip.obj"
+
+
+
+MinaretTower -->
+	alignScopeToAxes(y)
+	s(towerDiameter,minaretHeight,towerDiameter)
+	primitiveCube()
+	center(xz)
+	MinaretTowerOcclusion
+
+MinaretTowerOcclusion -->
+	case doOcclusionQueries :
+		case touches :
+			80% :
+				NIL
+			else :
+				TowerMainVolume
+		else :
+			TowerMainVolume
+	else:
+		TowerMainVolume
+		
+TowerMainVolume -->
+	CollisionMesh
+	split(y) {~towerFloorHeight : TowerFloor(split.index, split.total) }*
+
+scalerFunction(index, total) = pow ( towerFloorScaler, total - (total - index) )
+
+TowerFloor(index, total) -->
+	s('scalerFunction(index, total),'1,'scalerFunction(index, total))
+	center(xz)
+	i(cylinderAsset)
+	TowerRoof(index, total)
+	comp(f) {top : InsertTowerPlateau(index, total) | all : TowerWall(index)}
+
+InsertTowerPlateau(index, total) -->
+	case index == total - 1 :
+		NIL
+	else :
+		alignScopeToAxes(y)
+		s('1.4, .8, '1.4)
+		center(xz)
+		i(plateauAsset)
+		MinaretPlateauRailing
+		
+
+minaretTipHeight = rand(2,4)
+
+TowerRoof(index, total) -->
+	case index == total - 1 :
+		comp(f) {top : InsertRoof | all : NIL}
+	else :
+		NIL
+
+InsertRoof -->
+	alignScopeToAxes
+	s('1,minaretTipHeight,'1)
+	i(roofAsset)
+	MinaretWall
+	
+TowerWall(index) -->
+	case index == 0 :
+		comp(f) {vertical : PutTowerOpening | all : TowerMaterial}
+	else :
+		comp(f) {vertical : PutTowerProbOpening | all : TowerMaterial}
+
+PutTowerOpening -->
+	split(y) {2 :
+		i(wallArcAsset)
+		t(0,0,'-1)
+		comp(f) {0 : MinaretHoleMaterial | all : MinaretWall}
+	| ~1 : MinaretWall}
+
+
+PutTowerProbOpening -->
+	85% :
+		MinaretWall
+	else :
+		split(y) {2 :
+			s('1,'1,.4)
+			i(wallArcAsset)
+			t(0,0,'-1)
+			comp(f) {0 : MinaretHoleMaterial | all : MinaretWall}
+		| ~1 : MinaretWall}
+
+
+MinaretWall -->
+	tileUV(0,6,6)
+	texture(minaretTexture1)
+
+MinaretPlateauRailing -->
+	texture(minaretTexture2)
+
+TowerMaterial -->
+	texture(minaretTexture2)
+
+MinaretHoleMaterial -->
+	color(.3,.3,.3)
+
+####################################################
+###########################################################
+###########################################################################################
+# TEXTURING                                                              #####################################
+###########################################################################################
+###########################################################
+####################################################
+
+
+
+
+
+###########################################################################################
+# RoofTopFloorTexturing
+###########################################################################################
+
+texDim = 7
+const roofTopFloorTex 			= fileRandom("assets/roofTopFloors/*.png")
+const roofTopFloorVerticalTex 	= fileRandom("assets/roofTopFloors/*.png")
+
+
+RoofTopFloorTexturing -->
+	alignScopeToGeometry(zUp, any, world.lowest)
+	setupProjection(0,scope.xy, texDim, texDim)
+	projectUV(0)
+	texture(roofTopFloorTex)
+	set (material.bumpmap, material.colormap)
+	set (material.bumpValue, 0.7)
+	DirtMapping
+
+RoofTopFloorVerticalTexturing -->
+	alignScopeToGeometry(zUp, any, world.lowest)
+	setupProjection(0,scope.xy, texDim, texDim)
+	projectUV(0)
+	set (material.bumpmap, material.colormap)
+	set (material.bumpValue, 0.7)
+	texture(roofTopFloorVerticalTex)
+	DirtMapping	
+
+
+###########################################################################################
+# DirtMapping
+###########################################################################################
+
+const randDirtTex = fileRandom("assets/dirtMaps/*.jpg")
+
+xSize = 24
+zSize = 24
+
+texOffsetX(size) = getGeoCoord(X) % size
+texOffsetZ(size) = -getGeoCoord(Y) % size
+
+DirtMapping -->
+	#alignScopeToAxes(y)
+	setupProjection(2,scope.xy,xSize,zSize) 
+	projectUV(2)
+	offsetUV(2,rand(1), rand(1))
+	set(material.dirtmap, randDirtTex)
+	set(material.specularmap, randDirtTex)
+	RoofSurface.
+	
+
+###########################################################################################
+# MetalSurfaceTexturing
+###########################################################################################
+
+metalTextureDim = 4
+const metalTexture = fileRandom ("assets/metalRoofTextures/*.jpg")
+const metalSurfaceSpecValue = rand (0,.6)
+const metalSurfaceShininessValue = rand (20,30)
+
+MetalSurfaceTexturing -->
+	setupProjection(0,scope.xy,metalTextureDim,metalTextureDim)
+	projectUV(0)
+	texture(metalTexture)
+	set (material.bumpmap, material.colormap)
+	set (material.bumpValue, 0.7)
+	set(material.specular.r, metalSurfaceSpecValue)
+	set(material.specular.g, metalSurfaceSpecValue)
+	set(material.specular.b, metalSurfaceSpecValue)
+	set(material.shininess, metalSurfaceShininessValue)
+	DirtMapping
+
+
+
+
+
+
+
+
+
+
+
+####################################################
+###########################################################
+###########################################################################################
+# DISTRIBUTE ROOF ASSETS                                              #####################################
+###########################################################################################
+###########################################################
+####################################################
+
+
+
+AssetDistribution -->
+	case LOD == "low" || LOD == "medium":
+		NIL
+	else :
+		RoofProps
+		
+
+# distribute roof asset types on building types (s,m,l) and use types (assessUse, techUse, unused = open surface)
+RoofProps -->
+	case buildingType == "residential" :
+		DistributeRoofAssets("airExhaust")
+		DistributeRoofAssets("antenna") 				
+		DistributeRoofAssets("electricBox") 		
+		DistributeRoofAssets("metalPole") 		
+		DistributeRoofAssets("pipe") 			
+		DistributeRoofAssets("roofCover") 		
+		DistributeRoofAssets("satelliteDish") 	
+		DistributeRoofAssets("steelFrame")
+		DistributeRoofAssets("trashCan")
+		DistributeRoofAssets("ventilator") 		
+	case buildingType == "school" :
+		DistributeRoofAssets("airExhaust")
+		DistributeRoofAssets("antenna") 				
+		DistributeRoofAssets("electricBox") 		
+		DistributeRoofAssets("metalPole") 		
+		DistributeRoofAssets("pipe") 			
+		DistributeRoofAssets("roofCover") 		
+		DistributeRoofAssets("satelliteDish") 	
+		DistributeRoofAssets("steelFrame")
+		DistributeRoofAssets("trashCan")
+		DistributeRoofAssets("ventilator") 		
+	case buildingType == "commercial" :
+		DistributeRoofAssets("airExhaust")
+		DistributeRoofAssets("antenna") 				
+		DistributeRoofAssets("dumpster") 			
+		DistributeRoofAssets("electricBox") 		
+		DistributeRoofAssets("elevatorHouse") 	
+		DistributeRoofAssets("metalPole") 		
+		DistributeRoofAssets("pipe") 			
+		DistributeRoofAssets("roofCover") 		
+		DistributeRoofAssets("satelliteDish") 	
+		DistributeRoofAssets("solarPanel") 		
+		DistributeRoofAssets("steelFrame")
+		DistributeRoofAssets("trashCan")
+		DistributeRoofAssets("ventilator") 		
+	case buildingType == "religious" :
+		DistributeRoofAssets("airExhaust")
+		DistributeRoofAssets("antenna") 				
+		DistributeRoofAssets("electricBox") 		
+		DistributeRoofAssets("metalPole") 		
+		DistributeRoofAssets("pipe") 			
+		DistributeRoofAssets("roofCover") 		
+	else :
+	# industrial
+		DistributeRoofAssets("airExhaust")
+		DistributeRoofAssets("antenna") 				
+		DistributeRoofAssets("chimney")
+		DistributeRoofAssets("dumpster") 			
+		DistributeRoofAssets("electricBox") 		
+		DistributeRoofAssets("elevatorHouse") 	
+		DistributeRoofAssets("metalPole") 		
+		DistributeRoofAssets("pipe") 			
+		DistributeRoofAssets("roofCover") 		
+		DistributeRoofAssets("roofWindow") 	
+		DistributeRoofAssets("satelliteDish") 	
+		DistributeRoofAssets("solarPanel") 		
+		DistributeRoofAssets("steelFrame")
+		DistributeRoofAssets("trashCan")
+		DistributeRoofAssets("ventilator") 		
+		DistributeRoofAssets("waterTank")	
+
+##########################################################
+# ROOF ASSETS : ALL DATA
+##########################################################
+
+# rates of all asset types
+@Group("ASSET RATES", .1)
+attr airExhaustRate 	= .5
+@Group("ASSET RATES")
+attr antennaRate 		= .5
+@Group("ASSET RATES")
+attr chimneyRate 		= .5
+@Group("ASSET RATES")
+attr dumpsterRate 		= .5
+@Group("ASSET RATES")
+attr electricBoxRate 	= .5
+@Group("ASSET RATES")
+attr elevatorHouseRate 	= .5
+@Group("ASSET RATES")
+attr metalPoleRate 		= .5
+@Group("ASSET RATES")
+attr pipeRate 			= .5
+@Group("ASSET RATES")
+attr roofCoverRate 		= .5
+@Group("ASSET RATES")
+attr roofWindowRate 	= .5
+@Group("ASSET RATES")
+attr satelliteDishRate 	= .5
+@Group("ASSET RATES")
+attr solarPanelRate 	= .5
+@Group("ASSET RATES")
+attr steelFrameRate 	= .5
+@Group("ASSET RATES")
+attr trashCanRate 		= .5
+@Group("ASSET RATES")
+attr ventilatorRate 	= .5
+@Group("ASSET RATES")
+attr waterTankRate 		= .5
+
+assetArrayCreate(assetName) =
+	case assetName == "airExhaust" 		: p( airExhaustRate )
+	case assetName == "antenna" 		: p( antennaRate )
+	case assetName == "chimney" 		: p( chimneyRate )
+	case assetName == "dumpster" 		: p( dumpsterRate )
+	case assetName == "electricBox" 	: p( electricBoxRate )
+	case assetName == "elevatorHouse" 	: p( elevatorHouseRate )
+	case assetName == "metalPole" 		: p( metalPoleRate )
+	case assetName == "pipe" 			: p( pipeRate )
+	case assetName == "roofCover" 		: p( roofCoverRate )
+	case assetName == "roofWindow" 		: p( roofWindowRate )
+	case assetName == "satelliteDish" 	: p( satelliteDishRate )
+	case assetName == "solarPanel" 		: p( solarPanelRate )
+	case assetName == "steelFrame" 		: p( steelFrameRate )
+	case assetName == "trashCan" 		: p( trashCanRate )
+	case assetName == "ventilator" 		: p( ventilatorRate )
+	case assetName == "waterTank" 		: p( waterTankRate )
+	else:
+		false
+
+@Group("ASSET MULTIPLIER", 0.7)
+attr assetMultiplier = 1.2
+
+numArrays(assetName)= 
+	case assetName == "airExhaust" 		: rint(airExhaustRate * geometry.area / 60 * assetMultiplier)
+	case assetName == "antenna" 		: rint(antennaRate * geometry.area / 50 * assetMultiplier)
+	case assetName == "chimney" 		: rint(chimneyRate * geometry.area / 80 * assetMultiplier)
+	case assetName == "dumpster" 		: rint(dumpsterRate * geometry.area / 150 * assetMultiplier)
+	case assetName == "electricBox" 	: rint(electricBoxRate * geometry.area / 90 * assetMultiplier)
+	case assetName == "elevatorHouse" 	: rint(elevatorHouseRate * geometry.area / 200 * assetMultiplier)
+	case assetName == "metalPole" 		: rint(metalPoleRate * geometry.area / 250 * assetMultiplier)
+	case assetName == "pipe" 			: rint(pipeRate * geometry.area / 20 * assetMultiplier)
+	case assetName == "roofCover" 		: rint(roofCoverRate * geometry.area / 180 * assetMultiplier)
+	case assetName == "roofWindow" 		: rint(roofWindowRate * geometry.area / 140 * assetMultiplier)
+	case assetName == "satelliteDish" 	: rint(satelliteDishRate * geometry.area / 65 * assetMultiplier)
+	case assetName == "solarPanel" 		: rint(solarPanelRate * geometry.area / 100 * assetMultiplier)
+	case assetName == "steelFrame" 		: rint(steelFrameRate * geometry.area / 80 * assetMultiplier)
+	case assetName == "trashCan" 		: rint(trashCanRate * geometry.area / 80 * assetMultiplier)
+	case assetName == "ventilator" 		: rint(ventilatorRate * geometry.area / 250* assetMultiplier)
+	case assetName == "waterTank" 		: rint(waterTankRate * geometry.area / 110* assetMultiplier)
+	else: 0
+
+
+numAssetsPerArray(assetName) =
+	case assetName == "airExhaust" 		: rint (rand(2))
+	case assetName == "antenna" 		: rint (rand(2))
+	case assetName == "chimney" 		: 1
+	case assetName == "dumpster" 		: 80%: 1  else: 2
+	case assetName == "electricBox" 	: rint (rand(3))
+	case assetName == "elevatorHouse" 	: rint (rand(1))
+	case assetName == "metalPole" 		: rint (rand(2,9))
+	case assetName == "pipe" 			: rint (rand(3))
+	case assetName == "roofCover" 		: rint (rand(4))
+	case assetName == "roofWindow" 		: rint (rand(3))
+	case assetName == "satelliteDish" 	: 80%: 1  else: 2
+	case assetName == "solarPanel" 		: 5%: 4  else: rint (rand(2))
+	case assetName == "steelFrame" 		: rint (rand(1))
+	case assetName == "trashCan" 		: rint (rand(2))
+	case assetName == "ventilator" 		: rint (rand(3))
+	case assetName == "waterTank" 		: 10%: 4 else: rint (rand(2))
+	else: 0
+
+bailoutArea(assetName)= 
+	case assetName == "airExhaust" 		: 2
+	case assetName == "antenna" 		: 6
+	case assetName == "chimney" 		: 8
+	case assetName == "dumpster" 		: 20
+	case assetName == "electricBox" 	: 3
+	case assetName == "elevatorHouse" 	: 25
+	case assetName == "metalPole" 		: 4
+	case assetName == "pipe" 			: 4
+	case assetName == "roofCover" 		: 5
+	case assetName == "roofWindow" 		: 7
+	case assetName == "satelliteDish" 	: 2
+	case assetName == "solarPanel" 		: 20
+	case assetName == "steelFrame" 		: 8
+	case assetName == "trashCan" 		: 5
+	case assetName == "ventilator" 		: 4
+	case assetName == "waterTank" 		: 10
+	else: 20
+	
+assetArrayMinWidth(assetName) =
+	case assetName == "airExhaust" 		: .6
+	case assetName == "antenna" 		: 1.6
+	case assetName == "chimney" 		: 1.2
+	case assetName == "dumpster" 		: 2.5
+	case assetName == "electricBox" 	: .8
+	case assetName == "elevatorHouse" 	: 3
+	case assetName == "metalPole" 		: .2
+	case assetName == "pipe" 			: .8
+	case assetName == "roofCover" 		: 1.5
+	case assetName == "roofWindow" 		: 3
+	case assetName == "satelliteDish" 	: 2.5
+	case assetName == "solarPanel" 		: 3
+	case assetName == "steelFrame" 		: 1.5
+	case assetName == "trashCan" 		: .8
+	case assetName == "waterTank" 		: 2
+	else: 0
+	
+approxAssetDim(assetName) =
+	case assetName == "airExhaust" 		: .4
+	case assetName == "antenna" 		: .8
+	case assetName == "chimney" 		: .6
+	case assetName == "dumpster" 		: 1.5
+	case assetName == "electricBox" 	: .8
+	case assetName == "elevatorHouse" 	: 3.5
+	case assetName == "metalPole" 		: .8
+	case assetName == "pipe" 			: 1
+	case assetName == "roofCover" 		: 3
+	case assetName == "roofWindow" 	: 3
+	case assetName == "satelliteDish" 	: 1.5
+	case assetName == "solarPanel" 		: 3
+	case assetName == "steelFrame" 		: 4
+	case assetName == "trashCan" 		: .8
+	case assetName == "ventilator" 		: .6
+	case assetName == "waterTank" 		: 3
+	else: 0
+	
+assetRelativeScatterOffset(assetName) = # the closer to 1, the preciser the placement
+	case assetName == "airExhaust" 		: .2
+	case assetName == "antenna" 		: .6
+	case assetName == "chimney" 		: .8
+	case assetName == "dumpster" 		: .2
+	case assetName == "electricBox" 	: .8
+	case assetName == "elevatorHouse" 	: .8
+	case assetName == "metalPole" 		: .8
+	case assetName == "pipe" 			: .4
+	case assetName == "roofCover" 		: .95
+	case assetName == "roofWindow" 		: .9
+	case assetName == "satelliteDish" 	: .7
+	case assetName == "solarPanel" 		: .95
+	case assetName == "steelFrame" 		: .9
+	case assetName == "trashCan" 		: .9
+	case assetName == "ventilator" 		: .65
+	case assetName == "waterTank" 		: .95
+	else: 0
+##########################################################
+# DISTRIBUTE ROOF ASSETS
+##########################################################
+
+firstOffsetValue = .5
+
+DistributeRoofAssets(assetName) -->
+	alignScopeToGeometry(yUp, any, longest)
+	offset(-firstOffsetValue, inside)
+	AssetArrayMaker(assetName, numArrays(assetName))
+	
+	
+AssetArrayMaker(assetName, n) -->
+	case n > 0 && geometry.area > bailoutArea(assetName):
+		25% : split(z){ ~rand(0.2,0.8): AssetArrayMaker(assetName,(n-2)/2) | ~rand(0.2,0.8): AssetArray(assetName) | ~rand(0.2,0.8): AssetArrayMaker(assetName,(n-2)/2) | ~rand(0.2,0.8): AssetArray(assetName) }
+		25% : split(x){ ~rand(0.2,0.8): AssetArrayMaker(assetName,(n-2)/2) | ~rand(0.2,0.8): AssetArray(assetName) | ~rand(0.2,0.8): AssetArrayMaker(assetName,(n-2)/2) | ~rand(0.2,0.8): AssetArray(assetName) }
+		25% : split(z){ ~rand(0.2,0.8): AssetArray(assetName) | ~rand(0.2,0.8): AssetArrayMaker(assetName,(n-2)/2) | ~rand(0.2,0.8): AssetArray(assetName) | ~rand(0.2,0.8): AssetArrayMaker(assetName,(n-2)/2) }
+		else: split(x){ ~rand(0.2,0.8): AssetArray(assetName) | ~rand(0.2,0.8): AssetArrayMaker(assetName,(n-2)/2) | ~rand(0.2,0.8): AssetArray(assetName) | ~rand(0.2,0.8): AssetArrayMaker(assetName,(n-2)/2) }
+	else:
+		NIL
+
+# create the array or not depending on the asset's creationrate.
+AssetArray(assetName) -->
+	case assetArrayCreate(assetName):
+		alignScopeToGeometry(yUp, any, longest)
+		innerRect
+		AssetArrayDimChecker(assetName, numAssetsPerArray(assetName))
+		
+	else:
+		NIL
+
+# check the scope size for the required min dimension for the asset placement !
+AssetArrayDimChecker(assetName, n) -->
+	case n == 4:
+		case scope.sz > 2 * assetArrayMinWidth(assetName):
+			AssetArrayArea(assetName, n)
+		else:
+			AssetArrayArea(assetName, 2)
+	else:
+		case scope.sz > assetArrayMinWidth(assetName):
+			AssetArrayArea(assetName, n)
+		else:
+			NIL		
+
+# distribution type. if 4: squared, else in a line	
+AssetArrayArea(assetName, n) -->
+	case n == 4:
+		split(z){~(rand(1)): NIL 
+				| (approxAssetDim(assetName)) : split(x){~1 : NIL | n * (approxAssetDim(assetName)) : split(x){ (approxAssetDim(assetName)) :AssetSpotOffset(assetName, n)}* | ~1 : NIL}
+				| (approxAssetDim(assetName)) : split(x){~1 : NIL | n * (approxAssetDim(assetName)) : split(x){ (approxAssetDim(assetName)) :AssetSpotOffset(assetName, n)}* | ~1 : NIL}
+				| ~(rand(1)): NIL }
+	else:
+		split(z){~(rand(1)): NIL 
+				| (approxAssetDim(assetName)): split(x){~1 : NIL | n * (approxAssetDim(assetName)) : split(x){ scope.sx / n :AssetSpotOffset(assetName, n)}* | ~1 : NIL}
+				| ~(rand(1)): NIL }
+
+AssetSpotOffset(assetName, n) -->
+	alignScopeToGeometry(yUp, any, longest)
+	split(x){~1: NIL | scope.sz: offset(-(scope.sz * assetRelativeScatterOffset(assetName)/2), inside) ScatterAssets(assetName, n) | ~1: NIL}
+	
+	
+ScatterAssets(assetName, n) -->
+	scatter(surface,1,uniform) {PutAsset(assetName) }	
+	
+
+
+
+
+##########################################################
+# PUT ALL ASSETS
+##########################################################
+
+PutAsset(assetName) -->
+	alignScopeToAxes(y)
+	set(trim.vertical, false)
+	PutChosenAsset(assetName, fileRandom ("assets/roofAssets/" + assetName + "*.obj"))
+
+
+r90 = 25%: 0 25%: 90 25%: 180 else: 270
+satelliteDishRotationOffset = 5
+
+PutChosenAsset(assetName, chosenAssetName) -->
+	AssetTextureChoose(assetName, chosenAssetName, fileRandom("assets/roofAssets/"+assetName+"/" + fileBasename(chosenAssetName) + "_v*"))
+
+AssetTextureChoose(assetName, chosenAssetName, chosenTextureName) -->
+	case assetName == "solarPanel" || assetName == "satelliteDish" :
+		i(chosenAssetName,yUp,keepSizeAndPosition)
+		r(scopeCenter,0,-convert(y, scope, world, orient, 0, 0, 0) + rand(-satelliteDishRotationOffset, satelliteDishRotationOffset),0)
+		texture(chosenTextureName)
+		ShadeChosenAsset(assetName, chosenTextureName)
+	else:
+		i(chosenAssetName,yUp,keepSizeAndPosition)
+		r(scopeCenter,0,r90,0)
+		texture(chosenTextureName)
+		ShadeChosenAsset(assetName, chosenTextureName)
+
+
+doAssetShading(assetName) =
+	case assetName == "airExhaust" 		: true
+	case assetName == "antenna" 		: false
+	case assetName == "chimney" 		: false
+	case assetName == "dumpster" 		: true
+	case assetName == "electricBox" 	: true
+	case assetName == "elevatorHouse" 	: true
+	case assetName == "metalPole" 		: true
+	case assetName == "pipe" 			: true
+	case assetName == "roofCover" 		: true
+	case assetName == "roofWindow" 		: true
+	case assetName == "satelliteDish" 	: true
+	case assetName == "solarPanel" 		: true
+	case assetName == "steelFrame" 		: true
+	case assetName == "trashCan" 		: false
+	case assetName == "ventilator" 		: false
+	else								: false
+
+	
+assetSpecValue = rand (5,40)
+
+ShadeChosenAsset(assetName, chosenTexture) -->
+	case doAssetShading(assetName):
+		set(material.specular.r, assetSpecValue)
+		set(material.specular.g, assetSpecValue)
+		set(material.specular.b, assetSpecValue)
+		set(material.specularmap, chosenTexture)
+		set(material.shininess, rand(10,40))
+		set(material.bumpmap, chosenTexture)
+		set(material.bumpValue, rand(.2,.5))
+		RandomFurnitureDoOcclusionCheck(assetName)
+	else:
+		RandomFurnitureDoOcclusionCheck(assetName)
+
+
+RandomFurnitureDoOcclusionCheck(assetName) -->
+	case assetName == "airExhaust" 		: RandomFurniture(false)
+	case assetName == "antenna" 		: RandomFurniture(false)
+	case assetName == "chimney" 		: RandomFurniture(true)
+	case assetName == "dumpster" 		: RandomFurniture(false)
+	case assetName == "electricBox" 	: RandomFurniture(false)
+	case assetName == "elevatorHouse" 	: RandomFurniture(true)
+	case assetName == "metalPole" 		: RandomFurniture(false)
+	case assetName == "pipe" 			: RandomFurniture(false)
+	case assetName == "roofCover" 		: RandomFurniture(false)
+	case assetName == "roofWindow" 		: RandomFurniture(false)
+	case assetName == "satelliteDish" 	: RandomFurniture(false)
+	case assetName == "solarPanel" 		: RandomFurniture(true)
+	case assetName == "steelFrame" 		: RandomFurniture(false)
+	case assetName == "trashCan" 		: RandomFurniture(false)
+	case assetName == "ventilator" 		: RandomFurniture(false)
+	case assetName == "waterTank" 		: RandomFurniture(true)
+	else								: NIL	
+
+
+
+RandomFurniture(occlusionVolume) -->
+	case occlusionVolume:
+		t(0,5,0)
+		[ s('0.7,'1,'0.7) center(xyz) primitiveCube() comp(f){all = NIL } ] // trigger an occlusion dummy
+		FurnitureCheck
+	else:
+		t(0,5,0)		
+		FurnitureCheck
+	
+FurnitureCheck -->
+	case doOcclusionQueries:
+		case overlaps(intra) :
+			NIL
+		else:
+			t(0,-5,0)
+			RoofFurniture.
+			primitiveCube()
+			CollisionMesh
+	else:
+		t(0,-5,0)
+		RoofFurniture.
+		primitiveCube()
+		CollisionMesh
+
+
+
+
+

@@ -1,0 +1,373 @@
+/**
+ * File:    One_Part_Texturing.cga
+ * Created: 14 Apr 2013 19:01:10 GMT
+ * Author:  Esri
+ */
+
+
+version "2015.0"
+
+# Asset locations:
+
+# Use constants for Roof and Facade textures, so if one model has multiple roof shapes, 
+# they will all get same texture.
+const baseTexturingDir = "Buildings_Standard/StandardBuildingTextures/"
+const flatRoofDir = baseTexturingDir + "Roofs/Flat/"
+const slopedRoofDir = baseTexturingDir + "Roofs/Sloped/"
+
+
+
+# Note: You may need to reverse normals on premodeled buildings.
+
+################################################
+# TEXTURE vs. COLOR 
+
+@Order(0)
+@Description("Which facade library to choose textures from")
+@Range("commercial", "industrial", "office", "residential", "retail")
+attr Usage = "office" 
+
+@Order(1)
+@Description("Affects vertical tiling of texture")
+attr Story_Height = 3.5
+
+@Order(1)
+@Description("Affects vertical tiling of texture")
+attr totalHeight = scope.sy
+
+@Order(2)
+@Range(0.0, 1.0)
+@Description("You might consider turning off shape layer for premodeled assets or this might not display well.")
+attr Transparency = 0 
+
+# Note: You might want to link this attribute to thematic data, such as usage/zoning.
+@Order(3)
+@Description("To remove Override Color, delete the value.")
+@Color
+attr Override_Color = ""
+
+@Order(5)
+@Description("Uses this texture, not a random one.")
+@File
+attr Facade_Texture = getFacadeTexture(Floor_Count_Total, Usage )
+
+@Order(5)
+@Description("Uses this texture, not a random one.")
+@File
+attr Roof_Texture = getRoofTexture(Roof_Form)
+
+@Hidden
+attr Floor_Count_Total = rint(totalHeight / Story_Height)
+
+@Hidden
+attr Roof_Form = "Flat"
+
+
+
+#################################################
+# RULES
+#
+ 
+
+
+
+         
+#################################################
+# Multipatch start rule (the older version)
+#
+
+# XX this one is for faking out CGA, not really a good start rule. Change that later with default values.
+@StartRule
+SetupFromImportingRule -->
+	SetupFromImportingRule("", 0, 0, 0)
+
+#SetupFromImportingRule(BuildingElevation, TotalHeight, GeometryVerticalTiles, Facade_Texture) -->
+SetupFromImportingRule(FacadeTexture, BuildingElevation, TotalHeight, GeometryVerticalTiles) -->
+	# Make building's object coordinate system align to world axes 
+	# or else it evaluates faces incorrectly.
+	alignScopeToAxes()
+	set(_BuildingElevation, BuildingElevation)
+	set(_TotalHeight, TotalHeight)
+	set(_GeometryVerticalTiles, GeometryVerticalTiles)
+	set( _Facade_Texture , FacadeTexture)
+	#print("_BuildingElevation = " + _BuildingElevation)
+	#print("_TotalHeight = " + _TotalHeight)
+	#print("_GeometryVerticalTiles = " + _GeometryVerticalTiles)
+	#print("_Facade_Texture = " + _Facade_Texture)
+	SetupTexturingStep2
+	
+
+
+@StartRule
+Multipatch -->
+	# Opacity affects entire building, whether colored or textured, so do it first.
+	set(material.opacity, 1 - Transparency )
+	ColorOrTextureSwitch
+
+ColorOrTextureSwitch -->
+	# Buildings can display a solid color, so we check for that first.
+	case overrideColorAdjusted != "":
+		# Color the entire building with the chosen solid color, then halt generation.
+		color(overrideColorAdjusted)
+	else:
+		SetupTexturing
+		
+const overrideColorAdjusted = stripSpaces( Override_Color )
+# Utility function will remove all space characters from a string.
+stripSpaces(someString) = replace(someString," ","")
+
+
+SetupTexturing -->
+	# Make building's object coordinate system align to world axes 
+	# or else it evaluates faces incorrectly.
+	alignScopeToAxes()
+	# Save height of overall building, before separating faces.
+	set( _TotalHeight , scope.sy)
+	# Remember the bottom elevation for telling which faces are how high 
+	# on facade, so that all textures are aligned vertically. 
+	set( _BuildingElevation , scope.elevation)
+	# Do facade image query and calculations here, once.
+	# XX This should also be able to be done from importing rule.
+	set( _GeometryVerticalTiles , rint( _TotalHeight / _StoryHeightAdjusted ))
+	# Vertical tiles determined above are used to find texture by minimum floor count.
+	set( _Usage, Usage )
+	set( _Facade_Texture , getFacadeTexture)
+	SetupTexturingStep2 
+
+SetupTexturingStep2 -->
+	# Now that we have texture file, it may have more floors than we need,
+	#	so we check the file name for the number of vertical tiles (floors in texture file).
+	set( _textureVerticalTiles , float(getRange(_Facade_Texture ,"floors","_tiles"))) # Pulls floor count from file name.
+	#print("_textureVerticalTiles = " + _textureVerticalTiles)
+	# Find vertical projection size, based on Total height, floors needed, 
+	#	and floors present in texture.
+	set( _verticalProjectionSize , _TotalHeight / _GeometryVerticalTiles * _textureVerticalTiles )
+	#print("_verticalProjectionSize = " + _verticalProjectionSize)
+	# Separate roofs from facades.
+	# Send all non-vertical faces to a rule that checks the angle,
+	#   since the threshhold between aslant and horizontal selectors in the comp
+	#   operation is not right for slanted versus flat roofs.
+	comp(f) {vertical = TextureFacade | all : TextureRoof } #XX =?
+
+@Hidden
+attr _TotalHeight = 0  
+@Hidden
+attr _BuildingElevation = 1 
+@Hidden
+attr _GeometryVerticalTiles = 0
+@Hidden
+attr _Usage = ""
+@Hidden
+attr _StoryHeightAdjusted = case Story_Height > 0: Story_Height else : 3.5
+@Hidden
+attr _Facade_Texture = ""
+@Hidden
+attr _verticalProjectionSize = 0
+@Hidden
+attr _textureVerticalTiles = 0
+
+getFacadeTexture = 
+	case specificTextureAdjusted != "":
+		specificTextureAdjusted
+	else : 
+		# Find a fitting texture which has n floors or more. 
+		# A 3-floor facade should not be used to texture a 5 floor building,
+		# but in case of 60+ stories, it will repeat vertically.
+		fileRandom(facade_image_query( _GeometryVerticalTiles, Usage )) 
+		#listRandom(fileSearch(facade_image_query(GeometryVerticalTiles)))
+		#XX Check above
+		
+getFacadeTexture(GeometryVerticalTiles) =
+	fileRandom(facade_image_query( GeometryVerticalTiles, "office" )) 
+
+getFacadeTexture(GeometryVerticalTiles, Usage) =
+	fileRandom(facade_image_query( GeometryVerticalTiles, Usage )) 
+
+
+
+const specificTextureAdjusted = stripSpaces( Facade_Texture )
+
+
+TextureFacade -->
+	# Separate all faces and texture them separately.
+	#print("Facade_Texture = "+ Facade_Texture)
+	comp(f) {all : TextureFace}
+
+
+TextureFace -->
+	# Align scope for face or else windows might not be aligned horizontally.
+	alignScopeToAxes(y)
+	# Offset the texturing so that all vertical textures are aligned with ground.z
+#	 translate(rel, scope, 0,0,3)
+	setupProjection(0, scope.xy, horizontalProjectionSize, _verticalProjectionSize , 
+		0, _BuildingElevation - scope.elevation) 
+	projectUV(0)
+	texture( _Facade_Texture )
+	#print("huh = " + _Facade_Texture )
+	#print("--------------------------")
+	#print(horizontalProjectionSize)
+	#print(verticalProjectionSize)
+	#print(GeometryVerticalTiles)
+	
+	
+	
+# These functions are based on individual face sizes.
+horizontalProjectionSize = (scope.sx / geometryHorizontalTiles) * textureHorizontalTiles
+geometryHorizontalTiles = ceil((scope.sx / _StoryHeightAdjusted ) * TileWidthPerTileHeight)
+textureHorizontalTiles = float(getRange( _Facade_Texture ,"tiles",".jpg")) # Pulls tile count from file name.
+const TileWidthPerTileHeight = 0.75
+
+
+# This uses RegExp to find file names that match patterns based on number of floors.
+# It is modified from the original version, to use 60 story texture if the stories are higher than 60, 
+# since currently there are none higher than 60 in the Facade Library.
+facade_image_query(n, Usage) = 
+	case (nDigits(n) == 3):
+		case true: 
+			# This is because we have none higher than 60 stories.
+			"$"+facadeDir(Usage)+".*_floors([6][0])_.*.jpg"
+		case (hundreds(n) == 9): 
+			# Disabled by first case, but left here in case we add new 60+ textures.
+			"$"+facadeDir(Usage)+".*_floors(["+str(hundreds(n))+"-9]["+str(tens(n))+"-9]["+str(ones(n))+"-9]_.*.jpg"
+		else:
+			# Disabled by first case, but left here in case we add new 60+ textures.
+			"$"+facadeDir(Usage)+".*_floors(["+str(hundreds(n))+"-9]["+str(tens(n))+"-9]["+str(ones(n))+"-9]|["+str(hundreds(n)+1)+"-9][0-9][0-9])_.*.jpg"
+	case (nDigits(n) == 2):
+		case (tens(n) >= 6): 
+			# This is because we have none higher than 60 stories.
+			"$"+facadeDir(Usage)+".*_floors([6][0])_.*.jpg"
+		case (tens(n) == 9):
+			# Disabled by first case, but left here in case we add new 60+ textures.
+			"$"+facadeDir(Usage)+".*_floors([9-9]["+str(ones(n))+"-9]|[1-9][0-9][0-9])_.*.jpg"
+		else :
+			"$"+facadeDir(Usage)+".*_floors(["+str(tens(n))+"-9]["+str(ones(n))+"-9]|["+str(tens(n)+1)+"-9][0-9]|[1-9][0-9][0-9])_.*.jpg"
+	case (nDigits(n) == 1):
+		"$"+facadeDir(Usage)+".*_floors(["+str(ones(n))+"-9]|[1-9][0-9]|[1-9][0-9][0-9])_.*.jpg"
+	else:
+		"_"
+
+nDigits(n) =
+	case (n < 10):    1
+	case (n < 100):   2
+	case (n < 1000):  3
+	else:     		  -1
+
+hundreds(n) = floor(n / 100)	
+tens(n) = floor((n / 10)%10)	
+ones(n) = floor(n%10)	
+
+facadeDir(Usage) = baseTexturingDir + "Facades/" + Usage + "/"
+
+
+
+###########################################################################
+# ROOF TEXTURING
+
+# Minimum angle for sloped roofs is around 2/12, or 9.46 degrees.
+# This control allows you to specify an angle at which sloped starts.
+@Group("ROOFS") @Order(1)
+@Range("flat","sloped") #XX Mixed roof type disabled temporarily.
+#@Range("mixed","flat","sloped")
+#@Description("Overrides slope-based roof logic.")  #XX Mixed roof type disabled temporarily.
+@Description("Choose flat or sloped roof textures. Mixed type temporarily disabled")
+attr Roof_Mix = "flat"
+#attr Roof_Mix = "mixed"
+
+#@Group("ROOFS")
+#@Range(1,90)
+#@Description("Roofs angled steeper than this are considered sloped.")
+#attr Sloped_Roof_Min_Angle = 9.46
+const Sloped_Roof_Min_Angle = 9.46
+
+@Group("ROOFS")
+@Range(0.1, 10.0)	
+@Description("Scales roof textures")
+attr Sloped_Roof_Texture_Scaler = 2
+
+
+TextureRoof -->
+	alignScopeToAxes(y)
+	TextureRoofBasedOnForm
+
+TextureRoofBasedOnForm -->
+	case Roof_Form == "Flat": TextureFlatRoof
+	else: TextureSlopedRoof
+
+getRoofTexture(roofForm) = 
+	case roofForm == "Flat": flatRoofTexture
+	else: slopedRoofTexture
+
+const flatRoofTexture = fileRandom(flatRoofDir + "*.jpg")
+const slopedRoofTexture = fileRandom(slopedRoofDir + "*.jpg") 
+
+/*
+TextureRoof2 -->
+	#XX Just testing here.
+	TextureRoof3(angleCheck)
+	
+TextureRoof3(thisAngle) -->
+	# First check if "mixed" roof type has been overridden to use all flat or all sloped.
+	case Roof_Mix == "flat" : TextureFlatRoof
+	case Roof_Mix == "sloped" : TextureSlopedRoof
+	else :
+		# Check if roof should be sloped or flat, depending on the angle.
+		# The default value of attribute Sloped_Roof_Min_Angle is the minimum 
+		#	angle to shed rain over shingles.
+		### XX This code is disabled because CE2013 has a bug in the angle.
+		case thisAngle > Sloped_Roof_Min_Angle :
+			color(0,1,0)	
+			#print("SLOPED>"+(angleCheck) + " >" + thisAngle) 
+			TextureSlopedRoof
+		else : 
+			color(0,1,1)	
+			#print("FLAT>"+(angleCheck) + " >" + thisAngle) 
+			TextureFlatRoof
+		X.
+
+angleCheck = 90 - geometry.angle(maxSlope)
+*/
+
+#############################################################################
+# FLAT ROOF TEXTURING
+
+
+TextureFlatRoof -->
+	alignScopeToAxes(y)
+ 	setupProjection(0,scope.xz,scope.sx,scope.sz)
+ 	projectUV(0) 
+	texture(Roof_Texture)
+	# XX Fix above: Stretch roof texture to edges of roof. 
+	# Note: Not best method for some roofs - consider expanding logic.
+
+
+
+##############################################
+# SLOPED ROOF TEXTURING
+
+
+TextureSlopedRoof -->
+	alignScopeToGeometry(yUp, any, world.lowest)
+	setupProjection(0,scope.xz, slopedRoofTextureWidth/roofScalerAdjusted, slopedRoofTextureHeight/roofScalerAdjusted)
+	projectUV(0)
+	texture(Roof_Texture)
+
+
+
+# Check that roof texture scaling is not out of useful range.
+roofScalerAdjusted = 
+	case Sloped_Roof_Texture_Scaler < 0.1 : 0.1 
+	else : Sloped_Roof_Texture_Scaler
+  
+# From original RoofTexturing code by Zurich:
+const slopedRoofTextureWidth = rand(4,12)
+const slopedRoofTextureHeight = rand(4,12)
+
+
+
+
+# XX: Fix: We need separate sloped roofs for skyscrapers, since they won't use shingles like houses.
+
+
+
+
+

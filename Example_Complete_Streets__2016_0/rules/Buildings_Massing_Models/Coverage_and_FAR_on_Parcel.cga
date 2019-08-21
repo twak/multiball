@@ -1,0 +1,42 @@
+/**
+ * File:    Example_FAR.cga
+ * Created: 10 Jun 2014 19:27:34 GMT
+ * Author:  chri7180
+ */
+
+version "2015.0"
+
+
+@Range(1,20)
+attr FAR = 5
+
+@Range(0.1,1)
+attr Coverage = 0.5
+
+@Range(3.1,6.5)
+attr Floor_Height = 4 
+
+const GFA = FAR * geometry.area
+const footprintAreaFromCoverage = geometry.area * Coverage
+const heightFromFootprintArea = (GFA / footprintAreaFromCoverage) * Floor_Height
+
+
+@StartRule
+Parcel -->
+	Reports
+	s('relativeScalePerArea(footprintAreaFromCoverage, geometry.area), 0, 
+	  'relativeScalePerArea(footprintAreaFromCoverage, geometry.area))
+	center(xz)
+	extrude(heightFromFootprintArea)
+	split(y){{Floor_Height: X.}* | ~1: NIL} 
+	
+relativeScalePerArea(targetArea, originalArea) = sqrt(targetArea / originalArea)	
+
+Reports -->
+	print("GFA from FAR and Coverage: " + GFA)
+	print("Footprint Area from Coverage: " + footprintAreaFromCoverage)
+	print("Height from Footprint Area: " + heightFromFootprintArea)
+	NIL
+
+
+

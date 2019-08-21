@@ -1,0 +1,458 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2016.1"
+
+import plankTexturing : "plankTexturing.cga"
+
+
+##############################################
+# main attributes
+##############################################
+
+@Group("LEVEL OF DETAIL")
+attr highLOD = false
+
+@Group("ROOF DETAILS")
+attr roofTiles = false
+
+@Group("ROOF DETAILS")
+@Range(0.1, 0.45)
+attr randOverHangWidth = rand(.2,.45)	
+
+@Group("CONSTRUCTION DETAILS")
+@Order(5)
+attr socialLevelType = "low"
+
+CstrTypeScatters(trafo) =
+	case trafo == "r":
+		case socialLevelType == "high"	:	(rand(-0.5,0.5))
+		else							:	(rand(-5,5))
+	else:
+		case socialLevelType == "high"	:	(rand(-0.005,0.005))
+		else							:	(rand(-0.03,0.03))
+
+##############################################
+# random textures
+##############################################
+
+const guardTowerRoofTexture = fileRandom("assets/roofs/roofType_1*.jpg")
+const RoofTexture = fileRandom("assets/roofs/roofType_*.jpg")
+const chimneyTexture1 = fileRandom("assets/roofs/chimneyTex*.png")
+const chimneyTexture2 = fileRandom("assets/roofs/chimneyTex*.png")
+
+##############################################
+# assets
+##############################################
+
+const randRoundTowerTile = fileRandom("assets/roofs/roundRoofTile_*.obj")
+const randFlatTowerTile = fileRandom("assets/roofs/flatRoofTile_*.obj")
+randChimneyAsset = fileRandom("assets/roofs/chimneyType*.obj")
+
+roofTileThickness(constTileName) =
+	case constTileName == randRoundTowerTile: rand(0.08, 0.13)
+	case constTileName == randFlatTowerTile: rand(0.04, 0.06)
+	else: rand(0.06, 0.08)
+
+##############################################
+# other functions
+##############################################	
+
+const constGabledDormerWinWidth = rand(0.8,1.2)
+const constGabledDormerWinHeight = rand(1,1.6)
+const constGabledDormerWinLowerHeight = rand(0.6,1.2)
+const constGabledDormerWinDistance = rand(2,8)
+
+##############################################
+# textureTile functions
+##############################################
+
+#info on textures
+texInfo(texName, input) =
+	case (count(texName, "assets/roofs/roofType_1_v1.jpg") == 1) || 
+	     (count(texName, "assets/roofs/roofType_1_v2.jpg") == 1) || 
+  		 (count(texName, "assets/roofs/roofType_1_v3.jpg") == 1) ||
+		 (count(texName, "assets/roofs/roofType_1_v4.jpg") == 1) ||
+		 (count(texName, "assets/roofs/roofType_1_v5.jpg") == 1):
+			case input == "texTileNumHor"		: 70
+			case input == "texTileNumVert"		: 30
+			case input == "texTileDimHor" 		: 0.25
+			case input == "texTileDimVert"		: 0.45
+			else: 1
+	case (count(texName, "assets/roofs/roofType_2_v1.jpg") == 1) || 
+	     (count(texName, "assets/roofs/roofType_2_v2.jpg") == 1) || 
+	     (count(texName, "assets/roofs/roofType_2_v3.jpg") == 1) || 
+	     (count(texName, "assets/roofs/roofType_2_v4.jpg") == 1) || 
+	     (count(texName, "assets/roofs/roofType_2_v5.jpg") == 1):
+			case input == "texTileNumHor"		: 40
+			case input == "texTileNumVert"		: 40
+			case input == "texTileDimHor" 		: 0.2
+			case input == "texTileDimVert"		: 0.32
+			else: 1
+	case (count(texName, "assets/roofs/roofType_3_v1.jpg") == 1) || 
+		 (count(texName, "assets/roofs/roofType_3_v2.jpg") == 1) || 
+		 (count(texName, "assets/roofs/roofType_3_v3.jpg") == 1) || 
+		 (count(texName, "assets/roofs/roofType_3_v4.jpg") == 1) || 
+		 (count(texName, "assets/roofs/roofType_3_v5.jpg") == 1):
+			case input == "texTileNumHor"		: 40
+			case input == "texTileNumVert"		: 20
+			case input == "texTileDimHor" 		: 0.27
+			case input == "texTileDimVert"		: 0.39
+			else: 1
+	else: 1
+
+# calculate the number of tiles for the scope
+TileNumber(scopeDim, texName, orientation) =
+	case orientation == "hor":
+		rint(scopeDim/texInfo(texName, "texTileDimHor"))
+	else:
+		rint(scopeDim/texInfo(texName, "texTileDimVert"))
+
+# calculate the projection width
+projectionWidth(scopeDim, texName, orientation) =
+	case orientation == "hor":
+		case TileNumber(scopeDim, texName, "hor")==0:
+			0
+		else:
+			(scopeDim/TileNumber(scopeDim, texName, "hor") * texInfo(texName, "texTileNumHor"))
+	else:
+		case TileNumber(scopeDim, texName, "vert")==0:
+			0
+		else:
+			(scopeDim/TileNumber(scopeDim, texName, "vert") * texInfo(texName, "texTileNumVert")) 
+
+# calculate a random offset in full tiles	
+randomUVOffset(texName, orientation) =
+	case orientation == "hor":
+		(ceil(rand(0,texInfo(texName, "texTileNumHor"))) * 1 / texInfo(texName, "texTileNumHor"))
+	else:
+		(ceil(rand(0,texInfo(texName, "texTileNumVert"))) * 1 / texInfo(texName, "texTileNumVert"))
+
+##############################################
+# START 
+##############################################
+GuardTowerRoof -->
+	TriggerGuardTowerRoof(guardTowerRoofTexture, randRoundTowerTile, randRoundTowerTile,0) # 0 = do not create stuff on roof like chimneys
+GableRoof -->
+	TriggerGableRoof(RoofTexture, randFlatTowerTile, randRoundTowerTile,1)	# 1= create stuff on roof like chimneys
+HipRoof -->
+	TriggerHipRoof(RoofTexture, randFlatTowerTile, randRoundTowerTile,1)
+PyramidRoof -->
+	TriggerPyramidRoof(RoofTexture, randFlatTowerTile, randRoundTowerTile,1)
+FlatRoof -->
+	TriggerFlatRoof
+GazeboRoof -->
+	TriggerGazeboRoof(RoofTexture, randFlatTowerTile, randRoundTowerTile,0)
+
+##############################################
+# TriggerGuardTowerRoof
+##############################################
+
+TriggerGuardTowerRoof(texName, standardTile, specialTile, createRoofElements) -->
+	case roofTiles == true:
+		s('1.02,'1.02,0)
+		center(xy)
+		roofHip(rand(50,70),1)	
+		split(y){'0.25:
+			comp(f){0: NIL | side: GuardTowerRoofConstruction RoofSurface(texName, standardTile, specialTile, createRoofElements) | top: GuardTowerRoof2(texName, standardTile, specialTile, createRoofElements)}
+			comp(e){hip: PutSpecialRoofTiles(texName, standardTile, specialTile, createRoofElements) | all: NIL}
+		| ~1:NIL	}
+	else:
+		s('1.02,'1.02,0)
+		center(xy)
+		roofHip(rand(50,70),1)		
+		split(y){'0.25:
+			comp(f){0: NIL | side: RoofSurface(texName, standardTile, specialTile, createRoofElements) | top: GuardTowerRoof2(texName, standardTile, specialTile, createRoofElements)}
+		| ~1:NIL	}		
+
+GuardTowerRoofConstruction -->
+	alignScopeToGeometry(zUp, any, world.lowest)
+	t(0,0,-.08)
+	s('1,'1,.08)
+	primitiveCube()
+	split(x){~0.35:	comp(f){front: NIL | back: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | bottom: plankTexturing.PlankTopTexturing}}*
+	
+GuardTowerRoof2(texName, standardTile, specialTile, createRoofElements) -->
+	case roofTiles == true:
+		s('1.02,'1.02,0)
+		center(xy)
+		roofHip(rand(40,45),0)	
+		
+		comp(f){0: NIL | side: RoofSurface(texName, standardTile, specialTile, createRoofElements) | top: GuardTowerRoof2(texName, standardTile, specialTile, createRoofElements)}
+		comp(e){ridge : PutSpecialRoofTilesRidge(texName, standardTile, specialTile, createRoofElements) | hip : PutSpecialRoofTiles(texName, standardTile, specialTile, createRoofElements)}
+	else:
+		center(xy)
+		roofHip(rand(40,45),0)	
+		comp(f){0: NIL | side: RoofSurface(texName, standardTile, specialTile, createRoofElements) | top: GuardTowerRoof2(texName, standardTile, specialTile, createRoofElements)}
+	
+					
+##############################################
+# TriggerGableRoof
+##############################################
+
+
+TriggerGableRoof(texName, standardTile, specialTile, createRoofElements) -->
+	case roofTiles == true:
+		case geometry.isConcave || geometry.nFaces>1:
+			roofGable(rand(30,45),randOverHangWidth,randOverHangWidth,false)
+			comp(f){bottom: NIL | vertical: FacadeOnRoof | all:  alignScopeToGeometry(zUp, any, world.lowest) set(trim.horizontal, true) RoofUnderConstruction RoofSurface(texName, standardTile, specialTile, createRoofElements)  }
+			comp(e){ridge : PutSpecialRoofTilesRidge(texName, standardTile, specialTile, createRoofElements) | hip : PutSpecialRoofTiles(texName, standardTile, specialTile, createRoofElements)}
+		else:
+			roofGable(rand(30,45),randOverHangWidth,randOverHangWidth,false, 0)
+			comp(f){bottom: NIL | vertical: FacadeOnRoof | all:  alignScopeToGeometry(zUp, any, world.lowest) set(trim.horizontal, true) RoofUnderConstruction RoofSurface(texName, standardTile, specialTile, createRoofElements)  }
+			comp(e){ridge : PutSpecialRoofTilesRidge(texName, standardTile, specialTile, createRoofElements) | hip : PutSpecialRoofTiles(texName, standardTile, specialTile, createRoofElements)}
+	else:
+		case geometry.nVertices == 4 && !geometry.isConcave && geometry.nFaces==1: 
+			roofGable(rand(30,45),randOverHangWidth,randOverHangWidth,false, 0)
+			comp(f){bottom: NIL | vertical: FacadeOnRoof | all:  alignScopeToGeometry(zUp, any, world.lowest) set(trim.horizontal, true) RoofUnderConstruction RoofSurface(texName, standardTile, specialTile, createRoofElements) }			
+		else : # roofGable with index offset might fail on not 4vertex shapes, therefore no offset
+			roofGable(rand(30,45),randOverHangWidth,randOverHangWidth,false)
+			comp(f){bottom: NIL | vertical: FacadeOnRoof | all:  alignScopeToGeometry(zUp, any, world.lowest) set(trim.horizontal, true) RoofUnderConstruction RoofSurface(texName, standardTile, specialTile, createRoofElements) }			
+			
+
+TriggerHipRoof(texName, standardTile, specialTile, createRoofElements) -->
+	case roofTiles == true:
+		roofHip(rand(30,45),randOverHangWidth)
+		comp(f){bottom: NIL | vertical: FacadeOnRoof | all:  alignScopeToGeometry(zUp, any, world.lowest) set(trim.horizontal, true) RoofUnderConstruction RoofSurface(texName, standardTile, specialTile, createRoofElements) }
+		comp(e){ridge : PutSpecialRoofTilesRidge(texName, standardTile, specialTile, createRoofElements)| hip : PutSpecialRoofTiles(texName, standardTile, specialTile, createRoofElements)}
+	else:
+		roofHip(rand(30,45),randOverHangWidth)
+		comp(f){bottom: NIL | vertical: FacadeOnRoof | all:  alignScopeToGeometry(zUp, any, world.lowest) set(trim.horizontal, true) RoofUnderConstruction RoofSurface(texName, standardTile, specialTile, createRoofElements) }
+
+				
+TriggerPyramidRoof(texName, standardTile, specialTile, createRoofElements)-->
+	case roofTiles == true:
+		roofPyramid(rand(30,45))	
+		comp(f){bottom: NIL | all:  alignScopeToGeometry(zUp, any, world.lowest) set(trim.horizontal, true) RoofUnderConstruction RoofSurface(texName, standardTile, specialTile, createRoofElements)}
+		comp(e){ridge : PutSpecialRoofTilesRidge(texName, standardTile, specialTile, createRoofElements) | hip : PutSpecialRoofTiles(texName, standardTile, specialTile, createRoofElements)}
+
+	else:
+		roofPyramid(rand(30,45))
+		comp(f){bottom: NIL | all:  alignScopeToGeometry(zUp, any, world.lowest) set(trim.horizontal, true) RoofUnderConstruction RoofSurface(texName, standardTile, specialTile, createRoofElements)}			
+
+TriggerGazeboRoof(texName, standardTile, specialTile, createRoofElements) -->
+	case roofTiles == true:
+		alignScopeToGeometry(zUp, any, world.lowest) set(trim.horizontal, true) RoofUnderConstruction RoofSurface(texName, standardTile, specialTile, createRoofElements)	
+	else:
+		alignScopeToGeometry(zUp, any, world.lowest) set(trim.horizontal, true) RoofUnderConstruction RoofSurface(texName, standardTile, specialTile, createRoofElements)	
+
+
+##############################################
+# TriggerFlatRoof
+##############################################
+TriggerFlatRoof -->
+	[
+	offset(-.24)
+	comp(f){inside: t(0,0,.05) FlatRoofTexturing | border: extrude(0.24) comp(f){top: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) | side : plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) }}
+	]
+	offset(-.12)
+	comp(f){inside: t(0,0,.23) Gate}
+
+FlatRoofTexturing -->
+	setupProjection(0, scope.xy, rand(9,17), rand(9,17))
+	texture(fileRandom("assets/roofs/flatRoof*.png"))
+	projectUV(0)
+	translateUV(0, rand(1), rand(1))
+	rotateUV(0,rand(360))
+	FlatRoof.
+
+const GateTex = fileRandom("assets/gates/*.png")
+	
+Gate -->
+	extrude(world.up, rand(0.45, .65))
+	alignScopeToAxes(y)
+	comp(f){side: setupProjection(0, scope.xy, ~ 1.6, '1) projectUV(0) texture(GateTex) Gate.}
+
+##############################################
+# roof surfaces
+##############################################
+# standard roof surface
+RoofSurface(texName, standardTile, specialTile, createRoofElements) -->
+	setupProjection(0, scope.xy, projectionWidth(scope.sx, texName, "hor"), projectionWidth(scope.sy, texName, "vert"),0)
+	projectUV(0)
+	translateUV(0,randomUVOffset(texName, "hor"), randomUVOffset(texName, "vert"))
+	texture(texName)
+	PutTiles(texName, standardTile, specialTile, createRoofElements)
+	
+	
+# small roof surface under special tiles on edges
+RoofSurfaceSpecialTiles(texName, standardTile, specialTile, createRoofElements) -->
+	setupProjection(0, scope.xy, projectionWidth(scope.sx, texName, "hor"), projectionWidth(scope.sy, texName, "vert"),0)
+	projectUV(0)
+	translateUV(0,randomUVOffset(texName, "hor"), randomUVOffset(texName, "vert"))
+	texture(texName)
+	PutSpecialTiles(texName, standardTile, specialTile, createRoofElements)
+
+
+
+RoofUnderConstruction -->
+	case highLOD == true && geometry.area > 3:
+	# make area construction
+		[
+		alignScopeToGeometry(zUp, any, world.lowest)
+		split(x){0.2: NIL | ~ 1: split(y){0.2: NIL | ~ 1: t(0,0,-.08) extrude(.075) alignScopeToAxes(y) comp(f){top: NIL | all: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}}| 0.2: NIL}
+		]
+	# make planks
+		alignScopeToGeometry(zUp, any, world.lowest)
+		split(x){0.1: NIL | ~ 1: split(y){.1: NIL | ~ 1: t(0,0,-.24) extrude(.23) alignScopeToAxes(y) split(x){ ~(rand(.4,.8)): NIL | { (rand(.08, 0.12)): comp(f){top: NIL | front: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/PlankTop*.png")) | all: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png")) } | ~(rand(.4,.8)): NIL }*}}| 0.2: NIL}
+	case highLOD == true && geometry.area > .5:
+	# make area construction
+		[
+		alignScopeToGeometry(zUp, any, world.lowest)
+		split(x){0.2: NIL | ~ 1: split(y){0.2: NIL | ~ 1: t(0,0,-.08) extrude(.075) alignScopeToAxes(y) comp(f){top: NIL | all: plankTexturing.PlankTexturing("notNailed", fileRandom("assets/outerWall/Plank_v*.png"))}}| 0.2: NIL}
+		]
+	else:
+		NIL
+
+
+##############################################
+# tiles and special tiles
+##############################################
+# standard roof surface	
+PutTiles(texName, standardTile, specialTile, createRoofElements) -->
+	case createRoofElements == 1:
+		case roofTiles == true:
+			Roof. ChimneyOrGabledDormerWin
+			split(x, noAdjust){(scope.sx/TileNumber(scope.sx, texName, "hor")):
+			split(y, noAdjust){(scope.sy/TileNumber(scope.sy, texName, "vert")): i(standardTile) projectUV(0) s('1,'rand(1.08,1.13),roofTileThickness(standardTile)) t((CstrTypeScatters("t")), (CstrTypeScatters("t")), (CstrTypeScatters("t"))) r(scopeCenter, 0, (CstrTypeScatters("r")), (CstrTypeScatters("r"))) Roof. 
+				}*}*
+		else:
+			Roof. ChimneyOrGabledDormerWin
+	else:
+		case roofTiles == true:
+			Roof. 
+			split(x, noAdjust){(scope.sx/TileNumber(scope.sx, texName, "hor")):
+			split(y, noAdjust){(scope.sy/TileNumber(scope.sy, texName, "vert")): i(standardTile) projectUV(0) s('1,'rand(1.08,1.13),roofTileThickness(standardTile)) t((CstrTypeScatters("t")), (CstrTypeScatters("t")), (CstrTypeScatters("t"))) r(scopeCenter, 0, (CstrTypeScatters("r")), (CstrTypeScatters("r"))) Roof. 
+				}*}*
+		else:
+			Roof.
+					
+# small roof surface under special tiles on edges
+PutSpecialTiles(texName, standardTile, specialTile, createRoofElements) -->
+	case roofTiles == true:
+		case TileNumber(scope.sy, texName, "vert")==0:
+			Roof. ChimneyOrGabledDormerWin
+		else:
+			Roof. ChimneyOrGabledDormerWin
+			split(y, noAdjust){(scope.sy/TileNumber(scope.sy, texName, "vert")): i(specialTile) projectUV(0) s('1,'rand(1.08,1.13),roofTileThickness(specialTile)) Roof.
+				}*
+	else:
+		Roof. ChimneyOrGabledDormerWin
+
+
+PutSpecialRoofTilesRidge(texName, standardTile, specialTile, createRoofElements) -->
+	alignScopeToGeometry(zUp, any, world.lowest)
+	s('1,texInfo(texName, "texTileDimHor"),texInfo(texName, "texTileDimHor"))
+	t(0,0,'-1)
+	center(xy)
+	primitiveCube()
+	comp(f){front: /*set(trim.vertical, false)*/ alignScopeToGeometry(zUp, 1) RoofSurfaceSpecialTiles(texName, standardTile, specialTile, createRoofElements)}
+
+PutSpecialRoofTiles(texName, standardTile, specialTile, createRoofElements) -->
+	alignScopeToGeometry(zUp, any, world.lowest)
+	s('1,texInfo(texName, "texTileDimHor"),texInfo(texName, "texTileDimHor"))
+	t(0,0,'-1)
+	center(xy)
+	primitiveCube()
+	comp(f){front: /*set(trim.vertical, false)*/ alignScopeToGeometry(zUp, any, world.lowest) RoofSurfaceSpecialTiles(texName, standardTile, specialTile, createRoofElements)}	
+
+##############################################
+# tiles and special tiles
+##############################################
+	
+ChimneyOrGabledDormerWin	-->
+	case geometry.area >= 8:
+		# make GabledDormerWin
+		20%:
+			MakeGabledDormerWin
+		# or Chimney
+		25%:
+			33%:
+				# chimney in middle
+				split(x){~1 : NIL | 0.4 : split(y){~1 : NIL | 0.4 : ChimneySurface | ~1 : NIL}  | ~1 : NIL} 
+			33%:
+				split(x){~1 : NIL | 0.6 : split(y){~0.8 : NIL | 0.6 : ChimneySurface | ~1 : NIL}  | ~0.2 : NIL} 
+			else:
+				split(x){~rand(0.1,0.4) : NIL | (rand(0.4,0.8)) : split(y){~rand(0.1,0.4) : NIL | (rand(0.4,0.8)) : ChimneySurface | ~rand(0.1,0.4) : NIL}  | ~rand(0.1,0.4) : NIL} 
+		else:
+			NIL
+	else:
+		NIL
+
+MakeGabledDormerWin -->
+	split(x){~constGabledDormerWinDistance : NIL | constGabledDormerWinWidth : GabledDormerWinBase | ~constGabledDormerWinDistance: NIL}*
+
+GabledDormerWinBase -->
+	s('1,'1,0)
+	split(y){constGabledDormerWinLowerHeight : NIL | constGabledDormerWinHeight : alignScopeToAxes(y) GabledDormerWinVolume(scope.sz) | ~1: NIL}
+
+GabledDormerWinVolume(depth) -->
+	case geometry.nVertices == 4:
+		s('1,'1,0)
+		#t(0,0,-depth)
+		extrude(depth)
+		alignScopeToAxes(y)
+		comp(f){front: GabledDormerWin | side: FacadeOnRoof | top: GableRoof}
+	else:
+		NIL
+
+ChimneySurface -->
+	set(trim.horizontal, false)
+	set(trim.vertical, false)
+	alignScopeToAxes(y)
+	s('1,0,'1)
+	primitiveQuad()
+	extrude(world.up, rand(0.5, 1))
+	comp(f){side: ChimneyTexturing(chimneyTexture1) | top: [ChimneyTexturing(chimneyTexture2)] s('1.15, '1.15, 0) center(xy) extrude(world.up, rand(.35,.6)) i(randChimneyAsset) ChimneyAsset }
+
+
+ChimneyAsset -->
+	case highLOD == true:
+		30%:
+			comp(f){all: ChimneyTexturing(chimneyTexture2)}
+		else:
+			comp(f){all: ChimneyTexturing(chimneyTexture1)}
+	else:
+		primitiveCube()
+		comp(f){top: ChimneyTexturing(chimneyTexture2) | side: ChimneyTexturing(chimneyTexture2)}
+		
+ChimneyTexturing(tex) -->
+	setupProjection(0, scope.xy, .4, .8,0)
+	projectUV(0)
+	translateUV(0,rand(1), rand(1))
+	texture(tex)
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+	
+	
+	

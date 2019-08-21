@@ -1,0 +1,58 @@
+/**
+ * File: Environment Specification.cga
+ * Author: Esri
+ */
+
+version "2015.0"
+
+#------------------------------------------
+# USER-CUSTOMIZABLE SETTINGS:
+#------------------------------------------
+
+const Solar_Intensity_Avg__kWh_m2_day = 5 ## kWh/m2/day
+
+# Average intensity of rainfall in cm per hour (cm/hr). This is the "i" in the peak discharge calculation.
+#   2 Year Storm	4.5"	50%		11.43cm
+#   5 Year Storm	6.5"	20%		16.51cm
+#  10 Year Storm	7.5"	10%		19.05cm/hr
+#  25 Year Storm	8.5"	4%		21.59cm
+#  50 Year Storm	9.5"	2%		24.13
+# 100 Year Storm	10.5"	1%		26.67
+const Design_Storm_Rainfall = 19.05 #19.05cm/hr is 10 year storm.
+
+const Average_Annual_Rainfall = 80 #cm/yr
+
+# Soil types used for rainwater calculation
+# Range: "A"(Low Runoff), "B"(Moderate Infiltration), "C"(Low Infiltration), "D"(High Runoff)
+const Soil_Group = "B"
+
+# CUT/FILL TERRAIN MODIFICATION
+const Grading_Fill_Cost__m3 = 5				# m3
+const Grading_Cut_Cost__m3 = 5				# m3
+const Fill_Material_Input_Cost__m3 = 5		# m3
+const Cut_Material_Repurpose_Cost__m3 = 5	# m3
+const Cut_Material_Disposal_Cost__m3 = 5	# m3
+
+
+# Vegetation and Hardscape costs -------------------------------
+
+const TreeCostAverage = 100
+const GrassSurfaceCostAverage = 10	# In square meters
+const HardscapePaverCost = 25		# In square meters
+
+# Colors for pervious surface thematic display.-----------------
+
+const perviousThematicWoodlands = "#040afd"
+const perviousThematicPastureGrassFarmland = "#5457fe"
+const perviousThematicPerviousPavement = "#999bfe"
+const perviousThematicRooftopsAndPavement = "#c8c9f5"
+const perviousThematicUnknown = "#FFFFFF"
+
+
+
+
+
+
+
+
+

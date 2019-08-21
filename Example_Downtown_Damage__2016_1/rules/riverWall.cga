@@ -1,0 +1,114 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+import streets: "simpleStreets.cga"
+
+
+@Range(2,25) 	
+attr treeDist = 6
+
+@Range(2,20) 	
+attr wallElementDim = 8
+@Range(1,5) 	
+attr wallTopHeight = 2.4
+@Range(2,20) 	
+attr wallHeight = 35
+const railingLength = 3
+
+
+Sidewalk -->
+	case scope.sx < 4:
+		t(0,-wallHeight + streets.sidewalkHeight,0)
+		extrude(world.up, wallHeight )
+		comp(f){all: Wall}
+	else:
+		SidewalkArcs
+
+SidewalkArcs -->
+	split(v,unitSpace,0){2 : streets.Sidewalk | ~1 :
+		split(u,unitSpace,0) { ~wallElementDim : wallElement }*
+		split(u,unitSpace,0) { ~railingLength : RailingArea }*
+		split(u,unitSpace,0) { ~treeDist : TreeSpot }*
+	}
+wallElement -->
+	alignScopeToAxes(y)
+	t(0,-wallHeight + streets.sidewalkHeight,0)
+	extrude(world.up, wallHeight )
+	split(y){~1 : wallElementConstruction | wallTopHeight : s('1,'1,scope.sz + .6) t(0,0,-.6) comp(f){all: Wall}}
+
+wallElementConstruction -->
+	alignScopeToGeometry(yUp, 0, longest)
+	r(scopeCenter, 180,0,0)
+	i("assets/riverWall/wallElement_uved.obj")
+	texture(fileRandom("assets/bridge/OuterWallTexture_v*.jpg"))
+	translateUV(0,rand(1),0)
+	
+
+const texWidth = 25
+
+Wall -->
+	setupProjection(0, scope.xy, texWidth,texWidth)
+	projectUV(0)
+	WallTexturing
+	
+WallTexturing -->
+	texture(fileRandom("assets/bridge/OuterWallTexture_v*.jpg"))
+	translateUV(0,rand(1),0)
+	
+RailingArea -->
+	split(v,unitSpace,0) { ~1 : NIL | .1 : alignScopeToGeometry(yUp, 0) PutRailing | 0.1: NIL }
+
+randRot = rand(-2,2)
+	
+PutRailing -->
+	case scope.sx > 2:
+		85%:
+			t(0,streets.sidewalkHeight,0)
+			r(scopeCenter, randRot, randRot, 0)
+			i(fileRandom("assets/riverWall/railing*.obj"),yUp,keepSizeAndPosition)
+		else:
+			NIL
+	else:
+		NIL
+	
+TreeSpot -->
+	85%:
+		s(2,0,0)
+		center(z)
+		t(0,streets.sidewalkHeight,0)
+		i(fileRandom("assets/treeHole/treeHole*.obj"))
+		TreeSpot.
+		PutTree
+	else:
+		NIL
+
+tree = 50% : "park/baum1.obj"
+	else : 	"park/tree_dead.obj"
+
+		
+PutTree -->
+	60%:
+		alignScopeToAxes(y)
+		s(0,rand(6,10),0)
+		center(xz)
+		r(0,rand(360),0)
+		r(randRot, randRot, 0)
+		i(tree)
+		Tree.
+	else:
+		NIL
+
+
+
+
+
+
+
+
+
+
+
+

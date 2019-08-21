@@ -1,0 +1,84 @@
+/**
+ * Author:  Christian
+ */
+
+version "2013.1"
+
+
+
+const win1="brown/doppelfenster.obj"
+//const win1="brown/window1.obj"
+const win2="brown/doppelfenster_r.obj" ## TEXTURE NOT LOADED, but correct in asset preview?
+const wallTex = fileRandom("assets/wall/wall*.jpg")
+
+
+@Range(12,26)
+attr buildingHeight = rand(12,26)
+@Range(2.5,4.5)
+attr floorheight = 4.5
+
+@Range(4,8)
+attr tilespacing=6.1
+
+const adaptMass = scope.sx > 10 && scope.sz > 10
+
+LotInner -->
+	Lot
+	
+Lot-->
+	case  adaptMass : mirrorScope(p(0.5), false,false) shapeL(10,10){shape : Footprint | remainder : GroundFilled}
+	else : Footprint
+
+Footprint -->
+	Ground
+	offset(-0.2,inside) extrude(buildingHeight) 
+	setupProjection(0, scope.xy, 5, 5, -1)
+	comp(f){side:Facade|top:roof.Roof}
+Facade-->
+	setupProjection(2, scope.xy, '1, '1)
+	setupProjection(0, scope.xy, 5, 5,-1)
+	
+	split(y){
+		{~floorheight:Fensterreihe(split.index,split.total)}*
+		|1:Rand}
+Fensterreihe(ysplit,ytot)-->
+	case scope.sx < 5 : Rand
+	else :
+	split(x){
+		1:Pillar|{~tilespacing:Win(ysplit,ytot)}*|1:Pillar}
+
+Rand --> Wall
+
+const pillar = "pillar/saeule_ornate.obj"
+Pillar --> 
+	set(trim.vertical,false)
+	 i(pillar) t(0,0,-0.6) //projectUV(0)  set(material.dirtmap, "mansion/dirt.jpg")
+		
+
+
+Win(ind,tot)--> 
+	case ind==0:
+		i(win2) t(0,0,-0.42) //projectUV(2) set(material.dirtmap, "mansion/dirt.jpg")
+	else:
+		i(win1) t(0,0,-0.4) //projectUV(2) set(material.dirtmap, "mansion/dirt.jpg")
+
+import roof : "roof.cga"
+@Range("gable1","gable2","hip1","hip2")
+attr roofStyle = 25% : "gable1" 25% : "gable2" 25% : "hip1" else : "hip2"
+
+roof.Wall --> Wall
+
+roof.WindowTile --> i(win1) t(0,0,-0.1)
+
+Wall --> 
+	//projectUV(2) set(material.dirtmap, "mansion/dirt.jpg")
+	projectUV(0) texture(wallTex)
+	
+	
+
+import cy : "courtyard.cga"
+
+Ground --> cy.FloorTexture
+GroundFilled --> cy.LotInner
+
+	

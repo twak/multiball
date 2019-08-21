@@ -1,0 +1,152 @@
+/**
+ * File:    House2.cga
+ * Author:  christianholzer
+ * update: andi 201104
+ */
+
+version "2013.1"
+
+import roof : "roof.cga"
+import cy : "courtyard.cga"
+import smoke: "smoke.cga"
+
+
+
+##################
+#	ASSETS
+##################
+
+
+const balken="tiles/house2/balken.obj"
+const fenster1="tiles/house2/fenster1.obj"
+const fenster2="tiles/house2/fenster2.obj"
+const fenster3="tiles/house2/fenster3.obj"
+const qbalken1="tiles/house2/qbalken1.obj"
+const qbalken2="tiles/house2/qbalken2.obj"
+const tuer="tiles/house2/tuer.obj"
+const loch="tiles/house2/loch.obj"
+
+
+
+##################
+#	TEXTUR
+##################
+
+const wallTex = fileRandom("assets/wall/wall*.jpg")
+
+##################
+#	ATTRIBUTE
+##################
+
+@Range(4,6)
+attr floor1=4.8
+@Range(3,4)
+attr floor2=3.5
+@Range(2.5,4)
+attr floor3=3.1
+
+@Range(2,5)
+attr tileWidth=3.1
+@Range(0,2)
+attr bWidth=0.8
+@Range(0,2)
+attr qHeight=0.9
+
+@Range(15,26)
+attr buildingHeight=rand(15,26)
+
+##################
+#	CODE
+##################
+
+LotInner -->
+	Lot
+
+attr adaptMass = scope.sx > 10 && scope.sz > 10
+@StartRule
+Lot-->
+	case  adaptMass : mirrorScope(p(0.5), false,false) shapeL(10,10){shape : Footprint | remainder : GroundFilled}
+	else : Footprint
+
+
+Footprint-->
+	smoke.Smoke	Ground
+	s('1,0,'1) 
+	cleanupGeometry(all, 0.1)
+	offset(-0.5, inside) 
+	extrude(buildingHeight)
+	setupProjection(0, scope.xy, 5, 5, -1)
+	comp(f){side: Facade | top: Roof}
+
+
+
+#FASSADE
+Facade-->
+	split(y){
+					~floor1:Floor(split.index)
+					|~floor2:Floor(split.index)
+					|qHeight: QuerBalken(0) 
+					|	{~floor3:Floor(split.index)}*
+					|~qHeight: QuerBalken(1)}
+					
+
+//Stockwerk
+Floor(index)-->
+	case scope.sx < 3 : Balken
+	else : 
+	split(x){ bWidth: Balken 
+			| {~tileWidth: Window(index,split.index) 
+			  | bWidth: Balken }* }
+						//}* 
+						//|bWidth: Balken  }
+						
+Window(index,door)-->
+			#case  !touches && !inside():
+				case index==0 && door%4==0: i(tuer)t(0,0,-0.16)
+				case index==0: i(fenster1)t(0,0,-0.14)
+			    case index==1: 85%: i(fenster2)t(0,0,-0.11) 
+			    			   else: i(loch)t(0,0,-0.3)
+			    case index>=2: i(fenster3)t(0,0,-0.14) 
+				else:NIL
+		#	else:color("#ff0000")
+				
+Balken-->set(trim.vertical, false)
+	i(balken) t(0,0,-0.25) s('1,'1,0.4)
+QuerBalken(a)--> 
+	s('1.5,'1,'1) center(x) split(x)
+						{
+						~tileWidth: iQB(a)}* 
+				
+						
+iQB(a)--> 
+				#case !inside():
+					case a==0:i(qbalken1)
+					else:i(qbalken2) 
+				#else:NIL
+
+
+
+
+
+Ground --> cy.FloorTexture
+GroundFilled --> cy.LotInner
+	
+
+#DACH
+
+
+@Range("gable1","gable2","hip1","hip2")
+attr roofStyle = 25% : "gable1" 25% : "gable2" 25% : "hip1" else : "hip2"
+
+Roof -->  offset(0.6, inside) roof.Roof
+
+roof.WindowTile --> i(fenster3)
+
+roof.Wall --> Wall
+
+Wall -->
+	projectUV(0)
+	texture(wallTex)
+
+			
+

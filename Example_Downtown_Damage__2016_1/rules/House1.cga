@@ -1,0 +1,120 @@
+/**
+ * Author:  christianholzer
+ */
+
+version "2013.1"
+
+
+##################
+#	ASSETS
+##################
+
+
+const balken="tiles/house1/balken.obj"
+const fenster1="tiles/house1/fenster1.obj"
+const fenster2="tiles/house1/fenster2.obj"
+const fenster3="tiles/house1/fenster3.obj"
+const qbalken1="tiles/house2/qbalken1.obj"
+const qbalken2="tiles/house2/qbalken2.obj"
+const tuer="tiles/house1/tuer.obj"
+const loch="tiles/house2/loch.obj"
+
+
+##################
+#	ATTRIBUTE
+##################
+
+@Range(4,6)
+attr floor1=4.8
+@Range(3,4)
+attr floor2=3.9
+@Range(2.5,4)
+attr floor3=3.1
+
+@Range(2,4.5)
+attr tilespacing=3.5
+@Range(0,3)
+attr btilespacing=1.1
+@Range(0,1.5)
+attr qHeight=0.9
+
+@Range(16,22)
+attr buildingHeight=rand(16,22)
+
+##################
+#	CODE
+##################
+
+LotInner -->
+	Lot
+
+attr adaptMass = scope.sx > 10 && scope.sz > 10
+@StartRule
+Lot-->
+	case  adaptMass : shapeL(10,10){shape : Footprint | remainder : GroundFilled}
+	else : Footprint
+
+Footprint-->
+	Ground
+	offset(-0.2, inside) extrude(buildingHeight)comp(f){side: Facade | top: Roof} #comp(f){side: green | top: red}# comp(f){side: Facade | top: Roof}
+
+#FASSADE
+Facade-->split(y){
+					~floor1:Floor(split.index)
+					|~floor2:Floor(split.index)
+					|qHeight: QuerBalken(0) 
+					|	{~floor3:Floor(split.index)}*
+					|~qHeight: QuerBalken(1)}
+					
+
+//Stockwerk
+Floor(index)-->
+	case scope.sx< 5 : Balken
+	else : 
+		split(x)
+			{btilespacing: Balken 
+			| {~tilespacing: Window(index,split.index) 
+			#|~btilespacing: Balken }* }
+			}* 
+			|btilespacing: Balken  }
+					
+Window(index,door)-->
+			#case  !touches && !inside():
+				case index==0 && door%4==0: i(tuer)t(0,0,-0.45)
+				case index==0: i(fenster1)t(0,0,-0.425)
+			    case index==1: 85%: i(fenster2)t(0,0,-0.28) 
+			    			   else: i(loch)t(0,0,-0.48)
+			    case index>=2: i(fenster3)t(0,0,-0.38) 
+				else:NIL
+		#	else:color("#ff0000")
+				
+Balken-->i(balken) t(0,0,0) 
+QuerBalken(a)--> s('1.5,'1,'1) center(x) split(x)
+						{
+						~tilespacing: iQB(a)}* 
+				
+						
+iQB(a)--> 
+				#case !inside():
+					case a==0:i(qbalken1)
+					else:i(qbalken2) 
+				#else:NIL
+
+
+
+import cy : "courtyard.cga"
+
+Ground --> cy.FloorTexture
+GroundFilled --> cy.LotInner
+
+
+#DACH
+import roof : "roof.cga"
+
+
+@Range("gable1","gable2","hip1","hip2")
+attr roofStyle = 25% : "gable1" 25% : "gable2" 25% : "hip1" else : "hip2"
+
+
+Roof-->
+	roof.Roof

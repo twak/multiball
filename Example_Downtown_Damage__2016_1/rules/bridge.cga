@@ -1,0 +1,66 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+import st: "simpleStreets.cga"
+
+Street -->
+	st.Street
+	comp(f){all:
+	split(u,unitSpace,0){~35 : BridgeSide }*
+	}
+	
+const bridgeHeight = 8
+@Range(0,8)
+attr railingOverlap = 0.6
+
+bHeight = 
+	 bridgeHeight + convert(y, scope, world, pos, 0, 0, 0)
+
+Sidewalk -->
+	split(v,unitSpace,0){1.5 : st.Sidewalk |
+						~1 : alignScopeToAxes(y)
+						t(0,-railingOverlap,0)
+						comp(f){all : BridgeTop}}
+						
+						
+BridgeTop -->
+	extrude(world.up, 1.3 + railingOverlap)
+	comp(f){all : Wall}
+	
+minBridgeTop = 
+	case scope.sy < 4 : 4 else : scope.sy
+	
+BridgeSide -->
+	alignScopeToAxes(y) BridgeSide2(minBridgeTop, bHeight)
+
+
+
+BridgeSide2(h, b) -->
+	t(0,-b,0)
+	extrude(world.up, b)
+	split(y){~1: ArcPart | h:  comp(f){vertical : Wall}}//comp(f){top: NIL | all: comp(f){all : Wall} }}
+
+ArcPart2 -->
+	Wall
+	//split(x){~4 : NIL | ~6 : Wall}*
+	//case scope.sy < 4 : Wall
+	//else : BridgeSide2(minBridgeTop)
+
+ArcPart -->
+	#alignScopeToGeometry(yUp, largest, longest)
+	alignScopeToAxes(y)
+	i("assets/bridge/bridge1.obj")
+	WallTexturing
+
+texWidth = 45
+
+Wall -->
+	setupProjection(0, scope.xy, texWidth,texWidth,-1)
+	projectUV(0)
+	WallTexturing
+WallTexturing -->
+	translateUV(0, rand(1), rand(1))
+	texture("assets/bridge/OuterWallTexture_v1.jpg")

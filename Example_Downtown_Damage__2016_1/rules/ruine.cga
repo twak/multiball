@@ -1,0 +1,59 @@
+/**
+ * File:    BraunesAltesHaus.cga
+ * Author:  christianholzer
+ */
+
+version "2013.1"
+
+import smoke: "smoke.cga"
+import scatterRule: "scatter.cga"
+
+@Range(10,23)
+attr buildingHeight = rand(10,23)
+const dirt_tex = "streets/streetDirt.jpg"	
+
+@Range(3,8)
+attr tileWidth =6
+@Range(3.5,7)
+attr floorHeight = 4.5
+
+const win1="brown/fenster_durch.obj"
+const win2="brown/fenster_durch2.obj"
+
+Lot-->
+	scatterRule.Scatter	
+	smoke.Smoke
+	extrude(buildingHeight) 
+	setupProjection(2, scope.xy, '1, '1)
+	comp(f){side:Facade | bottom : Floor}
+
+Facade-->
+	split(y){~floorHeight:Fensterreihe(split.index,split.total)}*
+
+Fensterreihe(ysplit,ytot)-->
+	split(x){~tileWidth:in(ysplit,ytot)}*
+
+in(ind,tot)-->
+	case ind==0:
+		GroundFloorFacade
+	case ind!=tot-1:
+		set(trim.horizontal, true)i(win1) t(0,0,-0.42)
+	else:
+		set(trim.horizontal, true)i(win2) t(0,0,-0.7)
+
+
+GroundFloorFacade -->
+	i("brown/doppelfenster_r.obj") t(0,0,-0.42)
+	
+	
+
+Floor -->
+	reverseNormals
+	alignScopeToAxes(y)
+	setupProjection(0, scope.xz, '1, '1, 0)
+	projectUV(0)
+	texture("brown/rubble.jpg")
+	setupProjection(2,scope.xz,100,100)
+	projectUV(2)
+	set(material.dirtmap, dirt_tex)
+	Floor.

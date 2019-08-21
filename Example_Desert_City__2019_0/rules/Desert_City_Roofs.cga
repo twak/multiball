@@ -1,0 +1,194 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+
+###########################################################################################
+# Attributes & Functions
+###########################################################################################
+
+@Group ("Level of Detail",0) @Order(0)
+attr LOD = "medium"
+
+@Group ("Roof",1) @Order(0) @Range ("flat", "vault", "gable", "shed")
+attr roofType = 65% : "flat" 15%: "vault" 12% : "gable" else: "shed"
+
+@Group ("Roof") @Order(1)
+attr roofConvexify = 70% : true else : false
+
+
+####################################################
+###########################################################
+###########################################################################################
+# ROOF CREATION                                                #####################################
+###########################################################################################
+###########################################################
+####################################################
+
+
+
+Roof -->
+	case roofConvexify :
+		convexify
+		RoofCreation
+	else:
+		RoofCreation
+		
+RoofCreation -->
+	case roofType == "flat" :
+		FlatRoof
+	case roofType == "gable" :
+		GableRoof
+	case roofType == "shed" :
+		ShedRoof
+	case roofType == "vault" :
+		VaultRoof
+	else:
+		NIL
+
+
+
+
+
+
+###########################################################################################
+# FlatRoof
+###########################################################################################
+
+const flatRoofRimHeight = rand(.015,.35)
+const flatRoofRimWidth = rand(.15,.25)
+
+FlatRoof -->
+	case LOD == "low" :
+		alignScopeToAxes(y)
+		CollisionMesh
+		RoofSurfaceTexturing
+	else :
+		alignScopeToAxes(y)
+		CollisionMesh
+		[ offset(-.2,inside) RoofTopFloor ]
+		alignScopeToAxes(y)
+		comp(f) {top :
+					alignScopeToAxes(y)
+					offset(-flatRoofRimWidth,border)
+					extrude(flatRoofRimHeight)
+					comp(f) { all : RoofSurfaceTexturing }
+					comp(f) { top :	alignScopeToGeometry(yUp, world.lowest, longest) RailingDeco | all : NIL}
+				| all : NIL}	
+
+
+
+###########################################################################################
+# RailingDeco
+###########################################################################################
+
+decoDim = rand(.15,.25)
+decoDist = rand(.4,.6)
+const decoHeight = rand (.3,.45)
+const decoAsset = fileRandom("assets/railingWallDeco/*.obj")
+const doRailingDecoProb = 60% : true else : false
+
+
+RailingDeco -->
+	case doRailingDecoProb && LOD == "high" :
+		RoofSurfaceTexturing
+		split(x) { {~ decoDist : NIL | decoDim : DecoShape }* | ~ decoDist : NIL}
+	else :
+		RoofSurfaceTexturing
+
+
+DecoShape -->
+	s(0,'decoHeight,0)
+	center(xz)
+	i(decoAsset)
+	comp(f) {all : RoofSurfaceTexturing}	
+
+	
+###########################################################################################
+# ShedRoof
+###########################################################################################
+
+shedDepth = rand(2,4)
+shedDist = rand(1,3)
+const shedAngle = rand (5,25)
+
+ShedRoof -->
+	comp(f) {all :
+		alignScopeToAxes()
+		alignScopeToGeometry(yUp, 0)
+		split(z) { ~shedDepth : Shed | { shedDist : ShedMaterial | ~shedDepth : Shed }*}
+	}
+
+Shed -->
+	roofShed(shedAngle)
+	ShedMaterial
+
+ShedMaterial -->
+	comp(f) { all : RoofSurfaceTexturing }	
+
+
+
+
+###########################################################################################
+# GableRoof
+###########################################################################################
+
+GableRoof -->
+	roofGable(5,.2)
+	comp(f) { all : RoofSurfaceTexturing }
+	
+
+
+
+###########################################################################################
+# GableRoof
+###########################################################################################
+
+calcSegmentHt(n) = (rand(.5,2)) * (cos(n*curvedAngleResolution) - cos((n+1)*curvedAngleResolution))
+
+const curvedAngleResolution = 10	
+VaultRoof -->
+	VaultRoof(90/curvedAngleResolution-1)
+
+VaultRoof(n) -->
+	case n > 0:
+		roofGable(n*curvedAngleResolution,0,0,false,0)
+		split(y){ (calcSegmentHt(n)): 
+										VaultRoofTexturing 
+									  	comp(f){ bottom: NIL | horizontal: VaultRoof(n-1) } }
+	else: NIL
+
+
+VaultRoofTexturing -->
+	comp(f) { all : RoofSurfaceTexturing }
+
+
+
+
+
+####################################################
+###########################################################
+###########################################################################################
+# TEXTURING                                                             #####################################
+###########################################################################################
+###########################################################
+####################################################
+
+
+texDim = 7
+const roofTopFloorTex = fileRandom("assets/stoneSurfaces/*.png")
+
+RoofSurfaceTexturing -->
+	alignScopeToGeometry(zUp, any, world.lowest)
+	setupProjection(0,scope.xy, texDim, texDim)
+	projectUV(0)
+	offsetUV(0, rand(1), rand(1))
+	texture(roofTopFloorTex)
+	set (material.bumpmap, material.colormap)
+	set (material.bumpValue, 0.7)
+	DirtMapping
+
+
+

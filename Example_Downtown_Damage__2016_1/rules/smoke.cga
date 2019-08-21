@@ -1,0 +1,48 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+mintrsp = 0.7
+
+@Range("on","off","random")
+attr enableSmoke = "random"
+@Range(0,1)
+attr smokeProb = 0.2
+
+const nRec = rand(15,40)
+
+Smoke -->
+	case enableSmoke =="random" :
+		case p(smokeProb) :
+			alignScopeToAxes(y)
+			SmokeRec(nRec)
+		else: NIL
+	case enableSmoke =="on" :
+		alignScopeToAxes(y)
+		SmokeRec(nRec)
+	else : NIL
+		
+randSize = rand (3, 10)
+randTranslate = rand(1,3)
+randJitter = rand(.2,.3)
+
+windX = rand(2,3.6)
+windZ = rand(2,3.6)
+
+SmokeRec(n) -->
+	case n > 0:
+		s(0,0,0)
+		center(xz)
+		r(0,rand(360),0)
+		s('1,randSize * ( nRec - n) / 5,'1)
+		t(0,randTranslate,0)
+		t(randJitter + windX,randJitter,randJitter + windZ)
+		i("assets/smoke/smokeCard.obj")
+		texture("assets/smoke/smokeSprite.png")
+		set(material.color.a, mintrsp / (( nRec - n) / 3))
+		Smoke.
+		alignScopeToAxes(y)
+		SmokeRec(n - 1)
+	else:
+		Smoke.

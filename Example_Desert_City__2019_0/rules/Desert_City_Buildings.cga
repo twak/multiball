@@ -1,0 +1,533 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+
+###########################################################################################
+# Imports
+###########################################################################################
+
+import Ground_Floor : "Desert_City_GroundFloorFacades.cga" (LOD_int = case Level_of_Detail == "high" : 2 case Level_of_Detail == "medium" : 1 else : 0)
+import Upper_Floors : "Desert_City_UpperFloorFacades.cga" (LOD_int = case Level_of_Detail == "high" : 2 case Level_of_Detail == "medium" : 1 else : 0)
+import Roof_Shape 	: "Desert_City_Roofs.cga" (LOD = Level_of_Detail)
+import Roof_Props 	: "Desert_City_RoofTopFloors.cga" (LOD = Level_of_Detail)
+
+
+
+###########################################################################################
+# Attributes
+###########################################################################################
+
+# Building Parameters
+
+@Group ("Building Parameters",0) @Order(0) 
+attr Building_Height = 0
+
+@Group ("Building Parameters") @Order(1) @Range ("residential", "school", "commercial", "religious", "industrial")
+attr Building_Usage = 
+	case footprintArea > 500: 	80%: "industrial" 	00%: "religious"	20% : "commercial"	00%: "school"	else : "residential" 
+	case footprintArea > 200: 	30%: "industrial" 	05%: "religious"	47% : "commercial"	02%: "school"	else : "residential" 
+	case footprintArea > 100: 	10%: "industrial" 	05%: "religious"	60% : "commercial"	02%: "school"	else : "residential" 
+	else 					:	00%: "industrial" 	00%: "religious"	20% : "commercial"	02%: "school"	else : "residential"
+
+
+# Model Options
+
+@Group ("Model Options",1) @Order(0) @Range("high", "medium", "low")
+attr Level_of_Detail = "medium"
+
+@Group ("Model Options") @Order(1)
+attr Visualize_Usage = false
+
+@Group ("Model Options") @Order(2) @Range("None","Generate","Generate Above")
+attr Collision_Mesh = "None"
+
+
+
+
+# Generic and/or hidden Attributes
+
+@Hidden
+attr isHole = false
+
+@Hidden
+attr footprintArea = 0
+
+@Hidden
+attr floorHeight =
+	case footprintArea > 500 : rand(3.5,4)
+	case footprintArea > 100 : rand(2.5,3)
+	else 					 : rand(2.2,2.8)
+
+
+
+###########################################################################################
+# Constants
+###########################################################################################
+
+const buildingHeight =
+	case Building_Height < 0.1 : 	# catched the case when the GIS data is invalid ...
+		case footprintArea > 500 : 	80% : rand(8,14) else : rand(8,20)
+		case footprintArea > 200 : 	80% : rand(6,10) else : rand(8,20)
+		case footprintArea > 100 : 	80% : rand(4,9)  else : rand(7,25)
+		else :						80% : rand(4,5)  else : rand(4,10)
+	else:
+		Building_Height
+
+const groundFloorHeight =
+	case footprintArea > 500 : rand(4.5,5.5)
+	case footprintArea > 200 : rand(3.5,4.5)
+	case footprintArea > 100 : rand(3,4)
+	else 			         : rand(2.5,3.5)
+
+const colorTone =
+	case !Visualize_Usage				: "#ffffff"	# do not color in this case i.e. leave white as base color
+	case Building_Usage == "industrial" : "#333333"
+	case Building_Usage == "religious"  : "#0000ff"
+	case Building_Usage == "school" 	: "#ff00ff"
+	case Building_Usage == "commercial" : "#ff0000" 
+	else 								: "#00ff00" 
+	
+const topFloorOrientation = 70% : "longest" else: "front"
+const doTopFloorOffset = 25% : true else : false
+const doTopFloorSplit = 75% : true else : false
+const doTopFloorSplitDiversification = 60% : true else : false
+
+const doOcclusionQueries = Level_of_Detail == "high"
+
+
+
+###########################################################################################
+###########################################################################################
+##  
+##  RULES
+##
+##
+
+
+@StartRule
+Footprint -->
+	case isHole:
+		NIL
+	else:
+		cleanupGeometry(all, .1)
+		alignScopeToAxes(y) s('1,0,'1) 		# make footprint flat (just in case...)
+		set(footprintArea,geometry.area)
+		color(colorTone)
+		extrude(buildingHeight)
+		Mass
+
+Mass -->
+	case scope.sy > groundFloorHeight + floorHeight :
+		split(y){ groundFloorHeight	: GroundFloor
+				| { ~floorHeight	: UpperFloor }* 
+				| ~floorHeight		: TopFloorShell }
+	case scope.sy > groundFloorHeight :
+		split(y){ groundFloorHeight	: GroundFloor
+				| ~floorHeight		: TopFloorShell }
+	else :
+		split(y){ groundFloorHeight	: GroundFloor comp(f){top : Roof_Shape.Roof} }
+		
+#################################################################
+# Top Floor
+#
+
+TopFloorShell -->
+	set(floorHeight,scope.sy)
+	comp(f){ bottom :
+				reverseNormals alignScopeToAxes(y)
+				TopFloorBaseOrientation
+				RailingWall
+			| all : NIL}
+			
+TopFloorBaseOrientation -->
+	case topFloorOrientation == "longest" :
+		alignScopeToGeometry(yUp,any,longest) rotateScope(0,180,0) TopFloorVolumeProcess1
+	else:
+		TopFloorVolumeProcess1
+
+# TopFloorVolume processing, step 1 : offset
+
+topFloorOffsetMinDim = 8
+topFloorOffsetValueFunction(dim) = 60% : rand(1.2,topFloorOffsetMinDim / 4) else : rand(dim/8,dim/4)
+smallerValue(input1, input2) = case input1 <= input2 : input1 else : input2
+
+TopFloorVolumeProcess1 -->
+	case doTopFloorOffset && scope.sx > topFloorOffsetMinDim && scope.sz > topFloorOffsetMinDim :
+		offset(-topFloorOffsetValueFunction(smallerValue(scope.sx, scope.sz)))
+		cleanupGeometry(all, 0.0001)
+		comp(f){ border : alignScopeToAxes(y) RoofTopFloor | inside : alignScopeToAxes(y) TopFloorVolumeProcess2 }
+	else:
+		TopFloorVolumeProcess2
+		
+# TopFloorVolume processing, step 2 : cut Front & side
+
+topFloorVolumeSplitMinDim = 10
+
+TopFloorVolumeProcess2 -->
+	case doTopFloorSplit :
+		TopFloorBaseSplitX
+	else:
+		TopFloorVolumeProcess3
+
+TopFloorBaseSplitX -->
+	case scope.sx > topFloorVolumeSplitMinDim :
+		split(x) {(topFloorOffsetValueFunction(scope.sx)) : RoofTopFloor | ~1 : TopFloorBaseSplitZ}
+	else:
+		TopFloorBaseSplitZ
+		
+		
+TopFloorBaseSplitZ -->
+	case scope.sz > topFloorVolumeSplitMinDim :
+		50%:
+			split(z) {(topFloorOffsetValueFunction(scope.sz)) : RoofTopFloor | ~1 : TopFloorVolumeProcess3}
+		else :
+			split(z) {~1 : TopFloorVolumeProcess3 | (topFloorOffsetValueFunction(scope.sz)) : RoofTopFloor}
+	else:
+		TopFloorVolumeProcess3
+
+# TopFloorVolume processing, step 3 : diversification
+
+topFloorDiversificationMinDim = rand(6,12)
+topFloorDiversificationDist = rand(2,6)
+TopFloorVolumeProcess3 -->
+	case doTopFloorSplitDiversification :
+		TopFloorBaseDiversificationX
+	else:
+		ExtrudeTopFloor
+
+TopFloorBaseDiversificationX -->
+	case scope.sx > topFloorDiversificationMinDim :
+		40%  : split(x) {'0.5 : TopFloorBaseDiversificationZ | ~1 : RoofTopFloor}
+		20%  : split(x) { ~ topFloorDiversificationDist : RoofTopFloor | topFloorDiversificationMinDim : TopFloorBaseDiversificationZ | {~ topFloorDiversificationDist : RoofTopFloor| topFloorDiversificationMinDim : TopFloorBaseDiversificationZ }*}
+		20%  : split(x) {topFloorDiversificationMinDim : TopFloorBaseDiversificationZ | ~ topFloorDiversificationDist : RoofTopFloor | { topFloorDiversificationMinDim : TopFloorBaseDiversificationZ | ~ topFloorDiversificationDist : RoofTopFloor}*}
+		else : TopFloorBaseDiversificationZ
+	else :
+		TopFloorBaseDiversificationZ
+		
+TopFloorBaseDiversificationZ -->
+	case scope.sz > topFloorDiversificationMinDim :
+		40%  : split(z) {'0.5 : ExtrudeTopFloor | ~1 : RoofTopFloor}
+		20%  : split(z) { ~ topFloorDiversificationDist : RoofTopFloor | topFloorDiversificationMinDim : ExtrudeTopFloor | {~ topFloorDiversificationDist : RoofTopFloor| topFloorDiversificationMinDim : ExtrudeTopFloor }*}
+		20%  : split(z) {topFloorDiversificationMinDim : ExtrudeTopFloor | ~ topFloorDiversificationDist : RoofTopFloor | { topFloorDiversificationMinDim : ExtrudeTopFloor | ~ topFloorDiversificationDist : RoofTopFloor}*}
+		else : ExtrudeTopFloor
+	else :
+		ExtrudeTopFloor
+		
+remaininAreaMax = rand(150,750)
+minVolumeBaseArea = 5
+
+ExtrudeTopFloor -->
+	case geometry.area > minVolumeBaseArea && geometry.area > remaininAreaMax:
+		extrude(world.up, floorHeight)
+		TopFloorVolume
+	else:
+		RoofTopFloor
+
+# RoofTopFloor
+
+RoofTopFloor -->
+	CollisionMesh
+	Roof_Props.RoofTopFloor
+
+Roof_Shape.RoofTopFloor -->
+	Roof_Props.RoofTopFloor
+
+Roof_Shape.DirtMapping -->
+	Roof_Props.DirtMapping
+
+
+#################################################################
+# Railing Wall
+#
+
+const railingWallThickness = rand(.12,.2)
+const railingWallHeight = 80% : rand (.6,.8) else : rand(.5,1)
+
+RailingWall -->
+	case Level_of_Detail == "medium" || Level_of_Detail == "high" :	
+		offset(-railingWallThickness)
+		comp(f) { border :
+			alignScopeToGeometry(yUp, world.lowest, longest)
+			s('.998,'1,'1)
+			center(x)
+			extrude (world.up, railingWallHeight)
+			RailingWallOcclusion
+		}
+	else :
+		NIL
+
+RailingWallOcclusion -->
+	case doOcclusionQueries :
+		case overlaps(intra) :
+			NIL
+		else:
+			t(0,2,-.03)
+			s('1,'1,'1)
+			primitiveCube()
+			
+			comp(f){
+				bottom :
+					NIL
+				| top :
+					alignScopeToAxes(y)
+					t(0,-2,0)
+					CollisionMesh
+					RailingWallDeco
+				| all :
+					alignScopeToAxes(y)
+					t(0,-2,0)
+					CollisionMesh
+					Roof_Shape.RoofSurfaceTexturing
+				}
+	else :
+		t(0,0,-.03)
+		comp(f){ bottom : NIL | all : CollisionMesh Roof_Shape.RoofSurfaceTexturing}
+
+RailingWallDeco -->
+	Roof_Shape.RailingDeco
+
+
+#################################################################
+# 3D VOLUMES TO 2D SHAPES 
+#
+
+GroundFloor -->
+	comp(f){ side: s('1,'.999,'1) DecideGFWay CollisionMesh }
+
+UpperFloor -->
+	comp(f){ side : s('1,'.999,'1) DecideUFWay CollisionMesh }
+	
+TopFloorVolume -->
+	comp(f) {side : s('1,'.999,'1) DecideUFWay CollisionMesh | top : Roof_Shape.Roof }
+
+
+
+DecideGFWay -->
+	case Ground_Floor.styleIsUsed == 0 :
+		GF_Facade
+	else :
+		Ground_Floor.StyleStart
+
+DecideUFWay -->
+	case Upper_Floors.styleIsUsed == 0 :
+		UF_Facade
+	else:
+		Upper_Floors.StyleTrigger(rint(rand(Upper_Floors.n)))
+
+
+#################################################################
+# Ground Floor Dispatcher
+#
+
+GF_Facade -->
+	case Building_Usage == "commercial" :
+		40% : 
+			5% : Ground_Floor.GFStart_retail_1
+			#5% : Ground_Floor.GFStart_retail_2
+			#5% : Ground_Floor.GFStart_retail_3
+			#5% : Ground_Floor.GFStart_retail_4
+			#5% : Ground_Floor.GFStart_retail_5
+			#5% : Ground_Floor.GFStart_retail_6
+			#5% : Ground_Floor.GFStart_retail_7
+			#5% : Ground_Floor.GFStart_retail_8
+			#5% : Ground_Floor.GFStart_retail_9
+			#5% : Ground_Floor.GFStart_retail_10
+			#5% : Ground_Floor.GFStart_retail_11
+			#5% : Ground_Floor.GFStart_retail_12
+			#5% : Ground_Floor.GFStart_retail_13
+			#5% : Ground_Floor.GFStart_retail_14
+			#5% : Ground_Floor.GFStart_retail_15
+			#5% : Ground_Floor.GFStart_retail_16
+			#5% : Ground_Floor.GFStart_retail_17
+			#5% : Ground_Floor.GFStart_retail_18
+			#5% : Ground_Floor.GFStart_retail_19
+			else : Ground_Floor.GFStart_retail_2
+		else : 
+			12% : Ground_Floor.GFStart_commercial_1
+			#12% : Ground_Floor.GFStart_commercial_2
+			#12% : Ground_Floor.GFStart_commercial_3
+			#12% : Ground_Floor.GFStart_commercial_4
+			#12% : Ground_Floor.GFStart_commercial_5
+			#12% : Ground_Floor.GFStart_commercial_6
+			#12% : Ground_Floor.GFStart_commercial_7
+			else : Ground_Floor.GFStart_commercial_2
+	case Building_Usage == "religious" :
+		Ground_Floor.GFStart_religious_1
+	case Building_Usage == "school" :
+		25% : Ground_Floor.GFStart_school_1
+		#25% : Ground_Floor.GFStart_school_2
+		#25% : Ground_Floor.GFStart_school_3
+		else : Ground_Floor.GFStart_school_2
+	case Building_Usage == "residential" :
+		10% : 
+			5% : Ground_Floor.GFStart_retail_1
+			#5% : Ground_Floor.GFStart_retail_2
+			#5% : Ground_Floor.GFStart_retail_3
+			#5% : Ground_Floor.GFStart_retail_4
+			#5% : Ground_Floor.GFStart_retail_5
+			#5% : Ground_Floor.GFStart_retail_6
+			#5% : Ground_Floor.GFStart_retail_7
+			#5% : Ground_Floor.GFStart_retail_8
+			#5% : Ground_Floor.GFStart_retail_9
+			#5% : Ground_Floor.GFStart_retail_10
+			#5% : Ground_Floor.GFStart_retail_11
+			#5% : Ground_Floor.GFStart_retail_12
+			#5% : Ground_Floor.GFStart_retail_13
+			#5% : Ground_Floor.GFStart_retail_14
+			#5% : Ground_Floor.GFStart_retail_15
+			#5% : Ground_Floor.GFStart_retail_16
+			#5% : Ground_Floor.GFStart_retail_17
+			#5% : Ground_Floor.GFStart_retail_18
+			#5% : Ground_Floor.GFStart_retail_19
+			else : Ground_Floor.GFStart_retail_2
+		else : 
+			14% : Ground_Floor.GFStart_residential_1
+			#14% : Ground_Floor.GFStart_residential_2
+			#14% : Ground_Floor.GFStart_residential_3
+			#14% : Ground_Floor.GFStart_residential_4
+			#14% : Ground_Floor.GFStart_residential_5
+			#14% : Ground_Floor.GFStart_residential_6
+			else : Ground_Floor.GFStart_residential_2
+	else:
+		20% : 
+			5% : Ground_Floor.GFStart_retail_1
+			#5% : Ground_Floor.GFStart_retail_2
+			#5% : Ground_Floor.GFStart_retail_3
+			#5% : Ground_Floor.GFStart_retail_4
+			#5% : Ground_Floor.GFStart_retail_5
+			#5% : Ground_Floor.GFStart_retail_6
+			#5% : Ground_Floor.GFStart_retail_7
+			#5% : Ground_Floor.GFStart_retail_8
+			#5% : Ground_Floor.GFStart_retail_9
+			#5% : Ground_Floor.GFStart_retail_10
+			#5% : Ground_Floor.GFStart_retail_11
+			#5% : Ground_Floor.GFStart_retail_12
+			#5% : Ground_Floor.GFStart_retail_13
+			#5% : Ground_Floor.GFStart_retail_14
+			#5% : Ground_Floor.GFStart_retail_15
+			#5% : Ground_Floor.GFStart_retail_16
+			#5% : Ground_Floor.GFStart_retail_17
+			#5% : Ground_Floor.GFStart_retail_18
+			#5% : Ground_Floor.GFStart_retail_19
+			else : Ground_Floor.GFStart_retail_2
+		else : 
+			33% : Ground_Floor.GFStart_industrial_1
+			#33% : Ground_Floor.GFStart_industrial_2
+			else : Ground_Floor.GFStart_industrial_2
+
+
+#################################################################
+# Upper Floors Dispatcher
+#
+
+const commercialConst = floor(rand(0,2))
+const industrialConst = floor(rand(0,2))
+const residentialConst = floor(rand(0,2))
+const schoolConst = floor(rand(0,2))
+const religiousConst = floor(rand(0,2))
+
+
+
+UF_Facade -->
+	case Building_Usage == "commercial" :
+		#case commercialConst == 1 : Upper_Floors.commercial_1(rint(rand(2)))
+		case commercialConst == 2 : Upper_Floors.commercial_2(rint(rand(3)))
+		#case commercialConst == 3 : Upper_Floors.UFStart_commercial_3
+		#case commercialConst == 4 : Upper_Floors.UFStart_commercial_4
+		#case commercialConst == 5 : Upper_Floors.UFStart_commercial_5
+		#case commercialConst == 6 : Upper_Floors.UFStart_commercial_6
+		#case commercialConst == 7 : Upper_Floors.UFStart_commercial_7
+		#case commercialConst == 8 : Upper_Floors.UFStart_commercial_8
+		#case commercialConst == 9 : Upper_Floors.UFStart_commercial_9
+		#case commercialConst == 10 : Upper_Floors.UFStart_commercial_10
+		#case commercialConst == 11 : Upper_Floors.UFStart_commercial_11
+		#case commercialConst == 12 : Upper_Floors.UFStart_commercial_12
+		else : Upper_Floors.commercial_4(rint(rand(3)))
+		
+	case Building_Usage == "religious" :
+		case commercialConst == 1 : Upper_Floors.religious_1(0)
+		#case commercialConst == 2 : Upper_Floors.UFStart_religious_2
+		#case commercialConst == 3 : Upper_Floors.UFStart_religious_3
+		else : Upper_Floors.religious_2(0)
+	case Building_Usage == "school" :
+		case commercialConst == 1 : Upper_Floors.school_1(rint(rand(1)))
+		#case commercialConst == 2 : Upper_Floors.UFStart_school_2
+		#case commercialConst == 3 : Upper_Floors.UFStart_school_3
+		else : Upper_Floors.school_2(rint(rand(1)))
+	case Building_Usage == "residential" :
+		case commercialConst == 1 : Upper_Floors.residential_1(rint(rand(5)))
+		#case commercialConst == 2 : Upper_Floors.UFStart_residential_2
+		#case commercialConst == 3 : Upper_Floors.UFStart_residential_3
+		#case commercialConst == 4 : Upper_Floors.UFStart_residential_4
+		#case commercialConst == 5 : Upper_Floors.UFStart_residential_5
+		#case commercialConst == 6 : Upper_Floors.UFStart_residential_6
+		#case commercialConst == 7 : Upper_Floors.UFStart_residential_7
+		#case commercialConst == 8 : Upper_Floors.UFStart_residential_8
+		#case commercialConst == 9 : Upper_Floors.UFStart_residential_9
+		#case commercialConst == 10 : Upper_Floors.UFStart_residential_10
+		#case commercialConst == 11 : Upper_Floors.UFStart_residential_11
+		#case commercialConst == 12 : Upper_Floors.UFStart_residential_12
+		#case commercialConst == 13: Upper_Floors.UFStart_residential_13
+		#case commercialConst == 14 : Upper_Floors.UFStart_residential_14
+		#case commercialConst == 15 : Upper_Floors.UFStart_residential_15
+		#case commercialConst == 16 : Upper_Floors.UFStart_residential_16
+		#case commercialConst == 17 : Upper_Floors.UFStart_residential_17
+		#case commercialConst == 18 : Upper_Floors.UFStart_residential_18
+		else : Upper_Floors.residential_2(rint(rand(2)))
+	else:
+		case commercialConst == 1 : Upper_Floors.industrial_1(0)
+		#case commercialConst == 2 : Upper_Floors.UFStart_industrial_2
+		#case commercialConst == 3 : Upper_Floors.UFStart_industrial_3
+		else : Upper_Floors.industrial_3(rint(rand(1)))
+
+
+
+#################################################################
+# Collision Mesh
+#
+
+CollisionMesh -->
+	case Collision_Mesh == "None" :
+		NIL
+	else :
+		alignScopeToAxes(y)
+		t(0,(case Collision_Mesh == "Generate Above": buildingHeight+5 else: 0),0)
+		color(1,0,0)
+		texture("")
+		set(material.name, "collisionMesh")
+		set(material.bumpmap, "")
+		set(material.bumpValue, 0)
+		set(material.opacitymap, "")
+		set(material.specular.r, 0)
+		set(material.specular.g, 0)
+		set(material.specular.b, 0)
+		set(material.specularmap, "")
+		set(material.shininess, 0)
+
+
+Roof_Shape.CollisionMesh --> CollisionMesh
+Roof_Props.CollisionMesh --> CollisionMesh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	

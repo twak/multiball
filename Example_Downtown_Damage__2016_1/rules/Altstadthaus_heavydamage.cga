@@ -1,0 +1,275 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+import smoke: "smoke.cga"
+
+######################
+#
+#	ATTRIBUTE
+#
+######################
+
+
+@Range(2,6)
+attr tilespacing=5
+
+@Range(12,26)
+attr buildingHeight=rand(12,26)
+@Range(2.5,4.5)
+attr stock=3.5
+
+
+@Group("Damage") @Range(-1,2)
+attr offset_damage=0
+@Group("Damage") @Range(-5,5)
+attr offset_damage2=0
+@Range(4,6)
+attr groundfloor=5
+
+
+const orientation = 
+	case scope.sx > scope.sz : 0
+	else : 1
+
+
+const  mauerdicke=2
+const stockwerke= rint(buildingHeight/stock)
+const corrval=2
+
+######################
+#
+#	ASSETS
+#
+######################
+
+
+const bruch_gr2="tiles/altstadthaus/demolished/bruch_gr2.obj"
+const bruch_kl1_2="tiles/altstadthaus/demolished/bruch_kl1_2.obj"
+const bruch_kl2_2="tiles/altstadthaus/demolished/bruch_kl2_2.obj"
+const bruch_kl3_2="tiles/altstadthaus/demolished/bruch_kl3_2.obj"
+const bruch_binde2="tiles/altstadthaus/demolished/bruch_binde2.obj"
+
+#bruch_gr="braun/doppelfenster_br.obj"
+
+
+const bruch_gr="tiles/altstadthaus/demolished/bruch_gr.obj"
+const bruch_kl="tiles/altstadthaus/demolished/bruch_kl.obj"
+const bruch_kl2="tiles/altstadthaus/demolished/bruch_kl2.obj"
+const bruch_kl3="tiles/altstadthaus/demolished/bruch_kl3.obj"
+const bruch_binde="tiles/altstadthaus/demolished/bruch_binde.obj"
+
+const dach="tiles/altstadthaus/demolished/dach_cln.obj"
+stb= 50% : "tiles/altstadthaus/demolished/stockwerkboden.obj"
+	 else: "tiles/altstadthaus/demolished/stockwerkboden2.obj"
+	 
+###
+#stb="einsturz/stockwerkboden.obj"
+
+const schauF1="tiles/altstadthaus/shop_rec1.obj"
+const schauF2="tiles/altstadthaus/shop_round1.obj"
+
+##
+#win="OrnateFinal/win_breit.obj"
+const win="tiles/altstadthaus/double.obj"
+const tuer="tiles/altstadthaus/door.obj"
+const hole="tiles/altstadthaus/demolished/doubleH.obj"
+const Ledge="pillar/ledge.obj"
+
+
+LotInner-->
+	Lot
+
+Lot-->
+	smoke.Smoke
+	GroundFilled
+	innerRect 
+	alignScopeToGeometry(yUp, 0,orientation)
+	extrude(buildingHeight)
+	comp(f) {top: alignScopeToGeometry(zUp, 0,orientation) oben(scope.sx) 
+			| left: IntakteWand | right: niedereSeite 
+			| back:hinten |front:vorne 
+			| bottom: reverseNormals alignScopeToGeometry(zUp, 0,orientation) unten(scope.sy) }
+
+Erdgeschoss-->split(x){
+					//Balkenbreite/2: Balken
+					{~groundfloor: Erdgeschosselement(split.index)}*
+				#	|1: Balken(0)
+				 }
+Erdgeschosselement(nr)-->case nr==3:i(tuer)t(0,0,-0.75)
+						case nr%2==0:i(schauF2) t(0,0,-scope.sz)
+						else:  i(schauF1) t(0,0,-scope.sz)
+
+
+
+
+oben-->split(x){tilespacing:ObenIntakt(split.index,split.total)}*  
+
+oben(xLength)-->split(x){ ((getRatio((xLength/tilespacing),stockwerke)+offset_damage*0.9)*tilespacing) : Dach						
+}  
+
+
+#am boden werden die stockwerke generiert
+unten(origBreite)-->
+	extrude(buildingHeight) Stockwerksplit
+	
+Stockwerksplit --> 
+	split(y){groundfloor: NIL
+			|{~stock:stockwerksboden(split.index, split.total)}* }
+
+
+stockwerksboden(in,to) --> 
+	split(x){~1 : StockwerkAsset | ~((in-2)/(to)) : NIL }
+
+StockwerkAsset -->
+	setPivot(xyz, floor(rand(1,4))) #randomly rotate asset to create variation
+	set(trim.vertical,false) 
+	s(scope.sx-1,'1,scope.sz-0.2) center(x)
+	i(stb)
+
+#Baut platz fürs dach bis zum 1. Sprung 1 element wird skaliert --- 
+ObenIntakt(index,total)-->
+
+	case index==0:
+	s('1*getRatio(total,stockwerke),scope.sy+getRatio(total,stockwerke),'1)	Dach
+	
+	else: NIL
+	
+Dach-->
+set(trim.vertical, false) s(scope.sx*(2.5-offset_damage),scope.sy+scope.sy*0.075,'1)
+center(y) t(-0.5,0,0) i(dach)
+
+
+
+
+niedereSeite-->
+
+split(y){
+					groundfloor: Erdgeschoss
+					|1: Ledge(1)
+					|{~stock: frontstockwerk(split.index,split.total) }*
+					
+}
+
+frontstockwerk(ind,tot)-->
+				case ind <=offset_damage+corrval-1:
+					PlatteF
+				case ind <=offset_damage+corrval:
+					33%:i(bruch_kl) reverseNormals s('1,3,-1) 34%:i(bruch_kl2) reverseNormals s('1,2,-1) else: i(bruch_kl3) reverseNormals s('1,2.7,-1)
+					else:NIL
+
+
+
+IntakteWand-->split(y){
+					groundfloor: Erdgeschoss
+					|1: Ledge(1)
+					|{~stock: Platte}*
+					}
+
+PlatteF-->split(x){~tilespacing: FensterF}* 
+FensterF-->85%:i(win)t(0,0,-0.39)
+					else: i(hole) t(0,0,-scope.sz-0.025)
+Platte-->split(x){~tilespacing: Fenster}* 
+Fenster--> i(win)t(0,0,-0.35) 
+	
+
+
+
+
+
+hoheSeite-->color("#ad45d8")
+
+
+hinten-->split(y){groundfloor:Erdgeschoss|1: Ledge(1)|~1000:hinten2}
+hinten2-->split(x){~tilespacing:splitHeight(split.index,split.total,1)}*
+
+vorne-->split(y){groundfloor:Erdgeschoss|1: Ledge(1)|~1000:vorne2}* 
+
+
+vorne2-->split(x){~tilespacing:splitHeight(split.index,split.total,0)}* 
+
+splitHeight(xNr,maxElementsX,seite)-->
+			case seite==0:
+				split(y){
+					#groundfloor: Erdgeschoss
+					#|1: Ledge(1)
+					{~stock: Platte(xNr,split.index,maxElementsX,split.total,0,seite)}*
+}
+			else:
+				split(y){
+					#groundfloor: Erdgeschoss
+					#|1: Ledge(1)
+					{~stock: Platte((abs(xNr-maxElementsX)-1),split.index,maxElementsX,split.total,1,seite) 
+}*}
+
+
+getRatio(maxElementsX,maxElementsY)=(ceil(1/(maxElementsY/maxElementsX)))
+
+	
+
+	
+
+
+#
+Platte(xNr,yNr,maxElementsX,maxElementsY,front,seite)-->
+
+
+
+#ERKLÄRUNG:
+#	   akt.x	Stocknr. umgedreht     wieviele y bis Zeilensrpung				oben								Einsetzen von Objekten
+
+case seite==0:
+	case  xNr >= (((abs(yNr-maxElementsY))*getRatio(maxElementsX,maxElementsY))+offset_damage) && yNr==maxElementsY-(abs(yNr-maxElementsY)) && yNr!=0:Einriss(seite,getRatio(maxElementsX,maxElementsY),xNr-((abs(yNr-maxElementsY))+offset_damage)*getRatio(maxElementsX,maxElementsY),maxElementsX,xNr)
+	else:85%:i(win)t(0,0,-0.4)s('1,'1,'2) //W. primitiveCube() s('1,'1,mauerdicke*0.4) texture("tex_ornate_win2.jpg") StirnWall
+		else: i(hole)  t(0,0,-0.4)s('1,'1,'1.6)
+else: 
+	case  xNr >= (((abs(yNr-maxElementsY))*getRatio(maxElementsX,maxElementsY))+offset_damage2) && yNr==maxElementsY-(abs(yNr-maxElementsY)) && yNr!=0:Einriss(seite,getRatio(maxElementsX,maxElementsY),xNr-((abs(yNr-maxElementsY))+offset_damage2)*getRatio(maxElementsX,maxElementsY),maxElementsX,xNr)
+	else:85%:i(win)t(0,0,-0.4)s('1,'1,'2) //W. primitiveCube() s('1,'1,mauerdicke*0.4) texture("tex_ornate_win2.jpg") StirnWall
+		else: i(hole) t(0,0,-0.4)s('1,'1,'1.6)
+
+
+
+
+Einriss(seite,ratio,nummer,maxElementsX,xNr)-->
+case nummer>ratio: NIL
+case seite==0:
+	case nummer==0: i(bruch_gr)s('1,scope.sy,mauerdicke*0.35) t(0,0,-mauerdicke*0.20)
+	case nummer==ratio:i(bruch_binde) s(scope.sx/4.1,scope.sy/8.5,mauerdicke*0.435)t(0,0,-mauerdicke*0.33)	
+	case nummer>0 && nummer<ratio: //&& xNr!=maxElementsX:	
+			33%:i(bruch_kl) s('1,scope.sy/3,mauerdicke*0.25) t(0,0,-mauerdicke*0.20)//color("#afff00")
+			33%:i(bruch_kl2) s('1,scope.sy/4,mauerdicke*0.25)t(0,0,-mauerdicke*0.20)//color("#afff00")
+			else:i(bruch_kl3) s('1,scope.sy/3,mauerdicke*0.25)t(0,0,-mauerdicke*0.20)//color("#afff00")
+	else:
+		85%: i(win)t(0,0,-0.4)s('1,'1,mauerdicke*0.5) //W. primitiveCube() s('1,'1,mauerdicke*0.4) texture("tex_ornate_win2.jpg") StirnWall
+		else: i(hole) t(0,0,-scope.sz-0.025)
+else:
+	case nummer==0 && xNr!=1: i(bruch_gr2)s('1,scope.sy,mauerdicke*0.35) t(0,0,-mauerdicke*0.2)
+	case nummer==ratio:i(bruch_binde2) s(scope.sx/4.1,scope.sy/8.5,mauerdicke*0.25)t(scope.sx*3.11,0,-mauerdicke*0.2)	
+	case nummer>0 && nummer<ratio: //&& xNr!=maxElementsX:	
+			33%:i(bruch_kl1_2) s('1,scope.sy/3,mauerdicke*0.25) t(0,0,-mauerdicke*0.20)//color("#afff00")
+			33%:i(bruch_kl2_2) s('1,scope.sy/4,mauerdicke*0.25)t(0,0,-mauerdicke*0.20)//color("#afff00")
+			else:i(bruch_kl3_2) s('1,scope.sy/3,mauerdicke*0.25)t(0,0,-mauerdicke*0.20)//color("#afff00")
+	else:
+		85%: i(win)t(0,0,-0.4)s('1,'1,mauerdicke*0.5) //W. primitiveCube() s('1,'1,mauerdicke*0.4) texture("tex_ornate_win2.jpg") StirnWall
+		else: i(hole) t(0,0,-scope.sz-0.025)
+
+
+Ledge(size)--> s('1.3,'1,1) center(x) i(Ledge)
+
+
+StirnWall -->
+	scaleUV(0, 0.1, .11)
+	comp(f){front : NIL | back : NIL | all : Wall.}
+
+
+
+
+import cy : "courtyard.cga"
+
+Ground --> cy.FloorTexture
+GroundFilled --> cy.LotInner
+
+	
+	

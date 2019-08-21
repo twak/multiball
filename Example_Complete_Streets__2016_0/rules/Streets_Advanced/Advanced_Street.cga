@@ -1,0 +1,1821 @@
+/**
+ * Created: 16 May 2009 10:22:18 GMT
+ * Updated: 21 Oct 2010, 17 Apr 2013
+ * Author: Esri
+ */
+
+
+
+version "2015.0"
+
+
+# ----------------------------------------
+# Directory Paths
+# ----------------------------------------
+
+const assetsDirectory = "Streets_Advanced/"
+const streetAssetsDirectory = "Streets_Advanced/"
+const textureDirectory = streetAssetsDirectory + "textures/"
+const lowPolyAssetFolder = "3DModels_from_LowPolygon3D.com/"
+const peopleDirectory = lowPolyAssetFolder + "LowPolygon3D.com_People/"
+const vehicleDirectory = lowPolyAssetFolder + "LowPolygon3D.com_Vehicles/"
+const cyclistDirectory = lowPolyAssetFolder + "LowPolygon3D.com_Cyclists/"
+
+# ----------------------------------------
+# Imported files
+# ----------------------------------------
+
+import Tree : "/ESRI.lib/rules/Plants/Plant_Loader.cga" 
+import envReports : "Referenced/Environment_Reporting.cga"
+import envSettings : "Referenced/Environment_Settings.cga"
+
+
+# ----------------------------------------
+# Reporting 
+# ----------------------------------------
+
+const pavementMaterial = case Pervious_Road_Pavement: envReports.materialPerviousPavement else: envReports.materialPavementAndRooftops
+const pavementMaterialLabel = case Pervious_Road_Pavement: "Street, Lanes Area, Pervious" else: "Street, Lanes Area, Impervious"
+const parkingMaterial = case Pervious_Parking: envReports.materialPerviousPavement else: envReports.materialPavementAndRooftops
+const parkingMaterialLabel = case Pervious_Parking: "Street, Parking Area, Pervious" else: "Street, Parking Area, Impervious"
+const sidewalkMaterial = case Pervious_Sidewalks_Crosswalks: envReports.materialPerviousPavement else: envReports.materialPavementAndRooftops
+const sidewalkMaterialLabel = case Pervious_Sidewalks_Crosswalks: "Street, Sidewalk Area, Pervious" else: "Street, Sidewalk Area, Impervious"
+
+ReportSidewalkMaterial -->
+	report(sidewalkMaterialLabel, geometry.area)
+	report("Street, Sidewalk Area, Total", geometry.area)
+	envReports.ReportPeakDischarge(sidewalkMaterial)
+	NIL
+
+ReportParkingMaterial -->
+	report(parkingMaterialLabel, geometry.area)
+	report("Street, Parking Area, Total", geometry.area)
+	envReports.ReportPeakDischarge(parkingMaterial)
+	NIL
+
+ReportPavementMaterial -->
+	report(pavementMaterialLabel, geometry.area)
+	report("Street, Lanes Area, Total", geometry.area)
+	envReports.ReportPeakDischarge(pavementMaterial)
+	NIL
+
+################################################
+# DISPLAY OPTIONS
+
+@Group("DISPLAY OPTIONS",0) @Order(1)
+attr Display_Textures = true
+
+@Group("DISPLAY OPTIONS") @Order(2)
+@Range("Thematics Off", "Solid Color", "Peak Runoff/Permeability")
+attr Display_Thematics = "Thematics Off" 
+
+@Group("DISPLAY OPTIONS") @Order(3)
+attr Solid_Color = "#FFFFFF"
+
+@Group("DISPLAY OPTIONS") @Order(4) @Range(0,1)
+attr Transparency = 1
+
+texturingOn = Display_Textures 	# Shorthand.
+thematicsOn = Display_Thematics != "Thematics Off"
+coloringOn = !thematicsOn && texturingOn	# Shorthand.
+
+const peakRunoffDisplayOn = Display_Thematics == "Peak Runoff/Permeability"
+
+thematicColor = 
+	case Display_Thematics == "Peak Runoff/Permeability":
+		# Specific materials will be colored down the road, but everything else will use white.
+		"#FFFFFF"
+	case Display_Thematics == "Solid Color":
+		Solid_Color
+#	case Display_Thematics == "Usage":
+#		"#FFFFFF" # Will be overwritten at material level.
+	else:
+		"#FFFFFF"
+
+
+################################################
+
+TextureSwitch -->
+	case texturingOn: X.
+	else: deleteUV(0) X.
+
+################################################
+
+# FIX: Put this back in later.
+#@Group("DISPLAY OPTIONS",0) @Order(5) @Range("Low","High")
+#attr Level_of_Detail = "Low"
+const highLOD = true #Level_of_Detail == "High" 
+
+
+# ----------------------------------------
+# Street Layout Attributes
+
+@Group("ROAD LAYOUT",10)
+@Order(0) @Range("Right Hand Side", "Left Hand Side")
+attr Traffic_Direction = "Right Hand Side"
+# Convenience functions:
+rhs = Traffic_Direction == "Right Hand Side"
+lhs = !rhs
+
+@Description("Controls how many lanes are on which side.")
+@Group("ROAD LAYOUT") 
+@Order(1) @Range(0,1)
+attr Lane_Distribution = 0.5
+
+@Description("avg lane width, only needed when lane numbers are not set (= 0)")
+@Group("ROAD LAYOUT") 
+@Order(3) @Range(3,8)
+attr Lane_width = 3.2  
+
+@Group("ROAD LAYOUT") 
+@Order(4) @Range(0,10)
+attr Median_width = 0
+
+@Group("ROAD LAYOUT") 
+@Order(5)
+attr Arrow_marking = case p(0.3): true else: false
+
+@Group("ROAD LAYOUT") @Order(6) 
+attr Pervious_Road_Pavement = false
+
+
+# -----------------------
+# Sidewalk Attributes
+
+@Group("SIDEWALK LAYOUT",22) @Order(1)
+@Range ("Concrete Bright", "Concrete Bright White", "Concrete Aggregate", "Concrete Clean Dark", "Concrete Clean Light", "Concrete Composite", "Concrete Horizontal Lines", "Concrete Old", "Concrete Rough Dark", "Concrete Rough Light", "Concrete Rough Scratched", "Concrete Square Tiles", "Brick Brown No Mortar Rough Running Bond", "Brick Brown No Mortar Running Bond", "Brick Brown Running Bond", "Brick Brown Stack Bond", "Brick Grey Running Bond", "Brick Red High Contrast Running Bond", "Brick Red No Mortar Running Bond", "Brick Red Recessed Mortar Running Bond", "Brick Red Running Bond", "Brick Red Stack Bond", "Brick Red Purple Running Bond", "Brick Varied Brown Running Bond", "Brick White Dirty Running Bond", "Brick White Painted Running Bond", "Brick White Rough Running Bond", "Cement Block Dark Grey Running Bond", "Cement Block Grey Running Bond", "Cement Block Grey Specks Running Bond", "Cement Block Light Running Bond", "Cement Block Square Grey Stack Bond", "Paver Grey Ashlar")
+attr Sidewalk_Texture = "Concrete Bright"
+
+@Group("SIDEWALK LAYOUT") @Order(2) @Range(0.1,10)
+attr Sidewalk_Texture_Scale = 1
+
+@Group("SIDEWALK LAYOUT") @Order(3) @Range(0,360)
+attr Sidewalk_Texture_Rotation = 0
+
+@Group("SIDEWALK LAYOUT") @Order(4) @Range(0,0.4)
+attr Sidewalk_height = 0.2  # height of sidewalk (and depth of curbs)
+
+@Group("SIDEWALK LAYOUT") @Order(5) @Range(0,10)
+@Description("if no crosswalks should be generated, it can be set to zero")
+attr Crosswalk_width = 
+	case lenAlongU > 3: 
+		case lenAlongV > 10: 4 else: 3 
+	else: 0  
+
+#@Group("SIDEWALK LAYOUT") @Order(6) @Range("American","European")
+#attr Crosswalk_style = "American"
+
+@Group("SIDEWALK LAYOUT") @Order(7) 
+attr Pervious_Sidewalks_Crosswalks = false
+
+# ---------------------------------
+# Parking Attributes
+
+@Group("PARKING LAYOUT",25) @Order(1)
+@Range("None","Parallel","Angled Nose In","Angled Back In")
+attr Parking_Right = "None"
+
+@Group("PARKING LAYOUT") @Order(2)
+@Range("None","Parallel","Angled Nose In","Angled Back In")
+attr Parking_Left = "None"
+
+@Group("PARKING LAYOUT") @Order(3) 
+attr Pervious_Parking = false
+
+
+
+# ---------------------------------
+# Bike Lane Attributes
+
+@Group("BIKE LANES",27) @Order(1)
+attr Protected_Bike_Lanes = true
+
+@Group("BIKE LANES") @Order(2)
+attr Bike_Lane_Right = false
+
+@Group("BIKE LANES") @Order(3)
+attr Bike_Lane_Left = false
+
+@Group("BIKE LANES") @Order(4)
+@Range(1.0, 3.0)
+attr Bike_Lane_Width = 1
+
+@Group("BIKE LANES") @Order(5)
+@Range(0,500)
+attr Bicycle_per_km = 0
+
+@Group("BIKE LANES") @Order(6)
+attr Bike_Lane_Color = "#FFFFFF" 
+
+
+# -----------------------
+# Vegetation Attributes
+
+@Group("VEGETATION",50) @Order(1)
+attr Plantings = false
+
+@Group("VEGETATION") @Order(2)
+attr Planting_Width = 1.5
+
+@Group("VEGETATION") @Order(3)
+attr Planting_Length = 5
+
+@Group("VEGETATION") @Order(4)
+attr Planting_Spacing = 5
+
+@Group("VEGETATION") @Order(5)
+@Range ("Random", "Standard Grass", "Lawn 1", "Lawn 2", "Park", "Bermuda 1", "Bermuda 2", "Bermuda Dark", "Bluegrass 1", "Bluegrass 2", "Grass Short", "Grass Thick", "St Augustine 1", "St Augustine 2", "Light Rye") @Order(2)
+attr Planting_Type = "Random"
+
+@Group("VEGETATION") @Order(6)
+#@Range("Random", "Conifer", "Desert", "Eudicot", "Monocot")
+@Range("Random", "Alder Buckthorn","Amazon Sword Plant","American Chestnut","American Sycamore","Apricot","Australian Pine","Baldcypress","Balsam Fir","Bamboo","Banana Tree","Basswood","Bay Laurel","Black Locust","Blue Gum Eucalyptus","Boxwood","Cabbage Palm Fern","California Bay","California Incense Cedar","California Palm","California Redwood","California Walnut","Coconut Palm","Common Hawthorn","Common Whitebeam","Conker Tree","Date Palm","Desert Willow","Douglas Fir","European Beech","European Larch","Ficus","Field Elm","Flannelbush","Flowering Dogwood","Giant Sequoia","Hedgehog Agave","Japanese Angelica Tree","Lacy Tree Philodendron","Leyland Cypress","Lily of the Valley","Lodgepole Pine","Mediterranean Buckthorn","Mexican Palmetto","Mountain Mahogany","Northern Red Oak","Norway Maple","Norway Spruce","Orange Tree","Orchid","Oval-leaved Privet","Palm Lily","Palo Verde","Paper Birch","Parlour Palm","Prickly Pear Cactus","Red Alder","Red Hickory","Rhododendron Azaleas","Rose","Ruffle Palm","Saguaro Cactus","Sassafras","Scots Pine","Sea Islands Yucca","Shadbush","Snake Plant","Southern Magnolia","Spanish Broom","Strawberry Tree","Sugar Maple","Sunflower","Sweetgum","Umbrella Acacia","Western Juniper","White Ash","White Oak","White Poplar","White Willow","Witch Hazel","","_____________________________","GENERICS","","Generic Dead Tree","Generic Stump","Generic Unknown","","_____________________________","PROXIES","","Algarrobo","American Elderberry","American Pepper","American Silverberry","Athel Tamarisk","Avocado","Black Tupelo","Buttonbush","Canada Buffaloberry","Chinaberry Tree","Chinese Tallow Tree","Common Hackberry","Common Holly","Common Persimmon","Desert Bitterbrush","European Hornbeam","Giant Chinquapin","Honey Locust","Hophornbeam","Huckleberry Shrub","Japanese Hemlock","Japanese Nutmeg","Judas Tree","Lawson Cypress","Loblolly Bay","Mexican Buckeye","Necklacepod","Northern Bilberry","Northern White Cedar","Octopus Tree","Osage Orange","Paper Bark Tree","Pawpaw","Persian Silk Tree","Princess Tree","Smooth Sumac","Sourwood","Southern Wax Myrtle","Tanoak","Tree of Heaven","Turkish Hazel","Western Soapberry","White Mulberry","Yellow Poplar","Yew","","_____________________________","LATIN NAME","","Abies balsamea","Acacia tortilis","Acer platanoides","Acer saccharum","Aesculus hippocastanum","Agave stricta","Ailanthus altissima","Aiphanes horrida","Albizia julibrissin","Alnus rubra","Amelanchier canadensis","Aralia elata","Arbutus unedo","Asimina triloba","Betula papyrifera","Bulbophyllum phalaenopsis","Buxus sempervirens","Calocedrus decurrens","Carnegiea saguaro","Carpinus betulus","Carya ovalis","Castanea dentata","Casuarina equisetifolia","Celtis occidentalis","Cephalanthus occidentalis","Cercis siliquastrum","Cercocarpus montanus","Chamaecyparis lawsoniana","Chamaedorea elegans","Chilopsis linearis","Chrysolepis chrysophylla","Citrus sinensis","Cocos nucifera","Convallaria majalis","Cordyline petiolaris","Cornus florida","Corylus colurna","Crataegus monogyna","Cupressus leylandii","Cyrilla racemiflora","Diospyros virginiana","Echinodorus bleheri","Elaeagnus commutata","Eucalyptus globulus","Fagus sylvatica","Ficus benjamina","Frangula alnus","Fraxinus americana","Fremontodendron californicum","Generic deadtree","Generic stump","Generic unknown","Gleditsia triacanthos","Gordonia lasianthus","Hamamelis virginiana","Helianthus annuus","Ilex aquifolium","Juglans regia","Juniperus occidentalis","Larix decidua","Laurus nobilis","Ligustrum ovalifolium","Liquidambar styraciflua","Liriodendron tulipifera","Lithocarpus densiflorus","Maclura pomifera","Magnolia grandiflora","Melaleuca quinquenervia","Melia azedarach","Morus alba","Musa acuminata","Myrica cerifera","Nyssa sylvatica","Opuntia aciculata","Ostrya virginiana","Oxydendrum arboreum","Parkinsonia aculeata","Paulownia tomentosa","Persea americana","Philodendron selloum","Phlebodium aureum","Phoenix dactylifera","Phyllostachys aurea","Picea abies","Pinus contorta","Pinus sylvestris","Platanus occidentalis","Populus tremuloides","Prosopis nigra","Prunus armeniaca","Pseudotsuga menziesii","Purshia glandulosa","Quercus alba","Quercus rubra","Rhamnus alaternus","Rhododendron tsutsuji","Rhus glabra","Robinia pseudoacacia","Rosa grandiflora","Sabal mexicana","Salix alba","Sambucus canadensis","Sansevieria trifasciata","Sapindus saponaria","Sassafras albidum","Schefflera actinophylla","Schinus molle","Sequoia sempervirens","Sequoiadendron giganteum","Shepherdia canadensis","Sophora tomentosa","Sorbus aria","Spartium junceum","Tamarix aphylla","Taxodium distichum","Taxus baccata","Thuja occidentalis","Tilia americana","Torreya nucifera","Triadica sebifera","Tsuga diversifolia","Ulmus minor","Umbellularia californica","Ungnadia speciosa","Vaccinium uliginosum","Washingtonia filifera","Yucca gloriosa")
+attr Tree_Type = "Random"
+
+@Group("VEGETATION") @Order(7) @Range(0,100)
+attr Tree_percentage = 100
+
+@Group("VEGETATION") @Order(8) @Range(2,30)
+attr Tree_max_height = 0
+
+@Group("VEGETATION") @Order(9) @Range(2,30)
+attr Tree_distance_median = 10
+
+
+# -----------------------
+# Street Object Attributes
+
+@Group("STREET OBJECTS",70) @Order(1) 
+attr Traffic_lights = false
+
+@Group("STREET OBJECTS") @Order(2)
+attr Lamps = false
+
+@Group("STREET OBJECTS") @Order(3) @Range(10,30)
+attr Lamp_distance = 14
+
+@Group("STREET OBJECTS") @Order(4) @Range(0,100)
+attr Props_percentage = 0
+
+
+# ----------------------------------------
+# Population Attributes
+
+@Group("POPULATION",80) @Range(0,200) @Order(1) 
+@Description("vehicles per km per lane")
+attr Vehicles_per_km = 0	
+
+@Group("POPULATION") @Range(0,100) @Order(2)		
+attr Bus_Percentage = 0.2
+
+@Group("POPULATION") @Range(0,1) @Order(3)		
+attr Taxi_Percentage = 0.2
+
+@Group("POPULATION") @Order(4)
+attr Parked_Car_Percentage = 0.3
+
+@Group("POPULATION") @Order(5) @Range(0,100)
+attr People_percentage = 0
+
+
+# -----------------------
+# Bridge Attributes
+
+@Group("BRIDGES",90) @Order(1)
+@Range("Off","On, By Elevation","On, Regardless","On, Show All Piers", "On, Flag Occlusions")
+attr Bridge_Display = "Off" 
+
+@Group("BRIDGES") @Order(20) 
+attr Bridge_Starts_At = 3
+
+@Group("BRIDGES") @Order(30) 
+attr Bridge_Thickness = 1
+
+@Group("BRIDGES") @Order(40) 
+attr Pier_distance = 23
+
+@Group("BRIDGES") @Order(50) 
+attr Pier_width = 2.3
+
+
+
+
+
+
+
+
+
+# ---------------------------------
+# Mapped Attributes
+
+@Description("For internal use and reporting, must be set to 'Source=Object'.")
+@Group("LINK TO OBJECT ATTRIBUTES",99) @Order(1)
+attr cutVolume = 0
+
+@Description("For internal use and reporting, must be set to 'Source=Object'.")
+@Group("LINK TO OBJECT ATTRIBUTES",99) @Order(2)
+attr fillVolume = 0
+
+@Description("For internal use and reporting, must be set to 'Source=Object'.")
+@Group("LINK TO OBJECT ATTRIBUTES",99) @Order(3)
+attr connectionEnd = "STREET"		# built in value attributes, needs to be sourced as Object (parent)
+
+@Description("For internal use and reporting, must be set to 'Source=Object'.")
+@Group("LINK TO OBJECT ATTRIBUTES",99) @Order(4)
+attr connectionStart = "STREET"		# built in value attributes, needs to be sourced as Object (parent)
+
+@Description("For internal use and reporting, must be set to 'Source=Object'.")
+@Group("LINK TO OBJECT ATTRIBUTES",99) @Order(5)
+attr type = "MINOR"                # built in value attributes, needs to be sourced as Object (parent)
+
+@Description("For internal use and reporting, must be set to 'Source=Object'.")
+@Group("LINK TO OBJECT ATTRIBUTES",99) @Order(5)
+attr elevation = 0                # built in value attributes, needs to be sourced as Object (parent)
+
+# NOTE: 
+# For Bridges to work you must put this into the terrain layer attributes:
+# attr elevation = map_01(brightness, 405.20847, 419.22385) + elevationDelta
+# BUT I have no idea what those 400 numbers mean...
+
+
+#############################################################################################################
+#############################################################################################################
+#############################################################################################################
+#############################################################################################################
+##################            END ATTRIBUTES,   START RULES                             #####################
+#############################################################################################################
+#############################################################################################################
+#############################################################################################################
+#############################################################################################################
+#############################################################################################################
+
+
+
+
+
+# ----------------------------------------
+# Functions
+# ----------------------------------------
+
+
+lenAlongU = geometry.du(0,unitSpace)		# for convenience and readability only
+lenAlongV = geometry.dv(0,unitSpace)		# for convenience and readability only
+
+
+# Connection check helper functions. Depends on the mapped connection identifier.
+#connected(ident) = case ident =="CROSSING" : true else : false
+connected(ident) = (ident != "STREET")
+
+# returns 1 if a crossing at start/end, otherwise 0. Used as split dimension for crosswalk split
+conEnd = case connected(connectionEnd): 1 else: 0
+conStart = case connected(connectionStart): 1 else: 0
+
+# XXXX
+# ----------------------------------------
+# Assets
+# ----------------------------------------
+
+LOD = case highLOD: 1 else: 0
+
+
+# Street Textures
+concrete_tex  = textureDirectory + "asphalt2.jpg"
+sidewalk_tex  = textureDirectory + "asphalt_brighter.jpg"
+#crosswalk_tex = 
+#	case Crosswalk_style == "American"	: textureDirectory + "crosswalk_us2.jpg" 
+#	else								: textureDirectory + "crosswalk.jpg"
+curb_tex      = textureDirectory + "curb.jpg"
+
+arrows		  = case Arrow_marking: "arrows" else: "stop"
+
+# Fix for 2014:
+getStreetTexture(type,lanes) =
+	case type == "stop":
+		getStreetTexture2("stripes",lanes)
+	case type == "bikestop":
+		getStreetTexture2("bikeplain",lanes)
+	else:
+		getStreetTexture2(type,lanes)
+			
+# Fix for 2014:
+getStreetTexture2(type,lanes) =
+	case type == "bikeplain" : textureDirectory + "street_1bike_plain.jpg"
+	case type == "bikestop" : textureDirectory + "street_1bike_stop.jpg"
+	case lanes >= 6 : textureDirectory + "street_6lanes_" + type + ".jpg"
+	case lanes < 1  : textureDirectory + "street_1lanes_" + type + ".jpg"
+	else            : textureDirectory + "street_" + lanes + "lanes_" + type + ".jpg"
+
+const textureAngledParking = textureDirectory + "AngledParking.jpg"
+const textureAngledParkingPervious = textureDirectory + "AngledParkPervious.jpg"
+const textureRandomPlantings = textureDirectory + "random_plantings/*.jpg"
+const textureSidewalks = textureDirectory + "sidewalks/" + Sidewalk_Texture + ".jpg"
+
+
+# sidewalk props
+newsbox_asset = streetAssetsDirectory + "street_furniture/newsbox.obj"
+mailbox_asset = streetAssetsDirectory + "street_furniture/mailbox.obj"
+	
+# signs
+getSign = fileRandom(streetAssetsDirectory + "traffic_signs/*.obj")
+
+# lamps
+lamp2_asset = streetAssetsDirectory + "lamps/lamp.02.parallel.lod" + LOD + ".obj"
+lamp3_asset = streetAssetsDirectory + "lamps/lamp.03.withsign.lod" + LOD + ".obj"
+lamp4_asset = streetAssetsDirectory + "lamps/lamp.04.single.lod0.obj"
+lamp5_asset = streetAssetsDirectory + "lamps/lamp.05.withsign.lod" + LOD + ".obj"
+
+# trafficcontrols
+# The first one is only good for LHS traffic sense.
+#trafficcontrol1_asset = streetAssetsDirectory + "traffic_controls/traffic_light.01.with_walking_signs.lod" + LOD + ".obj"
+trafficcontrol2_asset = streetAssetsDirectory + "traffic_controls/traffic_light.02.big_with_lamp_and_sign.lod" + LOD + ".obj"
+trafficcontrol3_asset = streetAssetsDirectory + "traffic_controls/traffic_light.03.4sides.obj"
+trafficcontrol4_asset = streetAssetsDirectory + "traffic_controls/bigsign.01.luminated.lod" + LOD + ".obj"
+
+# vegetation
+lawn_tex = textureDirectory + "lawn.jpg"
+
+
+# -------------------
+# Street Rule
+# -------------------
+
+# More street start shapes:
+@StartRule
+Joint 				--> Junction
+
+@StartRule
+Freeway 			--> Junction
+
+@StartRule
+FreewayEntry 		--> Junction
+
+@StartRule
+Roundabout 			--> Asphalt
+
+@StartRule
+RoundaboutIsland 	--> Asphalt
+
+
+@StartRule
+Street -->
+	# Color shape if thematics is on.
+	case thematicsOn:
+		color(thematicColor)
+		StreetStep2
+	else:
+		StreetStep2
+
+StreetStep2 -->
+	# Setup street reporting. 
+	StreetAndSidewalkReportsSetup
+	# Set transparency.
+	set(material.opacity, Transparency)
+	# Set Y direction of scope (bounding box) to be in Y direction of world axes.
+	alignScopeToAxes(y)
+	# Adding new 2014 crosswalks.
+	CrosswalkSplitUV1
+
+_bufferCrossingToCrosswalk = Crosswalk_width / 5
+_bufferCrossingToStopLine = Crosswalk_width / 5
+#_stopLine = 0.4 #XX
+_totalCrosswalkWidth = 
+	_bufferCrossingToCrosswalk + 
+	Crosswalk_width + 
+	_bufferCrossingToStopLine # + _stopLine
+
+CrosswalkSplitUV1 -->
+	split(u,uvSpace,1){
+		_totalCrosswalkWidth * conStart : CrosswalkUV1 |
+		~1 : CrosswalkSplitUV2
+	} 
+	
+CrosswalkUV1 -->
+	split(u,uvSpace,1){
+		_bufferCrossingToCrosswalk: Asphalt
+		| Crosswalk_width: CrosswalkContintental
+		| _bufferCrossingToStopLine: Asphalt
+#		| _stopLine: color(1,1,1)
+	}
+
+CrosswalkSplitUV2 -->
+	split(u,uvSpace,2){
+		_totalCrosswalkWidth * conEnd: CrosswalkUV2 |
+		~1:StreetBetweenCrosswalks
+	}
+
+CrosswalkUV2 -->
+	split(u,uvSpace,2){
+		_bufferCrossingToCrosswalk: Asphalt
+		| Crosswalk_width: CrosswalkContintental
+		| _bufferCrossingToStopLine: Asphalt
+#		| _stopLine: color(1,1,1)
+	}
+
+
+StreetBetweenCrosswalks -->
+	#print("geometry.vMin= " + geometry.vMin)
+	#print("geometry.vMax= " + geometry.vMax)
+	Streetsides
+	# Run Bridge code using current street shape (full size, not split into lanes).
+	BridgeMain
+
+################################################
+
+const StreetTextureFolder 	= "Streets"
+
+
+/*
+@Group("Crosswalk Markings",5)
+@Order(1) @Range("none","continental","ladder","transverse","dashed","solid") 										# TODO "solid","dashed","ladder"
+attr CrosswalkBegin 	= "continental"
+@Order(2) @Range("none","continental","ladder","transverse","dashed","solid")
+attr CrosswalkEnd 		= "continental"
+@Order(3) @Range("white","yellow") 
+attr CrosswalkColor 	= "white"
+
+Crosswalk(crosswalkType,uvSet) -->
+	case crosswalkType == "transverse": CrosswalkTransverse(uvSet)
+	case crosswalkType == "dashed"    : CrosswalkDashed(uvSet)
+	case crosswalkType == "ladder"    : CrosswalkLadder(uvSet)
+	case crosswalkType == "solid"     : AsphaltPainted(CrosswalkColor)
+	else							  : CrosswalkContintential
+*/
+# Pcode:
+_widthOfFlareStart = (ceil(geometry.vMin-0.01)-geometry.vMin)
+# Pcode:
+_widthOfFlareEnd = geometry.vMax-floor(geometry.vMax+0.01)
+
+CrosswalkContintental -->
+	split(v,uvSpace,0){
+		_widthOfFlareStart: Asphalt 
+		| ~1: CrosswalkStripes(1)
+		| _widthOfFlareEnd: Asphalt
+	}
+
+CrosswalkStripes(stripeWidth) -->
+	cleanupGeometry(all, 0.001) 
+	tileUV(0,0,~1)
+	# to setup the v-direction: a continental crosswalk line is 1m width, and the texture contains 8 of these. 
+	scaleUV(0,1,1/8/stripeWidth) 		
+	texture(textureDirectory + "crosswalk_us2.jpg")
+	#color(Brightness)
+	
+#	split(v,uvSpace,0){ (ceil(geometry.vMin-0.01)-geometry.vMin): Asphalt
+#					  | ~1: CrosswalkStripes(1)
+#					  | geometry.vMax-floor(geometry.vMax+0.01): Asphalt }
+	
+/*
+CrosswalkLadder(uvSet) -->
+	split(u,uvSpace,uvSet){ 0.17: AsphaltPainted(CrosswalkColor) 
+						  | ~1  : CrosswalkStripes(1)
+						  | 0.17: AsphaltPainted(CrosswalkColor) }	
+
+CrosswalkTransverse(uvSet) -->
+	split(u,uvSpace,uvSet){ 0.27: AsphaltPainted(CrosswalkColor) 
+						  | ~1  : Asphalt 
+						  | 0.27: AsphaltPainted(CrosswalkColor) }
+
+CrosswalkDashed(uvSet) -->
+	split(u,uvSpace,uvSet){ 0.17: CrosswalkStripes(0.6) 
+						  | ~1  : Asphalt
+						  | 0.17: CrosswalkStripes(0.6) }	
+
+
+const Brightness			= "#d7d7d7"
+
+*/
+
+##########################################
+
+
+# Keep total streetWidth in hidden attribute, for use at any time during generation.
+@Hidden
+attr streetWidth = 0
+
+StreetAndSidewalkReportsSetup -->
+	# Report most of these to zero, so that they all show up regardless of each existing, just to make consistent when clicking between objects.
+	# Then we come back later in this rule and modify these values based on material states of surfaces.
+	report("Street, Lanes Area, Impervious", 0)
+	report("Street, Lanes Area, Pervious", 0)
+	report("Street, Lanes Area, Total", 0)
+	report("Street, Parking Area, Impervious", 0)
+	report("Street, Parking Area, Pervious", 0)
+	report("Street, Parking Area, Total", 0)
+	report("Street, Sidewalk Area, Impervious", 0)
+	report("Street, Sidewalk Area, Pervious", 0)
+	report("Street, Sidewalk Area, Total", 0)
+	report("Site Conditions, Slope (%)", geometry.angle(maxSlope)/90) # Fix: Need way to get average slope, not max.
+	report("Construction, Cut/Fill, Cost ($)", envReports.calculateCutAndFillCost(cutVolume, fillVolume))
+	report("Construction, Cut/Fill, Cut Volume (m3)", cutVolume)
+	report("Construction, Cut/Fill, Fill Volume (m3)", fillVolume) NIL
+
+
+# For calculating widths of different lanes, parking and median:
+
+const parkingAngle60U = 2.67
+const parkingAngle60V = 5.34
+
+parkingLaneWidthRight = parkingLaneWidth(0) 
+parkingLaneWidthLeft = parkingLaneWidth(2)
+parkingLaneWidth(dir) = 
+	case parkingType(dir) == "Parallel" : parallelParkingLaneWidth
+	case parkingType(dir) == "Angled Nose In" || parkingType(dir) == "Angled Back In" : parkingAngle60V 
+	else : 0
+ 
+bikeLaneWidthRight = bikeLaneWidth(0)
+bikeLaneWidthLeft = bikeLaneWidth(2)
+bikeLaneWidth(dir) = case (dir == 0 && Bike_Lane_Right) || (dir == 2 && Bike_Lane_Left) : Bike_Lane_Width  else : 0 
+
+availableForLanesRound1 = streetWidth - parkingLaneWidth(0) - parkingLaneWidth(2) - bikeLaneWidth(0) - bikeLaneWidth(2) - Median_width 
+laneCountTotalRound1 = floor(availableForLanesRound1 / Lane_width)
+laneCountRightRound1 = rint((1-Lane_Distribution) * laneCountTotalRound1)  
+laneCountLeftRound1 = laneCountTotalRound1 - laneCountRightRound1 
+
+# If there are no lanes in either direction, then this is a one way street.
+oneWayStreetRight = laneCountLeftRound1 == 0
+oneWayStreetLeft = laneCountRightRound1 == 0
+oneWayStreet = oneWayStreetRight || oneWayStreetLeft
+
+# If it is a one way street, we don't put the median in, even if user has a median width specified.
+medianWidthAdjusted = case oneWayStreet: 0 else : Median_width 
+
+# Now do same calculations again (this was done to avoid circular logic problem, so that Lane_Distribution does not have to be exactly 0 or 1 to create one way street).
+availableForLanes = streetWidth - parkingLaneWidth(0) - parkingLaneWidth(2) - bikeLaneWidth(0) - bikeLaneWidth(2) - medianWidthAdjusted 
+laneCountTotal = floor(availableForLanes / Lane_width)
+laneCountRight = rint((1-Lane_Distribution) * laneCountTotal)  
+laneCountLeft = laneCountTotal - laneCountRight 
+# Adjust lane width to expand to fill street. 
+laneWidthAdjusted = availableForLanes / laneCountTotal
+
+# Streets have a "right" and "left" side. 
+# Which side is which depends on the underlying network.
+# In the rule calls below, right is dir=0, left is dir=2.
+	
+Streetsides -->
+	split(v,unitSpace,0) {
+		streetWidth / 2 : trafficcontrol(0) |
+		streetWidth / 2 : trafficcontrol(2) }
+	StreetsidesStep2
+
+StreetsidesStep2 -->
+	# Save overall street width for use later. Length along V is the length of street; length along U is width of street.
+	set(streetWidth, lenAlongV)
+	StreetsidesStep3
+	
+StreetsidesStep3 -->
+	case Protected_Bike_Lanes:
+		split(v,unitSpace,0) {
+			bikeLaneWidthRight : BikeLane(0) |
+			parkingLaneWidthRight : Parking(0) | 
+			laneCountRight * laneWidthAdjusted : Lanes(0) |
+			medianWidthAdjusted : Median |
+			laneCountLeft * laneWidthAdjusted : Lanes(2) |
+			parkingLaneWidthLeft : Parking(2) | 
+			bikeLaneWidthLeft : BikeLane(2) } 
+	else:
+		split(v,unitSpace,0) {
+			parkingLaneWidthRight : Parking(0) | 
+			bikeLaneWidthRight : BikeLane(0) |
+			laneCountRight * laneWidthAdjusted : Lanes(0) |
+			medianWidthAdjusted : Median |
+			laneCountLeft * laneWidthAdjusted : Lanes(2) |
+			bikeLaneWidthLeft : BikeLane(2) |
+			parkingLaneWidthLeft : Parking(2) }
+		
+DEBUG --> 
+	print("$%$%$%$%$%")
+	print("parkingLaneWidthRight =" + parkingLaneWidthRight) 
+	print("bikeLaneWidthRight =" + bikeLaneWidthRight) 
+	print("laneCountRight * laneWidthAdjusted =" + (laneCountRight * laneWidthAdjusted)) 
+	print("medianWidthAdjusted =" + medianWidthAdjusted) 
+	print("laneCountLeft * laneWidthAdjusted =" + (laneCountLeft * laneWidthAdjusted)) 
+	print("bikeLaneWidthLeft =" + bikeLaneWidthLeft) 
+	print("parkingLaneWidthLeft =" + parkingLaneWidthLeft) 
+	print("$%$%$%$%$%")
+	NIL
+	
+
+
+
+LeftOverStreet --> Asphalt
+
+# Code to simplify directional code. Right is dir=0, Left is dir=2.
+laneCount(dir) = case dir == 0: laneCountRight else: laneCountLeft
+connectionType(dir) = case dir == 0: connectionStart else: connectionEnd 
+
+# Traffic sense switch will swap traffic direction.
+# RHS is 1, LHS is -1, which allows us to switch directionality by inverting scale operations.
+sense = case rhs : 1 else : -1
+
+# Flips direction based on sense. 
+flipDirPerSense(dir) = 
+	case sense == 1 : case dir == 0: 0 else: 2 
+	else : case dir == 0: 2 else: 0
+# Flips direction.
+flipDir(dir) = 
+	case dir == 0: 2 else: 0 
+
+
+Lanes(dir) -->
+	# For RHS, the right lane is not inverted (scaleUV(0,1,1)), and the left lane is inverted (scaleUV(0,-1-1)). Traffic sense reverses this. 
+	scaleUV(0,(1-dir)*sense,(1-dir)*sense) 
+	# Lane count is not flipped by the sense, but connectionType, lane direction, and vehicle direction are flipped.
+	Lanes(laneCount(dir),connectionType(flipDirPerSense(dir)),flipDirPerSense(dir)) Vehicles(laneCount(dir), flipDirPerSense(dir)) #1=0 -1=2   sense*-1+   1=dir   -1=2-dir 
+
+parkingType(dir) = case dir == 0 : Parking_Right else : Parking_Left 
+
+
+oneWaySense(dir) =
+	case oneWayStreetRight && dir == 2: -sense
+	case oneWayStreetLeft && dir == 0: -sense
+	else : sense
+ 
+Parking(dir) -->
+	case parkingType(dir) == "Angled Nose In":
+		scaleUV(0,(1-dir) * oneWaySense(dir),dir-1)
+		split(u,unitSpace,0){ parkingAngle60U : AngledParkingSpot alignScopeToGeometry(yUp,dir) s(0,0,0) AngledParkingCar(dir)} *
+	case parkingType(dir) == "Angled Back In" :
+		scaleUV(0,(dir-1) * oneWaySense(dir),dir-1)
+		split(u,unitSpace,0){ parkingAngle60U : AngledParkingSpot alignScopeToGeometry(yUp,dir) s(0,0,0) AngledParkingCar(dir)} *
+	else:
+		scaleUV(0,(1-dir) * oneWaySense(dir),dir-1)
+		split(u,unitSpace,0){ 
+			parallelRearBuffer : Asphalt |
+			parallelReafBracket : ParallelRearBracket |
+			parallelParkingLength : split(u,unitSpace,0) {lengthOfParallelParkingSpot: 
+				ParallelParkingSpot alignScopeToGeometry(yUp,dir) s(0,0,0) ParallelParkingCar(dir)}* | 
+			100 : Asphalt }*
+
+	
+
+# These are buffer zones for how far a car must park from intersections for safety reasons.
+const parallelRearBuffer = 2
+const parallelFrontBuffer = 2
+const parallelReafBracket = 1
+availableForParallelParking = lenAlongU - parallelRearBuffer - parallelFrontBuffer - parallelReafBracket   
+numberOfParallelParkingSpots = floor(availableForParallelParking/lengthOfParallelParkingSpot)
+parallelParkingLength = numberOfParallelParkingSpots * lengthOfParallelParkingSpot
+const lengthOfParallelParkingSpot = 6.5
+const parallelParkingLaneWidth = 2.5 
+
+ParallelParkingSpot -->
+	tileUV(0, lengthOfParallelParkingSpot, parallelParkingLaneWidth)
+	report("Street, Parking Spot Count", 1)
+	ReportParkingMaterial
+	ParallelParkingSpotStep2 
+	
+ParallelParkingSpotStep2 -->
+	case peakRunoffDisplayOn:
+		color(envReports.colorByPerviousMaterial(parkingMaterial))
+		ParallelParkingSpotTexture
+	else:
+		ParallelParkingSpotTexture
+
+
+ParallelParkingSpotTexture -->
+	case texturingOn:
+		case (split.index < split.total - 1):
+			case Pervious_Parking:
+				texture(textureDirectory + "ParallelParkMidPervious.jpg")
+			else:
+				texture(textureDirectory + "ParallelParkMid.jpg")
+		else:
+			case Pervious_Parking:
+				texture(textureDirectory + "ParallelParkFrontPervious.jpg")
+			else:
+				texture(textureDirectory + "ParallelParkFront.jpg")
+	else: X.
+
+
+ParallelRearBracket --> 
+	case peakRunoffDisplayOn:
+		color(envReports.colorByPerviousMaterial(parkingMaterial))
+		ParallelRearBracketStep2
+	else:
+		ParallelRearBracketStep2
+
+ParallelRearBracketStep2 -->
+	case texturingOn:
+		case Pervious_Parking:
+			tileUV(0, parallelReafBracket, parallelParkingLaneWidth)
+			texture(textureDirectory + "ParallelParkRearPervious.jpg")
+		else:
+			tileUV(0, parallelReafBracket, parallelParkingLaneWidth)
+			texture(textureDirectory + "ParallelParkRear.jpg")
+	else: X.
+	
+
+
+ParallelParkingCar(dir) -->
+	case p(Parked_Car_Percentage):
+	  	case (dir == 0 && oneWayStreetLeft) || (dir == 2 && oneWayStreetRight):
+			ParallelParkingCarStep2(-1)	  		
+		else:
+			ParallelParkingCarStep2(1)
+	else: NIL
+
+ParallelParkingCarStep2(senseFlip) -->
+	t((lengthOfParallelParkingSpot/2)-1,0,parallelParkingLaneWidth/2) 
+	r(0,sense*90*senseFlip,0)
+	i(vehicleAsset("car"))
+	TextureSwitch
+
+
+AngledParkingSpot -->
+	case (split.index < split.total - 1):
+		report("Street, Parking Spot Count", 1)
+		ReportParkingMaterial
+		AngledParkingSpotStep2
+	else:
+		Asphalt
+
+AngledParkingSpotStep2 -->
+	case peakRunoffDisplayOn:
+		color(envReports.colorByPerviousMaterial(parkingMaterial)) 
+		AngledParkingSpotTexture
+	else: 
+		AngledParkingSpotTexture
+
+
+#Fix: Possibly switch to this pattern of code if no ill effects on model export.
+#AngledParkingSpotTexture -->
+#	tileUV(0, parkingAngle60U, parkingAngle60V)
+#	texture(case texturingOn: textureAngledParking else: "")
+
+AngledParkingSpotTexture -->
+	case texturingOn:
+		case Pervious_Parking:
+			tileUV(0, parkingAngle60U, parkingAngle60V)
+			texture(textureAngledParkingPervious)
+		else:
+			tileUV(0, parkingAngle60U, parkingAngle60V)
+			texture(textureAngledParking)
+	else: X.	
+
+AngledParkingCar(dir) -->
+	case (split.index < split.total - 2) && p(Parked_Car_Percentage):
+		case (rhs && ((dir == 0 && Parking_Right == "Angled Nose In") || (dir == 2 && Parking_Left == "Angled Nose In")))
+		  || (lhs && ((dir == 0 && Parking_Right == "Angled Back In") || (dir == 2 && Parking_Left == "Angled Back In"))):
+		  	case (dir == 0 && oneWayStreetLeft) || (dir == 2 && oneWayStreetRight): 
+				AngledParkingRHSBackOrLHSNose(-1)
+			else:
+				AngledParkingRHSNoseOrLHSBack(1)
+		case (rhs && ((dir == 0 && Parking_Right == "Angled Back In") || (dir == 2 && Parking_Left == "Angled Back In")))
+		  || (lhs && ((dir == 0 && Parking_Right == "Angled Nose In") || (dir == 2 && Parking_Left == "Angled Nose In"))):
+		  	case (dir == 0 && oneWayStreetLeft) || (dir == 2 && oneWayStreetRight): 
+				AngledParkingRHSNoseOrLHSBack(-1)
+			else:
+				AngledParkingRHSBackOrLHSNose(1)
+		else : NIL
+	else : NIL
+
+AngledParkingRHSBackOrLHSNose(senseFlip) --> 
+	t(0.6,0,parkingAngle60V/2) 
+	r(scopeCenter, 0,60+(sense*90*senseFlip),0)
+	AngledParkingCar
+	
+AngledParkingRHSNoseOrLHSBack(senseFlip) --> 
+	t(2.4,0,parkingAngle60V/2) 
+	r(scopeCenter, 0,120+(-sense*90*senseFlip),0) 
+	AngledParkingCar
+
+AngledParkingCar -->
+	i(vehicleAsset("car"))
+	TextureSwitch
+
+# Lanes
+Lanes(nLanes,connectionType,dir) --> 
+	case connectionType == "STREET" || lenAlongU < 10:
+		Asphalt("stripes",nLanes) 
+	case connectionType == "JUNCTION" && type == "MAJOR": 
+		Asphalt("stripes",nLanes)
+	else:
+		split(u,unitSpace,0){ ~1  : Asphalt("stripes",nLanes) 
+				|  12 : Asphalt(arrows,nLanes) } #Fix: trafficcontrol(dir)}
+
+# Asphalt
+# - with lanes
+Asphalt(type,nLanes) -->
+	case lenAlongU > 3:
+		AsphaltTexture(type,nLanes)
+	else:
+		Asphalt
+
+AsphaltTexture(type,nLanes) -->
+	case texturingOn:
+		normalizeUV(0, uv, collectiveAllFaces) 
+		scaleUV(0,0.5*rint(lenAlongU/6),1)
+		texture(getStreetTexture(type,nLanes))
+		AsphaltTextureStep2
+	else: 
+		AsphaltTextureStep2
+
+AsphaltTextureStep2 -->
+	ReportPavementMaterial
+	AsphaltTextureStep3
+
+AsphaltTextureStep3 -->
+	case peakRunoffDisplayOn:
+		color(envReports.colorByPerviousMaterial(pavementMaterial))
+	else: 
+		X.	
+
+
+
+
+# - no lanes
+Asphalt -->
+	case texturingOn:
+		tileUV(0,3,3)
+		texture(concrete_tex)
+		AsphaltStep2
+	else:
+		AsphaltStep2
+
+
+AsphaltStep2 -->
+	ReportPavementMaterial
+	AsphaltStep3
+
+AsphaltStep3 -->
+	case peakRunoffDisplayOn:
+		color(envReports.colorByPerviousMaterial(pavementMaterial))
+	else: X.
+
+
+
+BikeLane(dir) -->
+  	case (dir == 0 && oneWayStreetLeft) || (dir == 2 && oneWayStreetRight):
+		Bikes(flipDir(flipDirPerSense(dir)))
+		scaleUV(0,(1-dir)*sense*(-1),(1-dir)*sense)
+		split(u,unitSpace,0){ ~1  : color(bikeLaneColor) Asphalt("bikeplain",1) |  
+			12 : color(bikeLaneColor) Asphalt("bikestop",1) }
+	else:
+		Bikes(flipDirPerSense(dir))
+		scaleUV(0,(1-dir)*sense,(1-dir)*sense)
+		split(u,unitSpace,0){ ~1  : color(bikeLaneColor) Asphalt("bikeplain",1) |  
+			12 : color(bikeLaneColor) Asphalt("bikestop",1) }
+
+bikeLaneColor = case coloringOn: Bike_Lane_Color else: thematicColor
+
+
+# -------------------
+# Traffic Light
+# -------------------
+
+
+		
+trafficcontrol(dir) -->
+	case Traffic_lights :
+		case rhs: 
+			scaleUV(0,(1-dir)*sense,(1-dir)*sense)
+ 			split(u,unitSpace,0){ ~1 : NIL 
+				| 0.1: split(v,unitSpace,0){ 0.1:
+					t(0, Sidewalk_height,(1-dir)*2* Sidewalk_height ) 
+					alignScopeToAxes(y)
+					
+					trafficcontrolAsset(dir) 
+					} }
+		else:
+			scaleUV(0,(1-dir)*sense,(1-dir)*sense)
+ 			split(u,unitSpace,0){ ~1 : NIL 
+				| 0.1: split(v,unitSpace,0){ ~1 : NIL | 0.1:
+				t(0, Sidewalk_height,(1-dir)*2* Sidewalk_height ) 
+				alignScopeToAxes(y) 
+				trafficcontrolAsset(dir) 
+				} }
+	else : 
+		NIL
+
+
+trafficcontrolAsset(dir) -->
+#	20% : s(0,3,0) r(0,-90+dir*90,0) i(trafficcontrol1_asset) trafficcontrolAssetStep2
+	40% : s(0,6,0) r(0,-90+dir*90,0) i(trafficcontrol4_asset) trafficcontrolAssetStep2
+	20% : s(0,4,0) r(0,-90+dir*90,0) i(trafficcontrol3_asset) trafficcontrolAssetStep2
+	else: s(0,6,0) r(0,-90+dir*90,0) i(trafficcontrol2_asset) trafficcontrolAssetStep2
+
+trafficcontrolAssetStep2 -->
+	case rhs: TextureSwitch
+	else : mirror(false,false,true) TextureSwitch 
+
+
+# -------------------
+# Crossing & Junction
+# -------------------
+		
+@StartRule
+Crossing --> 
+	case thematicsOn:
+		color(thematicColor)
+		CrossingStep2
+	else:
+		CrossingStep2
+
+CrossingStep2 -->
+	alignScopeToAxes(y)
+	Asphalt
+	BridgeCrossing		
+			
+@StartRule
+Junction --> 
+	case thematicsOn:
+		color(thematicColor)
+		JunctionStep2
+	else:
+		JunctionStep2
+
+JunctionStep2 -->
+	alignScopeToAxes(y)
+	Streetsides
+	BridgeCrossing
+
+@StartRule
+JunctionEntry --> 
+	Crossing
+	
+@StartRule
+Island -->
+	NIL
+
+# -------------------
+# Crosswalk
+# -------------------
+
+# Splits the street the same way as before the lanes. Fix: do this logic once and save to hidden attribute, rather than computing twice.
+/*  
+Crosswalk(side) -->
+	t(0,2,0)
+	Asphalt
+    
+CrosswalkOLD(side) -->
+	case medianWidthAdjusted > 0:
+		split(u,unitSpace,0) {
+			~(parkingLaneWidthRight + bikeLaneWidthRight + (laneCountRight * laneWidthAdjusted)): CrosswalkTexture | 
+			medianWidthAdjusted : Isle(side)  |
+			~(parkingLaneWidthLeft + bikeLaneWidthLeft + (laneCountLeft * laneWidthAdjusted)): CrosswalkTexture 
+		}
+	else :
+		CrosswalkTexture
+
+		
+# texture the shape
+CrosswalkTexture --> 
+	case geometry.isRectangular(2):
+		CrosswalkTextureQuad
+	case geometry.isRectangular(5):
+		alignScopeToGeometry(zUp,0,0)
+		split(x){ ~1: Asphalt | '0.6: CrosswalkTextureQuad | ~1: Asphalt }
+	else:
+		#CrosswalkTextureQuad
+		Asphalt
+
+CrosswalkTextureQuad -->
+	case texturingOn:
+		normalizeUV(0, uv, collectiveAllFaces) scaleUV(0,1,ceil(lenAlongV)/8)
+		#texture(crosswalk_tex)
+		CrosswalkTextureQuadStep2
+	else:
+		CrosswalkTextureQuadStep2
+	
+
+CrosswalkTextureQuadStep2 -->
+	case peakRunoffDisplayOn:
+		color(envReports.colorByPerviousMaterial(sidewalkMaterial))
+		CrosswalkTextureQuadStep3
+	else:
+		CrosswalkTextureQuadStep3
+	
+CrosswalkTextureQuadStep3 -->
+	ReportSidewalkMaterial
+	X.
+*/
+
+# the isle is a small extrusion plus a round median-end is added
+/*
+Isle(side) -->
+	alignScopeToGeometry(zUp, 0, 0) 
+	MedianWithCurb( Sidewalk_height *0.2, false)
+	RoundMedian(side)
+*/	
+	
+	
+
+# the median end is translated and splitted according to the side parameter (very hacky to support round streets)
+RoundMedian(side)-->
+	case side == 1:
+		split(u,unitSpace,0){ '0.99: NIL | ~1: 
+			alignScopeToGeometry(yUp, 0, longest)
+			s(medianWidthAdjusted, '1, medianWidthAdjusted)
+			alignScopeToGeometry(yUp, 0, 2)
+			RoundMedianStep2 }
+	else:
+		split(u,unitSpace,0){ '0.01:
+			alignScopeToGeometry(yUp, 0, longest) 
+			s(medianWidthAdjusted, '1, medianWidthAdjusted)
+			t(0,0,'-1)
+			alignScopeToGeometry(yUp, 0, 0)
+			RoundMedianStep2 }
+
+RoundMedianStep2 -->
+	split(x){ medianWidthAdjusted *0.5 : RoundCurbs(2) 
+			| ~1 			  : MedianWithCurb(Sidewalk_height, false)
+			| Sidewalk_height  : SolidCurbsNormal } 
+
+# and insert half a cylinder
+RoundCurbs(index) -->
+	extrude( Sidewalk_height ) 
+	setPivot(xyz,index) 
+	i(streetAssetsDirectory + "misc/roundcurbs.obj")
+	comp(f){ top   : split(y){ Sidewalk_height : Curbs | ~1 : MedianFill(Sidewalk_height, false) }
+	       | side  : Curbs }	
+	
+
+# -------------------
+# Median
+# -------------------
+
+Median -->
+	MedianWithCurbs
+	alignScopeToAxes(y) 
+	CenterLamps
+
+# adds curbs on all sides
+MedianWithCurbs -->
+	case Crosswalk_width > 0 || medianWidthAdjusted < 1:
+		split(u,unitSpace,0){ Sidewalk_height * conStart : SolidCurbs 
+				| ~1 			 		  : MedianWithCurb( Sidewalk_height, true)
+				| Sidewalk_height *conEnd   : SolidCurbs }
+	else:	# in case crosswalkWidth is set to zero, we make a round finishing
+		split(u,unitSpace,0){ lenAlongV*0.5*conStart : Asphalt RoundCurbs(2) 
+				| ~1 			 		: MedianWithCurb( Sidewalk_height, true)
+				| lenAlongV*0.5*conEnd   : Asphalt RoundCurbs(0) }
+ 
+MedianWithCurb(height, hasTrees) -->
+	# Extrude in World Up direction.
+	extrude(world.y,height)
+	# Break solid into top and sides.
+	# Top goes to both Curbs and MedianFill; sides go to Curbs.
+	comp(f){ top  : 
+		split(v,unitSpace,0){ Sidewalk_height : Curbs 
+		| ~(medianWidthAdjusted - (Sidewalk_height*2)) : MedianFill(height, hasTrees) 
+		# | ~1 : MedianFill(height, hasTrees) 
+		| Sidewalk_height : Curbs }
+	| side : Curbs }  
+
+MedianFill(height, putTrees) -->
+	# Do not create lawn on medians of crosswalks.
+	case Plantings && (height > (Sidewalk_height * 0.5)) : 
+		case putTrees:
+			CenterTrees
+		else: 
+			Lawn(false)
+	else : Pavement
+
+# distributes lamps
+CenterLamps -->
+	case Lamps : 
+		split(u,unitSpace,0){ ~ Lamp_distance :  NIL 
+				| { 0.1: alignScopeToGeometry(yUp,0,0) s(0,0,0) center(xyz) Lamp(2) 
+				  | ~ Lamp_distance : NIL }* }
+	else : NIL
+
+# and trees
+CenterTrees -->
+	case Tree_percentage > 0: 
+		split(u,unitSpace,0){ ~ Tree_distance_median *0.5 : NIL 
+			| { 0.1: s(0,0,0) center(xyz) Tree1 | ~ Tree_distance_median : NIL }*
+			| 0.1: s(0,0,0) center(xyz) Tree1 | ~ Tree_distance_median *0.5 : NIL }
+		Lawn(true)
+	else :
+		Lawn(false)
+
+# ----------------------------------------
+# Bridge Construction
+# ----------------------------------------
+
+# Bridge can be explicitly activated or deactivated,
+# or automatically set by height over terrain.
+
+
+
+isBridge = (Bridge_Display == "On, Regardless")
+	|| (Bridge_Display == "On, Show All Piers")
+	|| (Bridge_Display == "On, Flag Occlusions")
+	|| (Bridge_Display == "On, By Elevation" && isRaised) 
+
+
+# Road segment is raised if it is higher than Bridge_Starts_At attribute.
+# isRaised DOES NOT imply it is a bridge.
+isRaised = heightOverTerrain > Bridge_Starts_At
+
+heightOverTerrain = convert(y, scope, world, pos, 
+	 scope.sx * 0.5, scope.sy * 0.5, scope.sz * 0.5) - elevation
+# The above convert function finds the y world coordinate at the center
+# of the scope, then subtracts the elevation to get the 
+# height over the terrain. 
+# NOTE: To use this function, you must add a layer attribute
+# to your terrain layer, like this:  
+#   attr elevation = map_01(brightness, 405.20847, 419.22385) + elevationDelta
+
+
+
+BridgeMain -->
+	case isBridge:
+		# For debugging:
+		#print("heightOverTerrain = " + heightOverTerrain)
+		
+		# Give bridge thickness, sending the street shape to thickness rule. 
+		BridgeConcrete(Bridge_Thickness)
+		# Drop street shape down by thickness, to split for piers.
+		translate(rel, world, 0, -Bridge_Thickness, 0)
+		# Split to make starting points for piers.
+		split(u, unitSpace, 0) {
+			~(Pier_distance / 2) :  NIL 
+			| {Pier_width : Pier | ~Pier_distance :  NIL }* 
+			# XX: Not sure why the pattern was repeated in this manner:
+			| Pier_width : Pier |  ~Pier_distance :  NIL 
+		}
+	else : 
+		NIL
+
+Pier -->
+	case heightOverTerrain > 0:
+		split(v,unitSpace,0){ '0.15: NIL
+			| '0.70: PierStep2 
+			| '0.15: NIL }
+	else: NIL
+
+PierStep2 -->
+	alignScopeToGeometry(yUp,0,0)
+	# Make "feeler" for occlusion check in next rule.
+	# Extrude down to the terrain (must be mapped in layer attribute).
+	extrude(world.y,-heightOverTerrain)
+	# Align to yUp for feeler scaling.
+	alignScopeToAxes(y)
+	# Scale to go past regular pier shape.
+	s('1,'20,'1)
+	t(0,-0.5,0) 
+	# Check if pier will hit something.
+	PierCheck
+
+PierCheck -->
+	case (Bridge_Display == "On, Show All Piers"):
+		# Occlusion test is disabled, by "On, Show All piers".
+		PierShow
+	case (Bridge_Display == "On, Flag Occlusions"):
+		case overlaps(inter):
+			# This pier hits another model.
+			print("Occlusion true: Bridge pier overlaps another model!")
+			# Flag the pier in red. This is a debugging mode for the piers.
+			color(1,0,0)
+			PierShow
+		else:
+			# No occlusion so show the pier.
+			print("Occlusion false.")
+			PierShow
+	else:
+		# Use standard occlusion method. 
+		case overlaps(inter):
+			# Omit piers due to positive occlusion check.
+			# This means the pier would hit a street or other model.
+			NIL
+		else:
+			# No occlusion so show the pier.
+			PierShow
+
+
+PierShow -->
+	# Scale back occlusion feelers, reversing the feeler code.
+	s('1,'0.05,'1)
+	t(0,0.5,0) 
+	# 
+	split(y){2.2: PierBase | ~1: PierShafts | 1: BridgeSolid }
+
+
+# XX: Come back later and make smarter pier sizing code. 	
+PierShafts -->
+	case scope.sz > 7:
+		split(x){ 0.5: NIL 
+				| ~1 : split(z){ ~1: NIL | ~3: comp(f){side: BridgeSolid}  | ~4: NIL | ~3: comp(f){side: BridgeSolid} | ~1: NIL }
+				| 0.5: NIL }
+	else:
+		split(x){ 0.5: NIL 
+				| ~1 : split(z){ ~0.5: NIL | ~3: comp(f){side: BridgeSolid} | ~0.5: NIL }
+				| 0.5: NIL }
+		
+# XX: Come back later and make smarter pier sizing code. 	
+PierBase -->
+	s('1,scope.sy+5,'1) t(0,-5.3,0) i("builtin:cube")
+	comp(f){ side: BridgeSolid | top: roofHip(60) split(y){ 0.3: BridgeSolid } }
+
+
+
+
+BridgeSide -->
+	case isBridge:
+		BridgeRailing
+		BridgeConcrete(0.4) translate(rel,world,0,-0.4,0)
+		reverseNormals 
+		comp(f){all: BridgeSlope }
+	case isRaised:
+		BridgeConcrete(2)
+	else: NIL
+
+BridgeCrossing -->
+	case isBridge:
+		BridgeConcrete(Bridge_Thickness)
+	else: NIL
+
+BridgeSlope -->
+	case geometry.isRectangular(10) && Bridge_Thickness > 2:
+		roofShed(23,2)
+		comp(f){all = BridgeMaterial }
+	else:
+		NIL
+
+BridgeConcrete(height) -->
+	translate(rel,world,0,-height,0)
+	extrude(world.y,height)
+	comp(f){top: NIL | all= BridgeMaterial }
+
+BridgeRailing -->
+	case highLOD == true:
+		translate(rel,world,0, Sidewalk_height ,0)
+		split(v,unitSpace,0){ ~1: NIL | 0.4: 
+			extrude(world.y,0.8) 
+			color(case coloringOn: "#eeeeee" else: "") 
+			comp(f){all: BridgeMaterial} }
+		split(v,unitSpace,0){ ~1: NIL | 0.1: 
+			translate(rel,world,0,0.8,0) 
+			VerticalRails 
+			translate(rel,world,0,0.3,0) 
+			extrude(world.y,0.05) 
+			RailMaterial 
+			| 0.17: NIL }
+	else:
+		translate(rel,world,0, Sidewalk_height ,0)
+		split(v,unitSpace,0){ ~1: NIL | 0.4: extrude(world.y,0.8) color(case coloringOn: "#eeeeee" else: "") comp(f){all: BridgeMaterial } }
+		split(v,unitSpace,0){ ~1: NIL | 0.1: translate(rel,world,0,0.8,0) VerticalRails translate(rel,world,0,0.3,0) comp(f){ all: extrude(world.y,0.05) comp(f){front: RailMaterial} | 0.17: NIL } }
+
+VerticalRails -->
+	case highLOD == true:
+		comp(f){all: split(x){ ~1 : NIL 
+							 | 0.1: s('1,0.07,'1) center(y) extrude(world.y,0.3) RailMaterial
+							 | { ~2 : NIL 
+							 |   0.1: s('1,0.07,'1) center(y) extrude(world.y,0.3) RailMaterial }*
+							 | ~1 : NIL } }
+	else:
+		comp(f){all: split(x){ ~1 : NIL 
+							 | 0.1: s('1,0.07,'1) center(y) extrude(world.y,0.3) comp(f){front: RailMaterial}
+							 | { ~2 : NIL 
+							 |   0.1: s('1,0.07,'1) center(y) extrude(world.y,0.3) comp(f){front: RailMaterial} }*
+							 | ~1 : NIL } }		
+
+BridgeSolid -->
+      comp(f){ all: setupProjection(2,scope.xy,'1,'1) projectUV(2)
+		set(material.dirtmap,streetAssetsDirectory + "textures/dirtmap.1.512x512.jpg")
+        BridgeMaterial }
+
+BridgeMaterial -->
+	case texturingOn:
+		setupProjection(0,scope.xy,~12,~9,1) projectUV(0)
+		texture(sidewalk_tex)
+	else:
+		X.
+	
+RailMaterial -->
+	case texturingOn:
+		set(material.specular.r, 1) set(material.specular.g, 1) set(material.specular.b, 1)
+		set(material.shininess, 20)
+		setupProjection(0,scope.xy,~12,~9,1) projectUV(0)
+		texture(concrete_tex)
+		RailMaterialStep2
+	else:		
+		RailMaterialStep2
+
+RailMaterialStep2 -->
+	case coloringOn:
+		color("#cccccc")
+	else:
+		X.
+
+# ----------------------------------------
+# Sidewalk
+# ----------------------------------------
+
+Sidewalk -->
+	# First color the entire object based on the thematic scheme chosen in display options.
+	case thematicsOn:
+		color(thematicColor)
+		SidewalkStep2
+	else:
+		SidewalkStep2
+
+SidewalkStep2 -->
+	StreetAndSidewalkReportsSetup
+	alignScopeToAxes(y) 
+	BridgeSide
+	SidewalkWithCurbs 
+	t(0, Sidewalk_height ,0)
+	SidewalkLamps 
+	SidewalkProps 
+	People
+
+SidewalkWithCurbs --> 
+	extrude(world.y, Sidewalk_height )
+	comp(f){ top   : split(y){ Sidewalk_height : Curbs | ~1 : PlantingLayout }
+	       | side : Curbs }
+
+SidewalkLamps -->
+	case Lamps && lenAlongU > 5: 
+		split(u,unitSpace,0){ ~ Lamp_distance :  NIL 
+				| { 0.1: t(0,0,scope.sz- Sidewalk_height *2) Lamp(3) | ~ Lamp_distance : NIL }* }
+	else : NIL
+
+SidewalkProps -->
+	case p(Props_percentage/100) && lenAlongU > 5:
+		split(u,unitSpace,0){ Crosswalk_width *2.5+rand(-2,2): NIL
+				| 0.1: Box | ~1: NIL | 0.1: Box
+				| Crosswalk_width *2.5+rand(-2,2): NIL }
+		split(u,unitSpace,0){ ~ Lamp_distance *0.5 :  NIL  
+				| { 0.1 : SignAsset | ~ Lamp_distance : NIL }* 
+				| 0.1 : SignAsset | ~ Lamp_distance *0.5 :  NIL  }
+	else: NIL
+
+
+PlantingLayout -->
+	case lenAlongV > 2 && lenAlongU > 8  && heightOverTerrain < 2:
+		split(u,unitSpace,0)
+		{
+			Crosswalk_width * 2: Pavement | 
+			~1:split(v,unitSpace,0)
+			{
+				Planting_Width : split(u,unitSpace,0)
+				{ 
+					Planting_Length  : PlantingOrPavement | { Planting_Spacing:  Pavement | Planting_Length : PlantingOrPavement }* | ~1 : Pavement
+				} 
+				| ~1 : Pavement
+			}
+			| Crosswalk_width * 2: Pavement
+		}
+	else :  Pavement
+
+PlantingOrPavement -->
+	case Plantings : 
+		Planting
+	else :
+		Pavement
+
+Planting -->
+	case heightOverTerrain < 2 && p(Tree_percentage/100):
+		Lawn(true)
+      	alignScopeToGeometry(yUp,1)
+        t(Planting_Width / 2, 0, Planting_Length / 2)                        // in the middle of the sidewalk
+        s(0,rand( Tree_max_height *0.95, Tree_max_height ),0)       // set height
+        center(xz)
+        r(scopeCenter, 0,rand(0,360),0)            // randdom rotate
+		TreeInsert
+	else : 
+		Lawn(false)
+
+# ---------------------
+# Assets
+# ---------------------
+
+Lamp(index) -->
+	alignScopeToAxes(y)		// place the Lamps vertically
+	s(0,5,0)				// set height to 5 meters
+	LampAsset(index)		// since the scope's dimenstion are zero in x and z, these are set according to the asset
+
+LampAsset(nr) -->
+	case nr == 2 : r(0,90,0) i(lamp2_asset) TextureSwitch 
+	case nr == 3 : r(0,90,0) i(lamp3_asset) TextureSwitch
+	case nr == 4 : i(lamp4_asset) TextureSwitch
+	else         : i(lamp5_asset) TextureSwitch
+
+      
+Tree1 -->
+	case heightOverTerrain < 2 && p(Tree_percentage/100):
+		alignScopeToAxes()
+		t(0,0,'0.65)                        					// in the middle of the sidewalk
+		s(0,rand(Tree_max_height *0.95, Tree_max_height),0)       // set height
+		r(scopeCenter, 0,rand(0,360),0)            								// random rotate
+		TreeInsert
+	else : NIL
+
+TreeInsert -->
+#	tree.Tree(rand( Tree_max_height *0.95, Tree_max_height ), Tree_Type, rand(360), (case thematicsOn : thematicColor else : ""))  
+	s(0,0,0)
+	center(xz)
+	report("Construction, Tree Cost", envSettings.TreeCostAverage)
+	#Tree.Generate(Tree_Type_Adjusted)
+	set(Tree.Name, Tree_Type_Adjusted)
+	set(Tree.Transparency, 1 - Transparency)
+	Tree.Generate()
+
+Tree_Type_Adjusted = 
+	case Tree_Type == "Random": randomTreeType
+	else: Tree_Type
+
+randomTreeType = 
+	20%: "Tree of Heaven"
+	20%: "White Ash"
+	20%: "Common Hackberry"
+	20%: "Sweetgum"
+	else:"Sassafras"
+
+
+
+
+	
+Box -->
+	case p(Props_percentage/100) && heightOverTerrain < 2:
+		t(0,0,scope.sz- Sidewalk_height -rand(0.5,1))
+		s(0,rand(0.9,1.3),0) r(scopeCenter,0,180,0) 
+		BoxAsset
+	else : NIL
+
+BoxAsset -->
+	60%  : i(newsbox_asset) TextureSwitch
+	else : i(mailbox_asset) TextureSwitch
+
+SignAsset -->
+	case p(Props_percentage/100) : 
+		t(0,0,scope.sz-Sidewalk_height) 
+		s(0,0,0) r(scopeCenter,0,90,0) 
+		i(getSign) TextureSwitch
+	else : NIL
+
+
+# ----------------------------------------
+# Rules needed by all
+# ----------------------------------------
+	
+SolidCurbs -->
+	extrude(world.y, Sidewalk_height ) 
+	comp(f){ top: alignScopeToGeometry(zUp,1) Curbs | side: Curbs }	
+
+SolidCurbsNormal -->
+	extrude( Sidewalk_height ) 
+	comp(f){ top: alignScopeToGeometry(zUp,1) Curbs | side: Curbs }	
+
+
+
+
+
+Curbs --> 
+	ReportSidewalkMaterial
+	CurbsStep2
+
+CurbsStep2 -->
+	case scope.sx < 0.5:
+		setupProjection(0,scope.xy,1,'1) projectUV(0) 
+		translateUV(0,-scope.sx/2,0)
+		CurbsTexture
+	else:
+		setupProjection(0,scope.xy,~1.1,'1) projectUV(0)	
+		CurbsTexture
+
+CurbsTexture -->
+	case texturingOn:
+		texture(curb_tex)
+		CurbsStep4
+	else:
+		CurbsStep4
+
+#CurbsStep3 -->
+	#case geometry.isOriented(world.up):
+	#	CurbsStep4
+	#else:
+	#	X.
+
+CurbsStep4 -->
+	case peakRunoffDisplayOn:
+		color(envReports.colorByPerviousMaterial(sidewalkMaterial))
+	else:
+		X.
+
+	
+
+
+Lawn -->
+	Lawn(false)
+
+Lawn(hasTrees) -->
+	report("Street, Plantings Area (m2)", geometry.area)
+	LawnPart2(hasTrees)
+	
+LawnPart2(hasTrees) -->
+	case texturingOn:
+		case Planting_Type == "Random":
+			setupProjection(0,scope.xy,6,6) projectUV(0)
+			texture(fileRandom(textureRandomPlantings))
+			LawnPart3(hasTrees)
+		else :
+			setupProjection(0,scope.xy,6,6) projectUV(0)
+			texture(textureDirectory + "grass/" + Planting_Type + ".jpg")
+			LawnPart3(hasTrees)
+	else: LawnPart3(hasTrees)
+
+
+LawnPart3(hasTrees) -->
+	case peakRunoffDisplayOn:
+		case hasTrees:
+			color(envReports.colorByPerviousMaterial(envReports.materialUnderTrees)) X.		
+		else:
+			color(envReports.colorByPerviousMaterial(envReports.materialLawn)) X.		
+	else:
+		X.
+	
+	
+	
+	
+
+Pavement -->
+	Pavement(rand(10),rand(10))
+
+Pavement(texUOffset,texVOffset) -->
+	case texturingOn:
+		alignScopeToGeometry(zUp, 0,0)
+		setupProjection(0,scope.xy,12,9,texUOffset,texVOffset)
+		projectUV(0)
+		texture(textureSidewalks)
+		scaleUV(0, Sidewalk_Texture_Scale, Sidewalk_Texture_Scale)
+		rotateUV(0, Sidewalk_Texture_Rotation)
+		PavementStep2
+	else:
+		PavementStep2
+	
+PavementStep2 -->
+	ReportSidewalkMaterial
+	PavementStep3
+	
+PavementStep3 -->
+	case peakRunoffDisplayOn:
+		color(envReports.colorByPerviousMaterial(sidewalkMaterial)) X.
+	else:
+		X.
+	
+	#CWYO remove above?
+	
+	
+# -------------------------------------------
+# People
+# 
+# Sample assets provided by lowpolygon3d.com
+# 
+# More assets with high-res textures can be 
+# purchased at http://www.lowpolygon3d.com.
+# 
+# -------------------------------------------
+
+peopleAsset = fileRandom(peopleDirectory + "*.obj")
+dirHuman = 50%: 90 else: -90
+
+People -->
+	case lenAlongU > 1000:
+		split(u,unitSpace,0){ '0.5: People | '0.5: People }
+	case People_percentage > 0:
+		50% : split(u,unitSpace,0){ { 0.1: Human | ~rand(2,5): NIL | 0.1: Human | ~rand(2,5): NIL }* | 0.1: Human }          # could be distributed better...
+		else: split(u,unitSpace,0){ { 0.1: Human | ~rand(0.5,5.5): NIL | 0.1: Human | ~rand(0.5,5.5): NIL }* | 0.1: Human }  # could be distributed better...
+	else:
+		NIL
+	
+Human -->
+	case (scope.sz < 2 && p(People_percentage/100*0.3)) 
+			|| (scope.sz >= 2 && p(People_percentage/100)):
+		t(0,0,'rand(0.1,0.6))
+		s(0,rand(1.7,1.9),0) r(0,dirHuman,0) 
+		i(peopleAsset)
+		TextureSwitch
+	else:
+		NIL
+	
+	
+	
+
+# -------------------------------------------
+# Vehicles
+# 
+# Sample assets provided by lowpolygon3d.com
+# 
+# More assets with high-res textures can be 
+# purchased at http://www.lowpolygon3d.com.
+# 
+# -------------------------------------------
+
+vehicleAsset(type) = fileRandom(vehicleDirectory + type + "/*.obj")
+
+const vehiclesProb = ( Vehicles_per_km *minCarDistance)/1000
+const minCarDistance = 6
+
+Vehicles(laneCount, dir) -->
+	case vehiclesProb > 0:
+		split(v,unitSpace,0){ '(1/laneCount) : VehiclesOnLane(dir) }*		
+	else:
+		NIL
+
+VehiclesOnLane(dir) -->
+	case lenAlongU > 1000:
+		split(u,unitSpace,0){ '0.5: VehiclesOnLane(dir) | '0.5: VehiclesOnLane(dir) }
+	case lenAlongU > 10 && p(Bus_Percentage/100):
+		split(u,unitSpace,0){ ~1: VehiclesOnLane(dir) | (rand(15,25)): Vehicle(dir,"bus") }
+	case lenAlongU > 5:
+		split(u,unitSpace,0){ ~1: VehiclesOnLane(dir) | (rand(minCarDistance,15)): VehicleTaxiOrCar(dir) }
+	else:
+		NIL
+
+VehicleTaxiOrCar(dir) -->
+	case p(Taxi_Percentage): 
+		Vehicle(dir,"taxi") 
+	else:
+		Vehicle(dir,"car") 
+
+Vehicle(dir,type) --> 
+	case p(vehiclesProb):
+		split(u,unitSpace,0){ ~1: NIL | 0.5: alignScopeToGeometry(yUp,dir) VehicleAsset(type) | ~1: NIL }
+	else:
+		NIL	
+		
+VehicleAsset(type) -->
+	t(0,0,'rand(0.4,0.6)) 
+	s(0,0,0) 
+	r(0,90,0) 
+	i(vehicleAsset(type))
+	TextureSwitch	
+
+
+# -------------------------------------------
+# Cyclists
+# 
+# Sample assets provided by lowpolygon3d.com
+# 
+# More assets with high-res textures can be 
+# purchased at http://www.lowpolygon3d.com.
+# 
+# -------------------------------------------
+
+bikeAsset = fileRandom(cyclistDirectory + "*.obj")
+
+const bikeProb = ( Bicycle_per_km * minBikeDistance)/1000
+const minBikeDistance = 2
+
+Bikes(dir) -->
+	case bikeProb > 0:
+		BikesOnLane(dir)		
+	else:
+		NIL
+	
+BikesOnLane(dir) --> #Fix: Lots of logic here that doesn't apply to bikes, since it was adapted from car logic.
+	case lenAlongU > 1000:
+		split(u,unitSpace,0){ '0.5: BikesOnLane(dir) | '0.5: BikesOnLane(dir) }
+	case lenAlongU > 10:
+		split(u,unitSpace,0){ ~1: BikesOnLane(dir) | (rand(minBikeDistance,minBikeDistance*2)): Bike(dir) }
+	case lenAlongU > 5:
+		split(u,unitSpace,0){ ~1: BikesOnLane(dir) | (rand(minBikeDistance,3)): Bike(dir) }
+	else:
+		NIL
+
+	
+Bike(dir) --> 
+	case p(bikeProb):
+		split(u,unitSpace,0){ ~1: NIL | 0.5: alignScopeToGeometry(yUp,dir) BikeAsset | ~1: NIL }
+	else:
+		NIL	
+		
+BikeAsset -->
+	t(0,0,Bike_Lane_Width/2 + rand(-Bike_Lane_Width/4,Bike_Lane_Width/4)) 
+	s(0,0,0) i(bikeAsset) r(scopeCenter,0,90,0)
+	BikeAssetStep2
+
+BikeAssetStep2 -->
+	case texturingOn: 
+		X.
+	else: 
+		deleteUV(0)
+		# Our bicycle models have both textured and colored parts.
+		# So when texturing is off, we still need to change the color of the bikes.
+		color(thematicColor) 
+
+
+
+
+
+
+
+# -------------------------------------------
+# -------------------------------------------
+#
+# STYLES
+# 
+# -------------------------------------------
+# -------------------------------------------
+
+
+style Residential_Road
+attr Median_width = 1.5
+attr Plantings = true
+attr Traffic_lights = true
+attr Tree_percentage = 100.0
+attr Vehicles_per_km = 60.0
+attr People_percentage = 40.0

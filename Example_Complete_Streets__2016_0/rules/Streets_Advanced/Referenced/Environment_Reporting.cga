@@ -1,0 +1,194 @@
+/**
+ * File:    Environmental Reporting.cga
+ * Created: 23 Apr 2013 20:13:09 GMT
+ * Author:  Esri
+ */
+
+version "2015.0"
+
+
+import envSettings: "Environment_Settings.cga"
+
+
+# Constants for different material types used in pervious surface reporting/display.
+const materialUnderTrees = "Woodlands"
+const materialLawn = "Pasture, Grass, Farmland"
+const materialPerviousPavement = "Pervious Pavement"
+const materialPavementAndRooftops = "Rooftops, Pavement"
+
+
+
+
+# Peak discharge calculation (Q):
+#	Q = C * i * A / 100  (/100 is to get correct unit conversion to m3) 
+#
+#	Q = peak discharge (runoff) in cubic feet per second (m3/hr)  #
+#	C = runoff coefficient (no units)
+#	i = Average intensity of rainfall in inches per hour (cm/hr)
+#	A = the watershed area in meters^2 (m2)
+
+
+colorByPerviousMaterial(materialType) =
+	case materialType == materialUnderTrees: envSettings.perviousThematicWoodlands
+	case materialType == materialLawn: envSettings.perviousThematicPastureGrassFarmland
+	case materialType == materialPavementAndRooftops: envSettings.perviousThematicRooftopsAndPavement
+	case materialType == materialPerviousPavement: envSettings.perviousThematicPerviousPavement
+	else: envSettings.perviousThematicUnknown
+
+
+@Hidden
+attr slope = 0
+
+# Import this rule to the rule requiring reporting,
+# and then send a copy of the geometry to this rule.
+# If multiple geometries come here from the same initial shape, then 
+# it will still work - those geometries all report cumulatively to the same start shape.
+
+ReportPeakDischarge(materialType) -->
+	# Align object scope to yUp world coordinate system.
+	alignScopeToAxes(y)
+	# Save the slope of the geometry before projecting into xz plane for rainfall area calculation.
+	# Note: Not sure if maxSlope is best way to get slope. We need average slope, but probably is not applicable, since most shapes in CE are planar or close to it.
+	set(slope, geometry.angle(maxSlope))
+	# Project the geometry into xz plane, by scaling to zero in the y direction.
+	s('1,0,'1)
+	ReportPeakDischargePart2(materialType)
+
+ReportPeakDischargePart2(materialType) -->
+	case errors(materialType) :
+		# Remove textures, color it red, move up into the air so it shows up visibly, print warning to CGA panel, in case they have that open.
+		deleteUV(0)		 
+		color(1,0,0)	
+		t(0,1,0)		
+		print("WARNING: Error in peak discharge reporting (Environmental Reporting.cga)")
+	else :
+		# Report operations will attach these reports to the shape that called this rule.
+		report("Site Conditions, Stormwater Runoff (m3/hr)", peakDischarge(geometry.area, slope, materialType,  envSettings.Soil_Group))
+		# Lose the geometry in question, since it is not part of the final model.
+		NIL
+
+# Support functions ----------------------
+
+
+peakDischarge(area, slopeInDegrees, materialType, soilGroup) = 
+	runoffCoefficient(slopeInDegrees / 90, materialType, soilGroup) * envSettings.Design_Storm_Rainfall * area	
+
+
+# Note: This error mechanism could be built out further to check the other inputs, 
+# but we are putting this one in now, since it will be the only input specified by the user.
+errors(materialType) = !materialTypeMatch(materialType)
+
+# Note: May want to create function to map more user-friendly naming into these four categories.
+materialTypeMatch(materialType) = 
+	materialType == materialUnderTrees || 
+	materialType == materialLawn || 
+	materialType == materialPavementAndRooftops || 
+	materialType == materialPerviousPavement
+
+# Note: This will give off a very large negative number if soil group is not specified correctly, 
+# to flag the error by skewing the results out of the ballpark.
+runoffCoefficient(slope, materialType, soilGroup) = 
+	case slope < 0.02 :
+		case materialType == materialUnderTrees : 
+			case soilGroup == "A" : 0.1
+			case soilGroup == "B" : 0.15
+			case soilGroup == "C" : 0.15
+			case soilGroup == "D" : 0.2
+			else : -100000000
+		case materialType == materialLawn : 
+			case soilGroup == "A" : 0.15
+			case soilGroup == "B" : 0.2
+			case soilGroup == "C" : 0.2
+			case soilGroup == "D" : 0.25
+			else : -100000000
+		case materialType == materialPavementAndRooftops : 0.95
+		case materialType == materialPerviousPavement :
+			case soilGroup == "A" : 0.75
+			case soilGroup == "B" : 0.95
+			case soilGroup == "C" : 0.9
+			case soilGroup == "D" : 0.95
+			else : -100000000
+		else : -100000000
+	case slope >= 0.02 && slope < 0.07 :
+		case materialType == materialUnderTrees : 
+			case soilGroup == "A" : 0.15
+			case soilGroup == "B" : 0.2
+			case soilGroup == "C" : 0.2
+			case soilGroup == "D" : 0.25
+			else : -100000000
+		case materialType == materialLawn : 
+			case soilGroup == "A" : 0.2
+			case soilGroup == "B" : 0.25
+			case soilGroup == "C" : 0.25
+			case soilGroup == "D" : 0.3
+			else : -100000000
+		case materialType == materialPavementAndRooftops : 0.95
+		case materialType == materialPerviousPavement :
+			case soilGroup == "A" : 0.8
+			case soilGroup == "B" : 0.95
+			case soilGroup == "C" : 0.9
+			case soilGroup == "D" : 0.95
+			else : -100000000
+		else : -100000000
+	else :
+		case materialType == materialUnderTrees : 
+			case soilGroup == "A" : 0.2
+			case soilGroup == "B" : 0.25
+			case soilGroup == "C" : 0.25
+			case soilGroup == "D" : 0.3
+			else : -100000000
+		case materialType == materialLawn : 
+			case soilGroup == "A" : 0.25
+			case soilGroup == "B" : 0.35
+			case soilGroup == "C" : 0.3
+			case soilGroup == "D" : 0.4
+			else : -100000000
+		case materialType == materialPavementAndRooftops : 0.95
+		case materialType == materialPerviousPavement :
+			case soilGroup == "A" : 0.85
+			case soilGroup == "B" : 0.95
+			case soilGroup == "C" : 0.9
+			case soilGroup == "D" : 0.95
+			else : -100000000
+		else : -100000000
+	
+		
+##############################################################
+# Cut and Fill
+
+
+
+calculateCutAndFillCost(cutVolume, fillVolume) =
+	(cutVolume * envSettings.Grading_Cut_Cost__m3) + (fillVolume * envSettings.Grading_Fill_Cost__m3) + calculateCutAndFillMaterialCost(cutVolume, fillVolume)  
+	
+calculateCutAndFillMaterialCost(cutVolume, fillVolume) =
+	case cutVolume == 0 && fillVolume == 0: 0 
+	case cutVolume == 0 && fillVolume > 0:
+		# If filling, but not cutting.
+		fillVolume * (envSettings.Fill_Material_Input_Cost__m3) 
+	case cutVolume > 0 && fillVolume == 0:
+		# If cutting, but not filling.
+		cutVolume * envSettings.Cut_Material_Disposal_Cost__m3
+	case cutVolume > fillVolume:
+		# If cutting more than filling.
+		(fillVolume * envSettings.Cut_Material_Repurpose_Cost__m3) + ((cutVolume - fillVolume) * envSettings.Cut_Material_Disposal_Cost__m3)
+	case cutVolume < fillVolume:
+		# If cutting less than filling.
+		(cutVolume * envSettings.Cut_Material_Repurpose_Cost__m3) + ((fillVolume - cutVolume) * envSettings.Fill_Material_Input_Cost__m3) 
+	else: 0
+	
+
+
+
+
+
+
+
+#-------------------------------
+# Non-functional code:
+
+DisableCGAWarnings -->
+	# This is rule exists only to stop the "unused rules" CGA warnings from showing; otherwise it has no use.
+	# The below lines are just calling all of the unused rules so they do not flag as unused.
+	ReportPeakDischarge("")
+

@@ -1,0 +1,173 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+attr powerlineLineHeight = 16
+attr poleDist = rand(30,50)
+attr poleDiam = 0.4
+
+topDist = 1
+nHolderLevels = 2
+holderHeight = 0.2
+cableHeight = poleDist / 60
+
+
+poleRotation = 85% : rand(0,2) else : rand(3,10)
+
+poleAsset = "assets/powerlines/powerlinePole.obj"
+poleTex = "assets/powerlines/powerlinePoleWood.jpg"
+cableTex = "assets/powerlines/cableTransp.png"
+
+
+branchDiam = 0.08
+branchLengthScaler = 1.5
+branchAsset = "assets/powerlines/powerlinePoleBranch.obj"
+
+isolatorAsset = "assets/powerlines/powerlinePoleIsolator.obj"
+isolatorTex = "assets/powerlines/isolatorMaterial.jpg"
+
+
+attr connectionStart = ""
+
+Sidewalk -->
+	NIL
+
+@StartRule
+Street -->
+	alignScopeToAxes(y)
+	PowerlineAligned
+
+PowerlineAligned -->
+
+	case connectionStart == "" :
+		t(0,powerlineLineHeight,0)
+		CornerCables
+	else :
+		t(0,powerlineLineHeight,0)
+		split(u,unitSpace,0) {{ .5 : PutPole PutHolderBranches | ~poleDist : PutCables }* | .5 : PutPole PutHolderBranches}
+		
+
+
+PutPole -->
+	alignScopeToAxes(y)
+	t(0,-topDist,0)
+	r(scopeCenter, poleRotation,rand(360),poleRotation)
+	alignScopeToGeometry(yUp, 0)
+	t(0,topDist,0)
+	s(poleDiam,powerlineLineHeight * 1.2,poleDiam)
+	center(xz)
+	t(0,'-1,0)
+	i(poleAsset)
+	texture(poleTex)
+	offsetUV(0,rand(1), rand(1))
+	Pole.
+
+
+PutCables -->
+	t(0,-topDist - nHolderLevels * (cableHeight+holderHeight) ,0)
+	extrude(nHolderLevels * (cableHeight+holderHeight))
+	alignScopeToGeometry(zUp, world.lowest, longest)
+	CableLengthCheck
+
+CableLengthCheck -->
+	case connectionStart == "" :
+		NIL
+	else :
+		CablePlane
+
+CablePlane -->
+	alignScopeToGeometry(zUp, world.lowest, longest)
+	comp(f) {top : SplitCableModules | bottom: SplitCableModules | all : NIL}
+	
+SplitCableModules -->
+	alignScopeToGeometry(zUp, any, world.lowest)
+	split(y) {~(cableHeight+holderHeight) : CablePlusHolderArea}*
+
+CablePlusHolderArea -->
+	split(y) {cableHeight : Cable | ~1 : NIL}
+	
+Cable -->
+	s('1.02, '1,'1)
+	t(0,0,rand(-.02,.02))
+	center(x)
+	alignScopeToGeometry(zUp, any, world.lowest)
+	setupProjection(0,scope.xy, '1,'1)
+	projectUV(0)
+	texture(cableTex)
+	Cable.
+
+
+
+CornerCables -->
+	t(0,-topDist - nHolderLevels * (cableHeight+holderHeight) ,0)
+	#align to middle face
+	alignScopeToGeometry(yUp, rint((geometry.nVertices /2 )), 0)
+	primitiveQuad()
+	extrude(nHolderLevels * (cableHeight+holderHeight))
+	alignScopeToGeometry(zUp, world.lowest, world.lowest)
+	comp(f) {top : SplitCableModules | bottom : SplitCableModules | all : NIL}
+
+
+
+
+
+
+PutHolderBranches -->
+	t(0,-topDist - nHolderLevels * (cableHeight+holderHeight) ,0)
+	extrude(nHolderLevels * (cableHeight+holderHeight))
+	split(y) {cableHeight+holderHeight : CableBranchesVolume  }*
+
+
+CableBranchesVolume -->
+	split(y) {cableHeight : NIL | ~1 : t(0,'-1.5,0) alignScopeToGeometry(zUp, any, longest) PutTwoBranches}
+	
+PutTwoBranches -->
+	split(x) {~1 : rotateScope(0,180,0) Branch Isolator| ~1 : Branch Isolator}
+
+Branch -->
+	t(poleDiam/6,0,0)
+	s('branchLengthScaler,branchDiam,branchDiam) center(yz)
+	i(branchAsset) 
+	texture(poleTex)
+
+Isolator -->
+	comp(f) {right : alignScopeToAxes(y) PutIsolator}
+
+PutIsolator -->
+	set(trim.vertical, false)
+	s(0,.11,0)
+	center(xyz)
+	i(isolatorAsset)
+	t(0,'0.8,0)
+	texture(isolatorTex)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

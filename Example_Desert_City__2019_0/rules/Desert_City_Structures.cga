@@ -1,0 +1,63 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+
+import minaret : "Desert_City_RoofTopFloors.cga"
+
+
+@Group ("Model Options") @Order(2) @Range("None","Generate","Generate Above")
+attr Collision_Mesh = "None"
+
+
+attr Type = "Cellphone Tower"
+
+attr Size = 0
+
+@StartRule
+Structure -->
+	alignScopeToAxes(y)
+	StructureAligned
+
+StructureAligned -->
+	case Type == "Religious Tower" :
+		minaret.MinaretTower
+	case Type == "Cellphone Tower" :
+		s(0,Size,0)
+		center(xz)
+		i("assets/cellPhoneTower/cellPhoneTower.obj")
+		Tower.
+		primitiveCube()
+		CollisionMesh
+		
+	else :
+		NIL
+
+		
+
+#################################################################
+# Collision Mesh
+#
+
+CollisionMesh -->
+	case Collision_Mesh == "None" :
+		NIL
+	else :
+		alignScopeToAxes(y)
+		t(0,(case Collision_Mesh == "Generate Above": scope.sy +5 else: 0),0)
+		color(1,0,0)
+		texture("")
+		set(material.name, "collisionMesh")
+		set(material.bumpmap, "")
+		set(material.bumpValue, 0)
+		set(material.opacitymap, "")
+		set(material.specular.r, 0)
+		set(material.specular.g, 0)
+		set(material.specular.b, 0)
+		set(material.specularmap, "")
+		set(material.shininess, 0)
+
+
+minaret.CollisionMesh --> CollisionMesh

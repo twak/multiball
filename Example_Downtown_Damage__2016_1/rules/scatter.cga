@@ -1,0 +1,103 @@
+/**
+ * Author:  matt, Esri R&D Center Zurich
+ */
+
+version "2013.1"
+
+
+attr assetDensity = 0.2
+
+Scatter -->
+	scatter(surface,geometry.area * assetDensity, uniform) { ChooseAsset }
+	NIL
+
+ChooseAsset -->
+	1%:
+		PutScatteredAsset("sandBag")
+	1%:
+		PutScatteredAsset("crater")
+	7%:
+		PutScatteredAsset("barrier")
+	1%:
+		PutScatteredAsset("rubblePatch")
+	20% :
+		PutScatteredAsset("rubble")		
+	else:
+		NIL
+
+	
+PutScatteredAsset(name) -->
+	case name == "crater":
+		s(0,rand(.5,1.6),0) t(0,-.05,0) r(0,rand(360),0)
+		i("assets/scatter/crater_1.obj")
+		texture(fileRandom("assets/scatter/crater_*.jpg"))
+		ScatteredAssetOcclusionCheck
+	case name == "rubble":
+		s(0,rand(.1,.3),0) r(0,rand(360),0)
+		i(fileRandom("assets/scatter/rubblePiece_*.obj"))
+		texture(fileRandom("assets/scatter/rubblePiece*.jpg"))
+		ScatteredAssetOcclusionCheck
+	case name == "rubblePatch":
+		s(0,rand(.4,1.1),0) r(0,rand(360),0)
+		i(fileRandom("assets/scatter/rubblePatch_*.obj"))
+		texture(fileRandom("assets/scatter/rubblePatch*.jpg"))
+		ScatteredAssetOcclusionCheck
+	case name == "sandBag":
+		SandBagWall
+	else:
+		s(0,rand(.8,1.5),0) r(0,rand(360),0)
+		i("assets/scatter/barrier_1.obj")
+		ScatteredAssetOcclusionCheck		
+	
+ScatteredAssetOcclusionCheck -->
+	case overlaps () :
+		20%:
+			ScatteredAsset.
+		else:
+			NIL
+	else:
+		ScatteredAsset.
+
+bagX = rand(.7,.9)
+bagY = rand(.4,.55)
+	
+SandBagWall -->
+	s(rand(2,4), rand(.8,1.6), rand(.4,.6))#
+	r(0,rand(360),0)
+	primitiveCube()
+	split(y){~bagY : BagRow}*
+
+BagRow -->
+	case split.index%2 == 1:
+		split(x){~bagX *.75: Bag | {~bagX : Bag}* | ~bagX *.75 : Bag}
+	else:
+		split(x){~bagX : Bag | ~bagX : Bag}*
+
+Bag -->
+	setPivot(xyz,floor(rand(8))) 
+	i("assets/scatter/sandBag_1.obj")
+	s('1.1,'1.1,'1.1)
+	r(scopeCenter, rand(-3,3), rand(-3,3), rand(-3,3) )
+	center(xyz)
+	BagMissing
+	
+	
+BagMissing -->
+	10%:
+		NIL
+	else:
+		Bag.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
